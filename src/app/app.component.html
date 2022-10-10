@@ -1,0 +1,1424 @@
+<div class="container-scroller" *ngIf="isload">
+  <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+    <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+      <a class="navbar-brand brand-logo" routerLink="/dashboard"><img src="assets/images/logo.png" alt="logo"
+          class="img-fluid" /></a>
+      <a class="navbar-brand brand-logo-mini" routerLink="/dashboard"><img src="assets/images/logo-mini.png" alt="logo"
+          class="img-fluid" /></a>
+    </div>
+    <div class="navbar-menu-wrapper d-flex align-items-stretch">
+      <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+        <span class="mdi mdi-menu"></span>
+      </button>
+      <ul class="navbar-nav navbar-nav-right">
+        <span class="overflow-x-md d-block">
+          <li *ngFor="let farm of userFarms"
+            class="text-truncate nav-item poultries-list d-sm-none d-md-none d-lg-none d-xl-inline-block d-none">
+            <a href="" (click)="OnFarmSelect(farm)" [ngClass]="{'pltr-name': farm.FarmId==SelectedFarm.FarmId}"
+              class="text-truncate dropdown-item nav-link">
+              <i class="mdi mdi-paw mr-1"
+                [ngClass]="{'Colorli': farm.FarmId!==SelectedFarm.FarmId}"></i>{{farm.FarmName}}</a>
+          </li>
+        </span>
+        <li class="nav-item nav-profile dropdown d-sm-block d-lg-block d-xl-none d-block">
+          <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-toggle="dropdown"
+            aria-expanded="false">
+            <div class="nav-profile-img pltry-name">
+              <img src="assets/images/icons/left-and-right-arrows.png" alt="Select poultry">
+            </div>
+            <div class="nav-profile-text ml-2" *ngFor="let farm of userFarms">
+              <p class="mb-1 text-black text-capitalize"
+                [ngClass]="{'d-none': farm.FarmId!==SelectedFarm.FarmId, 'pltr-name': farm.FarmId==SelectedFarm.FarmId}">
+                {{farm.FarmName}}</p>
+            </div>
+          </a>
+          <div class="dropdown-menu navbar-dropdown" aria-labelledby="profileDropdown">
+            <ul class="m-0 p-0">
+              <li *ngFor="let farm of userFarms" class="d-block">
+                <a href="" (click)="OnFarmSelect(farm)" [ngClass]="{'pltr-name': farm.FarmId==SelectedFarm.FarmId}"
+                  class="text-truncate dropdown-item">
+                  <i class="fa fa-paw mr-1"
+                    [ngClass]="{'Colorli': farm.FarmId!==SelectedFarm.FarmId}"></i>{{farm.FarmName}}</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item nav-profile dropdown">
+          <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-toggle="dropdown" aria-expanded="true"
+            aria-haspopup="true">
+            <div class="nav-profile-img">
+              <!-- <img src="assets/images/faces/face1.jpg" alt="image"> -->
+              <i class="mdi mdi-account-circle f-32"></i>
+              <span class="availability-status online"></span>
+            </div>
+            <div class="nav-profile-text">
+              <p class="mb-1 text-black text-capitalize">{{userData.UserName}}</p>
+            </div>
+          </a>
+          <div class="dropdown-menu navbar-dropdown" aria-labelledby="profileDropdown" aria-haspopup="true">
+            <a class="dropdown-item" routerLink="/changePassword">
+              <i class="mdi mdi-key-change mr-2 text-success"></i>Change Password </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" (click)="logout()">
+              <i class="mdi mdi-logout mr-2 text-primary"></i> Signout </a>
+          </div>
+        </li>
+        <li class="nav-item d-none full-screen-link">
+          <!-- d-lg-block -->
+          <a class="nav-link">
+            <i class="mdi mdi-fullscreen" id="fullscreen-button"></i>
+          </a>
+        </li>
+      </ul>
+      <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
+        data-toggle="offcanvas">
+        <span class="mdi mdi-menu"></span>
+      </button>
+    </div>
+  </nav>
+  <!-- partial -->
+  <div class="container-fluid page-body-wrapper">
+    <!-- partial:partials/_sidebar.html -->
+    <nav class="sidebar sidebar-offcanvas fixed-top h-100 overflow-y" id="sidebar">
+      <ul class="nav">
+        <li class="nav-item nav-profile">
+          <a class="nav-link">
+            <div class="nav-profile-image">
+              <!-- <img src="assets/images/faces/face1.jpg" alt="profile"> -->
+              <i class="mdi mdi-account-circle f-42"></i>
+              <span class="login-status online"></span>
+              <!--change to offline or busy as needed-->
+            </div>
+            <div class="nav-profile-text d-flex flex-column">
+              <span class="font-weight-bold mb-2 text-capitalize">{{userData.UserName}}</span>
+              <span class="text-secondary text-small">Super Admin</span>
+            </div>
+            <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
+          </a>
+        </li>
+        <li class="nav-item" routerLinkActive="active">
+          <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">
+            <span class="menu-title">Driver Seat</span>
+            <i class="mdi mdi-home menu-icon"></i>
+          </a>
+        </li>
+        <li class="nav-item" routerLinkActive="active"
+          *ngIf="userActivityRights.CanViewVisitLogs||userActivityRights.CanManageVisitLogs">
+          <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+            <span class="menu-title">Daily Activity Logs</span>
+            <i class="menu-arrow"></i>
+            <i class="mdi mdi-calendar-text menu-icon"></i>
+          </a>
+          <div class="collapse" id="ui-basic">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item" *ngIf="userActivityRights.CanManageVisitLogs">
+                <a class="nav-link" routerLink="/log/adddailylog" routerLinkActive="active">Add Daily Transactions</a>
+              </li>
+              <li class="nav-item" *ngIf="userActivityRights.CanViewVisitLogs">
+                <a class="nav-link" routerLink="/log/viewlog" routerLinkActive="active">View Production Transactions</a>
+              </li>
+              <!-- <li class="nav-item"
+                *ngIf="userActivityRights.CanViewEggProductionLogs||userActivityRights.CanManageEggProductionLogs">
+                <a routerLink="/log/eggprotection" routerLinkActive="active" class="nav-link">Egg Stock Register</a>
+              </li>
+              <li class="nav-item"
+                *ngIf="userActivityRights.CanViewEggSaleRegister||userActivityRights.CanManageEggSaleRegister">
+                <a class="nav-link" routerLink="/log/eggsalereg" routerLinkActive="active">Egg Sale Register</a></li> -->
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item" routerLinkActive="active"
+          *ngIf="userActivityRights.CanViewEggProductionLogs||userActivityRights.CanManageEggProductionLogs||userActivityRights.CanViewEggSaleRegister||userActivityRights.CanManageEggSaleRegister">
+          <a class="nav-link" data-toggle="collapse" href="#ui-basic1" aria-expanded="false" aria-controls="ui-basic1">
+            <span class="menu-title">Egg Collection</span>
+            <i class="menu-arrow"></i>
+            <i class="mdi mdi-calendar-text menu-icon"></i>
+          </a>
+          <div class="collapse" id="ui-basic1">
+            <ul class="nav flex-column sub-menu">
+              <!-- <li class="nav-item" *ngIf="userActivityRights.CanManageVisitLogs">
+                <a class="nav-link" routerLink="/log/adddailylog" routerLinkActive="active">Add Daily Transactions</a></li>
+              <li class="nav-item" *ngIf="userActivityRights.CanViewVisitLogs">
+                <a class="nav-link" routerLink="/log/viewlog" routerLinkActive="active">View Production Transactions</a></li> -->
+              <li class="nav-item"
+                *ngIf="userActivityRights.CanViewEggSaleRegister||userActivityRights.CanManageEggSaleRegister">
+                <a class="nav-link" routerLink="/log/eggsalereg" routerLinkActive="active">Egg Sale Payment</a></li>
+              <li class="nav-item"
+                *ngIf="userActivityRights.CanViewEggProductionLogs||userActivityRights.CanManageEggProductionLogs">
+                <a routerLink="/log/eggprotection" routerLinkActive="active" class="nav-link">Egg Stock Register</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item" routerLinkActive="active" *ngIf="userActivityRights.CanViewBatchDetails||userActivityRights.CanManageBatchDetails ||userActivityRights.CanViewShedDetails ||userActivityRights.CanManageShedDetails||userActivityRights.CanViewFeedPurchase||userActivityRights.CanManageFeedPurchase
+          ||userActivityRights.CanViewVaccinationDetails||userActivityRights.CanManageVaccinationDetails||userActivityRights.CanViewInorOutRegistration||userActivityRights.CanManageInorOutRegistration||userActivityRights.CanViewIncomeExpenses||userActivityRights.CanManageIncomeExpenses||
+          userActivityRights.CanViewFeedGrinding||userActivityRights.CanManageFeedGrinding ">
+          <a class="nav-link" data-toggle="collapse" href="#farm-activities" aria-expanded="false"
+            aria-controls="farm-activities">
+            <span class="menu-title">Batch Management</span>
+            <i class="menu-arrow"></i>
+            <i class="mdi mdi-book-open menu-icon"></i>
+          </a>
+          <div class="collapse" id="farm-activities">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item"
+                *ngIf="userActivityRights.CanViewBatchDetails||userActivityRights.CanManageBatchDetails"><a
+                  class="nav-link" routerLink="/farm/batchdetails" routerLinkActive="active">Batch Details</a></li>
+              <li class="nav-item"><a class="nav-link" routerLink="/farm/batchperformance" routerLinkActive="active" >Analyze Batch
+                  Performance</a></li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item" routerLinkActive="active" *ngIf="userActivityRights.CanViewFeedPurchase||userActivityRights.CanManageFeedPurchase
+        ||userActivityRights.CanViewVaccinationDetails||userActivityRights.CanManageVaccinationDetails||userActivityRights.CanViewInorOutRegistration||userActivityRights.CanManageInorOutRegistration||userActivityRights.CanViewIncomeExpenses||userActivityRights.CanManageIncomeExpenses||
+        userActivityRights.CanViewFeedGrinding||userActivityRights.CanManageFeedGrinding">
+          <a class="nav-link" data-toggle="collapse" href="#feed-management" aria-expanded="false"
+            aria-controls="feed-management">
+            <span class="menu-title">Feed Management</span>
+            <i class="menu-arrow"></i>
+            <i class="mdi mdi-book-open menu-icon"></i>
+          </a>
+          <div class="collapse" id="feed-management">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item"
+                *ngIf="userActivityRights.CanViewFeedPurchase||userActivityRights.CanManageFeedPurchase"><a
+                  class="nav-link" routerLink="/farm/feedpurchase" routerLinkActive="active">Feed Purchase</a></li>
+              <li class="nav-item"
+                *ngIf="userActivityRights.CanViewFeedGrinding||userActivityRights.CanManageFeedGrinding">
+                <a class="nav-link" routerLink="/farm/feedgrinding" routerLinkActive="active">Feed Grinding</a></li>
+              <!-- <li class="nav-item"
+            *ngIf="userActivityRights.CanViewIncomeExpenses||userActivityRights.CanManageIncomeExpenses">
+              <a class="nav-link" routerLink="/farm/incomeexpenses" routerLinkActive="active">Income Expenses</a>
+            </li> -->
+              <!-- <li class="nav-item"
+              *ngIf="userActivityRights.CanViewVaccinationDetails||userActivityRights.CanManageVaccinationDetails">
+              <a class="nav-link" routerLink="/farm/vaccinationdetails" routerLinkActive="active">Chick
+                Vaccinations</a></li>
+            <li class="nav-item"
+              *ngIf="userActivityRights.CanViewInorOutRegistration||userActivityRights.CanManageInorOutRegistration">
+              <a class="nav-link" routerLink="/farm/inoutregister" routerLinkActive="active">In/Out Register</a></li> -->
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item" routerLinkActive="active"
+          *ngIf="userActivityRights.CanViewIncomeExpenses||userActivityRights.CanManageIncomeExpenses">
+          <a class="nav-link" data-toggle="collapse" href="#income-expenses" aria-expanded="false"
+            aria-controls="income-expenses">
+            <span class="menu-title">Income/Expenses</span>
+            <i class="menu-arrow"></i>
+            <i class="mdi mdi-book-open menu-icon"></i>
+          </a>
+          <div class="collapse" id="income-expenses">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item"
+                *ngIf="userActivityRights.CanViewIncomeExpenses||userActivityRights.CanManageIncomeExpenses">
+                <a class="nav-link" routerLink="/farm/incomeexpenses" routerLinkActive="active">Add Income/Expenses</a>
+              </li>
+              <!-- <li class="nav-item" *ngIf="userActivityRights.CanViewMonthlyBalanceReports">
+                <a class="nav-link" routerLink="/reports/monthlybalance" routerLinkActive="active">Monthly Balance Report</a>
+              </li> -->
+              <!-- <li class="nav-item"  
+              *ngIf="userActivityRights.CanViewFeedPurchase||userActivityRights.CanManageFeedPurchase"><a
+                class="nav-link" routerLink="/farm/feedpurchase" routerLinkActive="active">Feed Purchase</a></li>
+            <li class="nav-item"
+            *ngIf="userActivityRights.CanViewFeedGrinding||userActivityRights.CanManageFeedGrinding"><a class="nav-link" routerLink="/farm/feedgrinding" routerLinkActive="active">Feed
+                Grinding</a></li>
+            <li class="nav-item"
+            *ngIf="userActivityRights.CanViewIncomeExpenses||userActivityRights.CanManageIncomeExpenses">
+              <a class="nav-link" routerLink="/farm/incomeexpenses" routerLinkActive="active">Income Expenses</a>
+            </li>
+            <li class="nav-item"
+              *ngIf="userActivityRights.CanViewVaccinationDetails||userActivityRights.CanManageVaccinationDetails">
+              <a class="nav-link" routerLink="/farm/vaccinationdetails" routerLinkActive="active">Chick
+                Vaccinations</a></li>
+            <li class="nav-item"
+              *ngIf="userActivityRights.CanViewInorOutRegistration||userActivityRights.CanManageInorOutRegistration">
+              <a class="nav-link" routerLink="/farm/inoutregister" routerLinkActive="active">In/Out Register</a></li> -->
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item" routerLinkActive="active"
+          *ngIf="userActivityRights.CanViewDialyProductionReports||userActivityRights.CanViewFeedPurchaseReports ||userActivityRights.CanViewFeedPurchaseReports
+        ||userActivityRights.CanViewFeedPurchaseReports ||userActivityRights.CanViewEggStockReports ||userActivityRights.CanViewCullBirdsReports ||userActivityRights.CanViewMonthlyBalanceReports">
+          <a class="nav-link" data-toggle="collapse" href="#reports" aria-expanded="false" aria-controls="reports">
+            <span class="menu-title">Reports</span>
+            <i class="menu-arrow"></i>
+            <i class="mdi mdi-chart-areaspline menu-icon"></i>
+          </a>
+          <div class="collapse" id="reports">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item" *ngIf="userActivityRights.CanViewDialyProductionReport">
+                <a class="nav-link" routerLink="/reports/cullbirds" routerLinkActive="active">Daily Production
+                  Report</a></li>
+              <!-- <li class="nav-item" *ngIf="userActivityRights.CanViewFeedPurchaseReports">
+                <a class="nav-link" routerLink="/reports/feedpurchase" routerLinkActive="active">Feed
+                  Purchase Report</a></li>
+              <li class="nav-item" *ngIf="userActivityRights.CanViewEggSaleReports"><a class="nav-link"
+                  routerLink="/reports/eggsale" routerLinkActive="active">Egg Sale
+                  Register</a></li>
+              <li class="nav-item" *ngIf="userActivityRights.CanViewEggStockReports"><a class="nav-link"
+                  routerLink="/reports/eggstock" routerLinkActive="active">Egg
+                  Stock Register</a></li> -->
+              <li class="nav-item" *ngIf="userActivityRights.CanViewCullBirdsReports"><a class="nav-link"
+                  routerLink="/reports/cullbirds" routerLinkActive="active">Cull
+                  Birds Report</a></li>
+              <!-- <li class="nav-item" *ngIf="userActivityRights.CanViewMonthlyBalanceReports">
+                <a class="nav-link" routerLink="/reports/monthlybalance">Monthly Balance Report</a>
+              </li> -->
+              <li class="nav-item" >
+                <a class="nav-link" routerLink="/reports/incomeexpensesreport" routerLinkActive="active">Income/Expenses Report</a>
+              </li>
+              <li class="nav-item" >
+                <a class="nav-link" routerLink="/reports/feedduereport" routerLinkActive="active">Feed Due Report</a>
+              </li>
+              <li class="nav-item" *ngIf="userActivityRights.CanViewMonthlyBalanceReports">
+                <a class="nav-link" routerLink="/reports/monthlybalance" routerLinkActive="active">Monthly Balance Report</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item" routerLinkActive="active"
+          *ngIf="userActivityRights.CanViewMasters||userActivityRights.CanManageMasters || userActivityRights.CanViewHatchery||userActivityRights.CanManageHatchery
+          || userActivityRights.CanViewFeed||userActivityRights.CanManageFeed || userActivityRights.CanViewFeedBrokers||userActivityRights.CanManageFeedBrokers||userActivityRights.CanViewVaccination||userActivityRights.CanManageVaccination
+          ||userActivityRights.CanManageEggTraders||userActivityRights.CanManageEggTraders || userActivityRights.CanViewTemparature||userActivityRights.CanManageTemparature||userActivityRights.CanViewShedDetails ||userActivityRights.CanManageShedDetails">
+          <a class="nav-link" data-toggle="collapse" href="#masters" aria-expanded="false" aria-controls="masters">
+            <span class="menu-title">Masters</span>
+            <i class="menu-arrow"></i>
+            <i class="mdi mdi mdi-bulletin-board menu-icon"></i>
+          </a>
+          <div class="collapse" id="masters">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item"
+                *ngIf="userActivityRights.CanViewShedDetails ||userActivityRights.CanManageShedDetails"><a
+                  class="nav-link" routerLink="/farm/sheddetails" routerLinkActive="active">Shed Details</a></li>
+              <li class="nav-item" *ngIf="userActivityRights.CanViewFeed||userActivityRights.CanManageFeed">
+                <a class="nav-link" routerLink="/masters/feed" routerLinkActive="active">Feed Types</a>
+              </li>
+              <li class="nav-item"
+                *ngIf="userActivityRights.CanViewFeedBrokers||userActivityRights.CanManageFeedBrokers">
+                <a class="nav-link" routerLink="/masters/feedbroker" routerLinkActive="active">Feed Brokers</a>
+              </li>
+              <!-- <li class="nav-item" *ngIf="userActivityRights.CanViewMaterials||userActivityRights.CanManageMaterials">
+                <a class="nav-link" routerLink="/masters/materials" routerLinkActive="active">Materials</a>
+              </li> -->
+              <!-- <li class="nav-item" *ngIf="userActivityRights.CanViewVaccination||userActivityRights.CanManageVaccination">
+                <a class="nav-link" routerLink="/masters/vaccination" routerLinkActive="active">Vaccination</a>
+              </li> -->
+              <li class="nav-item"
+                *ngIf="userActivityRights.CanManageEggTraders||userActivityRights.CanManageEggTraders">
+                <a class="nav-link" routerLink="/masters/eggtrader" routerLinkActive="active">Egg Traders</a>
+              </li>
+              <!-- <li class="nav-item" *ngIf="userActivityRights.CanViewTemparature||userActivityRights.CanManageTemparature">
+                <a class="nav-link" routerLink="/benchmark/temprature" routerLinkActive="active">Temparature</a>
+              </li> -->
+              <li class="nav-item" *ngIf="userActivityRights.CanViewHatchery||userActivityRights.CanManageHatchery">
+                <a class="nav-link" routerLink="/masters/hatcheries" routerLinkActive="active">Hatcheries</a>
+              </li>
+              <li class="nav-item"><a class="nav-link" routerLink="/benchmark/vaccination"
+                  routerLinkActive="active">Vaccination</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item" routerLinkActive="active"
+          *ngIf="userActivityRights.CanViewComanyInfo||userActivityRights.CanViewFarmsInfo||userActivityRights.CanViewUserInfo||userActivityRights.CanViewRoleInfo||userActivityRights.CanManageComanyInfo||userActivityRights.CanManageFarmsInfo||userActivityRights.CanManageUserInfo||userActivityRights.CanManageRoleInfo">
+          <a class="nav-link" data-toggle="collapse" href="#security" aria-expanded="false" aria-controls="security">
+            <span class="menu-title">Security</span>
+            <i class="menu-arrow"></i>
+            <i class="mdi mdi-security menu-icon"></i>
+          </a>
+          <div class="collapse" id="security">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item" *ngIf="userActivityRights.CanViewComanyInfo||userActivityRights.CanManageComanyInfo">
+                <a class="nav-link" routerLink="/userdata/companyinfo" routerLinkActive="active">Company Info</a></li>
+              <li class="nav-item" *ngIf="userActivityRights.CanViewFarmsInfo||userActivityRights.CanManageFarmsInfo">
+                <a class="nav-link" routerLink="/userdata/forminfo" routerLinkActive="active">Farms Info</a></li>
+              <li class="nav-item" *ngIf="userActivityRights.CanViewUserInfo||userActivityRights.CanManageUserInfo">
+                <a class="nav-link" routerLink="/userdata/userinfo" routerLinkActive="active">User Info</a></li>
+              <li class="nav-item" *ngIf="userActivityRights.CanViewRoleInfo||userActivityRights.CanManageRoleInfo">
+                <a class="nav-link" routerLink="/userdata/addrole" routerLinkActive="active">Role Info</a></li>
+            </ul>
+          </div>
+        </li>
+        <!-- <li class="nav-item" routerLinkActive="active" *ngIf="userActivityRights.CanViewVaccination">
+          <a class="nav-link" data-toggle="collapse" href="#benchmark" aria-expanded="false" aria-controls="benchmark">
+            <span class="menu-title">Benchmark</span>
+            <i class="menu-arrow"></i>
+            <i class="mdi mdi-chart-histogram menu-icon"></i>
+          </a>
+          <div class="collapse" id="benchmark">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item"><a class="nav-link" routerLink="/benchmark/vaccination"
+                  routerLinkActive="active">Vaccination</a></li>
+            </ul>
+          </div>
+        </li> -->
+      </ul>
+      <div class="weather-wrapper d-none">
+        <div class="weather-card madrid">
+          <div class="weather-icon sun"></div>
+          <h1>{{temparature}}º<span id="C">C</span></h1>
+          <p>{{farmDeatils.Mandal}}</p>
+          <p>{{curDate | date}}</p>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+      <div class="elfsight-app-b55989a3-9254-4b78-b610-5765d0d47d67 eapps-widget eapps-widget-show-toolbar mb-3 pb-3">
+        <div id="eapps-weather-b55989a3-9254-4b78-b610-5765d0d47d67" data-app="eapps-weather" data-app-version="1.1.0"
+          class="jsx-1418609448 eaw-root-layout-component eapps-weather-b55989a3-9254-4b78-b610-5765d0d47d67-custom-css-hook mb-5">
+          <div class="jsx-1052935560 eaw-weather-component">
+            <div class="jsx-1052935560 eaw-weather-info">
+              <div class="jsx-1052935560 eaw-weather-detail" style="background: rgb(225, 221, 255);">
+                <div class="jsx-2463672715 eaw-detail-component">
+                  <div class="jsx-2463672715 eaw-detail-tempBlock">
+                    <div class="jsx-2463672715 eaw-detail-location">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="12" viewBox="0 0 10 12"
+                        class="jsx-2463672715 eaw-detail-locationIcon">
+                        <path fill-rule="nonzero"
+                          d="M9 5c0-2.265-1.757-4-4-4-2.243 0-4 1.735-4 4 0 1.16 1.32 3.094 4 5.636C7.68 8.094 9 6.16 9 5zm-4 7C1.667 8.967 0 6.634 0 5c0-2.851 2.239-5 5-5s5 2.149 5 5c0 1.634-1.667 3.967-5 7zm0-6a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"
+                          class="jsx-2463672715"></path>
+                      </svg>
+                      <div class="jsx-2463672715 eaw-detail-locationName">{{farmDeatils.Mandal}}</div>
+                    </div>
+                    <div class="jsx-2463672715 eaw-detail-currentTemp">{{temparature}}°C</div>
+                  </div>
+                  <div class="jsx-2463672715 eaw-detail-iconBlock">
+                    <svg viewBox="4 4 58 58">
+                      <defs>
+                        <filter id="blur" width="200%" height="200%">
+                          <feGaussianBlur in="SourceAlpha" stdDeviation="3"></feGaussianBlur>
+                          <feOffset dx="0" dy="4" result="offsetblur"></feOffset>
+                          <feComponentTransfer>
+                            <feFuncA type="linear" slope="0.05"></feFuncA>
+                          </feComponentTransfer>
+                          <feMerge>
+                            <feMergeNode></feMergeNode>
+                            <feMergeNode in="SourceGraphic"></feMergeNode>
+                          </feMerge>
+                        </filter>
+                      </defs>
+                      <g filter="url(#blur)" id="01d">
+                        <g transform="translate(32,32)">
+                          <g class="am-weather-sun am-weather-sun-shiny am-weather-easing-ease-in-out">
+                            <g>
+                              <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                            </g>
+                            <g transform="rotate(45)">
+                              <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                            </g>
+                            <g transform="rotate(90)">
+                              <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                            </g>
+                            <g transform="rotate(135)">
+                              <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                            </g>
+                            <g transform="rotate(180)">
+                              <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                            </g>
+                            <g transform="rotate(225)">
+                              <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                            </g>
+                            <g transform="rotate(270)">
+                              <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                            </g>
+                            <g transform="rotate(315)">
+                              <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                            </g>
+                          </g>
+                          <circle class="am-weather-sun-circle" cx="0" cy="0" fill="orange" r="5" stroke="orange"
+                            stroke-width="2"></circle>
+                        </g>
+                      </g>
+                    </svg>
+                    <div class="jsx-2463672715 eaw-detail-weatherName">{{curDate | date}}</div>
+                  </div>
+                </div>
+                <div class="jsx-3927339588 eaw-forecast-component">
+                  <div class="horizontal-menu" style="align-items: center; display: flex; user-select: none;">
+                    <div class="scroll-menu-arrow">
+                      <div class="jsx-3927339588 eaw-forecast-arrow eaw-forecast-prev carousel-control-prev"
+                        href="#hours-slide" data-slide="prev">
+                        <svg viewBox="4 0 8 16" width="12" height="16"
+                          class="jsx-3927339588 eaw-forecast-iconLeft eaw-forecast-icon">
+                          <path
+                            d="M4.3,8.7l6,5.9c0.4,0.4,1.1,0.4,1.5,0c0.4-0.4,0.4-1.1,0-1.5L6.5,8l5.2-5.2c0.4-0.4,0.4-1.1,0-1.5 c-0.4-0.4-1.1-0.4-1.5,0l-6,6C3.9,7.7,3.9,8.3,4.3,8.7z"
+                            class="jsx-3927339588"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="menu-wrapper carousel slide" style="overflow: hidden; user-select: none;"
+                      id="hours-slide" data-ride="carousel" data-interval="false">
+                      <div class="menu-wrapper--inner carousel-inner"
+                        style="transform: translate3d(0px, 0px, 0px); transition: transform 0.4s ease-out 0s; text-align: left; user-select: none; white-space: nowrap;">
+                        <div class="carousel-item active">
+                          <div class="menu-item-wrapper" tabindex="1" role="button" style="display: inline-block;">
+                            <div class="jsx-1569952112 eaw-forecast-item-component">
+                              <div class="jsx-1569952112 eaw-forecast-item-date">Now</div>
+                              <div class="jsx-1569952112 eaw-forecast-item-icon">
+                                <svg viewBox="4 4 58 58">
+                                  <defs>
+                                    <filter id="blur" width="200%" height="200%">
+                                      <feGaussianBlur in="SourceAlpha" stdDeviation="3"></feGaussianBlur>
+                                      <feOffset dx="0" dy="4" result="offsetblur"></feOffset>
+                                      <feComponentTransfer>
+                                        <feFuncA type="linear" slope="0.05"></feFuncA>
+                                      </feComponentTransfer>
+                                      <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                      </feMerge>
+                                    </filter>
+                                  </defs>
+                                  <g filter="url(#blur)" id="01d">
+                                    <g transform="translate(32,32)">
+                                      <g class="am-weather-sun am-weather-sun-shiny am-weather-easing-ease-in-out">
+                                        <g>
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(45)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(90)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(135)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(180)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(225)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(270)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(315)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                      </g>
+                                      <circle class="am-weather-sun-circle" cx="0" cy="0" fill="orange" r="5"
+                                        stroke="orange" stroke-width="2"></circle>
+                                    </g>
+                                  </g>
+                                </svg>
+                              </div>
+                              <div class="jsx-1569952112 eaw-forecast-item-temp">{{temparature}}°C</div>
+                            </div>
+                          </div>
+                          <div class="menu-item-wrapper" tabindex="1" role="button" style="display: inline-block;">
+                            <div class="jsx-1569952112 eaw-forecast-item-component">
+                              <div class="jsx-1569952112 eaw-forecast-item-date">2 PM</div>
+                              <div class="jsx-1569952112 eaw-forecast-item-icon">
+                                <svg viewBox="4 4 58 58">
+                                  <defs>
+                                    <filter id="blur" width="200%" height="200%">
+                                      <feGaussianBlur in="SourceAlpha" stdDeviation="3"></feGaussianBlur>
+                                      <feOffset dx="0" dy="4" result="offsetblur"></feOffset>
+                                      <feComponentTransfer>
+                                        <feFuncA type="linear" slope="0.05"></feFuncA>
+                                      </feComponentTransfer>
+                                      <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                      </feMerge>
+                                    </filter>
+                                  </defs>
+                                  <g filter="url(#blur)" id="01d">
+                                    <g transform="translate(32,32)">
+                                      <g class="am-weather-sun am-weather-sun-shiny am-weather-easing-ease-in-out">
+                                        <g>
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(45)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(90)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(135)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(180)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(225)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(270)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(315)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                      </g>
+                                      <circle class="am-weather-sun-circle" cx="0" cy="0" fill="orange" r="5"
+                                        stroke="orange" stroke-width="2"></circle>
+                                    </g>
+                                  </g>
+                                </svg>
+                              </div>
+                              <div class="jsx-1569952112 eaw-forecast-item-temp">28°C</div>
+                            </div>
+                          </div>
+                          <div class="menu-item-wrapper" tabindex="1" role="button" style="display: inline-block;">
+                            <div class="jsx-1569952112 eaw-forecast-item-component">
+                              <div class="jsx-1569952112 eaw-forecast-item-date">3 PM</div>
+                              <div class="jsx-1569952112 eaw-forecast-item-icon">
+                                <svg viewBox="4 4 58 58">
+                                  <defs>
+                                    <filter id="blur" width="200%" height="200%">
+                                      <feGaussianBlur in="SourceAlpha" stdDeviation="3"></feGaussianBlur>
+                                      <feOffset dx="0" dy="4" result="offsetblur"></feOffset>
+                                      <feComponentTransfer>
+                                        <feFuncA type="linear" slope="0.05"></feFuncA>
+                                      </feComponentTransfer>
+                                      <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                      </feMerge>
+                                    </filter>
+                                  </defs>
+                                  <g filter="url(#blur)" id="01d">
+                                    <g transform="translate(32,32)">
+                                      <g class="am-weather-sun am-weather-sun-shiny am-weather-easing-ease-in-out">
+                                        <g>
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(45)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(90)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(135)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(180)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(225)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(270)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(315)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                      </g>
+                                      <circle class="am-weather-sun-circle" cx="0" cy="0" fill="orange" r="5"
+                                        stroke="orange" stroke-width="2"></circle>
+                                    </g>
+                                  </g>
+                                </svg>
+                              </div>
+                              <div class="jsx-1569952112 eaw-forecast-item-temp">23°C</div>
+                            </div>
+                          </div>
+                          <div class="menu-item-wrapper" tabindex="1" role="button" style="display: inline-block;">
+                            <div class="jsx-1569952112 eaw-forecast-item-component">
+                              <div class="jsx-1569952112 eaw-forecast-item-date">4 PM</div>
+                              <div class="jsx-1569952112 eaw-forecast-item-icon">
+                                <svg viewBox="4 4 58 58">
+                                  <defs>
+                                    <filter id="blur" width="200%" height="200%">
+                                      <feGaussianBlur in="SourceAlpha" stdDeviation="3"></feGaussianBlur>
+                                      <feOffset dx="0" dy="4" result="offsetblur"></feOffset>
+                                      <feComponentTransfer>
+                                        <feFuncA type="linear" slope="0.05"></feFuncA>
+                                      </feComponentTransfer>
+                                      <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                      </feMerge>
+                                    </filter>
+                                  </defs>
+                                  <g filter="url(#blur)" id="01n">
+                                    <g transform="translate(20,20)">
+                                      <g class="am-weather-moon-star-1">
+                                        <polygon fill="orange"
+                                          points="3.3,1.5 4,2.7 5.2,3.3 4,4 3.3,5.2 2.7,4 1.5,3.3 2.7,2.7" stroke="none"
+                                          stroke-miterlimit="10"></polygon>
+                                      </g>
+                                      <g class="am-weather-moon-star-2">
+                                        <polygon fill="orange"
+                                          points="3.3,1.5 4,2.7 5.2,3.3 4,4 3.3,5.2 2.7,4 1.5,3.3 2.7,2.7" stroke="none"
+                                          stroke-miterlimit="10" transform="translate(20,10)"></polygon>
+                                      </g>
+                                      <g class="am-weather-moon">
+                                        <path
+                                          d="M14.5,13.2c0-3.7,2-6.9,5-8.7   c-1.5-0.9-3.2-1.3-5-1.3c-5.5,0-10,4.5-10,10s4.5,10,10,10c1.8,0,3.5-0.5,5-1.3C16.5,20.2,14.5,16.9,14.5,13.2z"
+                                          fill="orange" stroke="orange" stroke-linejoin="round" stroke-width="0"></path>
+                                      </g>
+                                    </g>
+                                  </g>
+                                </svg>
+                              </div>
+                              <div class="jsx-1569952112 eaw-forecast-item-temp">19°C</div>
+                            </div>
+                          </div>
+                          <div class="menu-item-wrapper" tabindex="1" role="button" style="display: inline-block;">
+                            <div class="jsx-1569952112 eaw-forecast-item-component">
+                              <div class="jsx-1569952112 eaw-forecast-item-date">5 PM</div>
+                              <div class="jsx-1569952112 eaw-forecast-item-icon">
+                                <svg viewBox="4 4 58 58">
+                                  <defs>
+                                    <filter id="blur" width="200%" height="200%">
+                                      <feGaussianBlur in="SourceAlpha" stdDeviation="3"></feGaussianBlur>
+                                      <feOffset dx="0" dy="4" result="offsetblur"></feOffset>
+                                      <feComponentTransfer>
+                                        <feFuncA type="linear" slope="0.05"></feFuncA>
+                                      </feComponentTransfer>
+                                      <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                      </feMerge>
+                                    </filter>
+                                  </defs>
+                                  <g filter="url(#blur)" id="01n">
+                                    <g transform="translate(20,20)">
+                                      <g class="am-weather-moon-star-1">
+                                        <polygon fill="orange"
+                                          points="3.3,1.5 4,2.7 5.2,3.3 4,4 3.3,5.2 2.7,4 1.5,3.3 2.7,2.7" stroke="none"
+                                          stroke-miterlimit="10"></polygon>
+                                      </g>
+                                      <g class="am-weather-moon-star-2">
+                                        <polygon fill="orange"
+                                          points="3.3,1.5 4,2.7 5.2,3.3 4,4 3.3,5.2 2.7,4 1.5,3.3 2.7,2.7" stroke="none"
+                                          stroke-miterlimit="10" transform="translate(20,10)"></polygon>
+                                      </g>
+                                      <g class="am-weather-moon">
+                                        <path
+                                          d="M14.5,13.2c0-3.7,2-6.9,5-8.7   c-1.5-0.9-3.2-1.3-5-1.3c-5.5,0-10,4.5-10,10s4.5,10,10,10c1.8,0,3.5-0.5,5-1.3C16.5,20.2,14.5,16.9,14.5,13.2z"
+                                          fill="orange" stroke="orange" stroke-linejoin="round" stroke-width="0"></path>
+                                      </g>
+                                    </g>
+                                  </g>
+                                </svg>
+                              </div>
+                              <div class="jsx-1569952112 eaw-forecast-item-temp">18°C</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="carousel-item">
+                          <div class="menu-item-wrapper" tabindex="1" role="button" style="display: inline-block;">
+                            <div class="jsx-1569952112 eaw-forecast-item-component">
+                              <div class="jsx-1569952112 eaw-forecast-item-date">6 PM</div>
+                              <div class="jsx-1569952112 eaw-forecast-item-icon">
+                                <svg viewBox="4 4 58 58">
+                                  <defs>
+                                    <filter id="blur" width="200%" height="200%">
+                                      <feGaussianBlur in="SourceAlpha" stdDeviation="3"></feGaussianBlur>
+                                      <feOffset dx="0" dy="4" result="offsetblur"></feOffset>
+                                      <feComponentTransfer>
+                                        <feFuncA type="linear" slope="0.05"></feFuncA>
+                                      </feComponentTransfer>
+                                      <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                      </feMerge>
+                                    </filter>
+                                  </defs>
+                                  <g filter="url(#blur)" id="01n">
+                                    <g transform="translate(20,20)">
+                                      <g class="am-weather-moon-star-1">
+                                        <polygon fill="orange"
+                                          points="3.3,1.5 4,2.7 5.2,3.3 4,4 3.3,5.2 2.7,4 1.5,3.3 2.7,2.7" stroke="none"
+                                          stroke-miterlimit="10"></polygon>
+                                      </g>
+                                      <g class="am-weather-moon-star-2">
+                                        <polygon fill="orange"
+                                          points="3.3,1.5 4,2.7 5.2,3.3 4,4 3.3,5.2 2.7,4 1.5,3.3 2.7,2.7" stroke="none"
+                                          stroke-miterlimit="10" transform="translate(20,10)"></polygon>
+                                      </g>
+                                      <g class="am-weather-moon">
+                                        <path
+                                          d="M14.5,13.2c0-3.7,2-6.9,5-8.7   c-1.5-0.9-3.2-1.3-5-1.3c-5.5,0-10,4.5-10,10s4.5,10,10,10c1.8,0,3.5-0.5,5-1.3C16.5,20.2,14.5,16.9,14.5,13.2z"
+                                          fill="orange" stroke="orange" stroke-linejoin="round" stroke-width="0"></path>
+                                      </g>
+                                    </g>
+                                  </g>
+                                </svg>
+                              </div>
+                              <div class="jsx-1569952112 eaw-forecast-item-temp">17°C</div>
+                            </div>
+                          </div>
+                          <div class="menu-item-wrapper" tabindex="1" role="button" style="display: inline-block;">
+                            <div class="jsx-1569952112 eaw-forecast-item-component">
+                              <div class="jsx-1569952112 eaw-forecast-item-date">7 PM</div>
+                              <div class="jsx-1569952112 eaw-forecast-item-icon">
+                                <svg viewBox="4 4 58 58">
+                                  <defs>
+                                    <filter id="blur" width="200%" height="200%">
+                                      <feGaussianBlur in="SourceAlpha" stdDeviation="3"></feGaussianBlur>
+                                      <feOffset dx="0" dy="4" result="offsetblur"></feOffset>
+                                      <feComponentTransfer>
+                                        <feFuncA type="linear" slope="0.05"></feFuncA>
+                                      </feComponentTransfer>
+                                      <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                      </feMerge>
+                                    </filter>
+                                  </defs>
+                                  <g filter="url(#blur)" id="01n">
+                                    <g transform="translate(20,20)">
+                                      <g class="am-weather-moon-star-1">
+                                        <polygon fill="orange"
+                                          points="3.3,1.5 4,2.7 5.2,3.3 4,4 3.3,5.2 2.7,4 1.5,3.3 2.7,2.7" stroke="none"
+                                          stroke-miterlimit="10"></polygon>
+                                      </g>
+                                      <g class="am-weather-moon-star-2">
+                                        <polygon fill="orange"
+                                          points="3.3,1.5 4,2.7 5.2,3.3 4,4 3.3,5.2 2.7,4 1.5,3.3 2.7,2.7" stroke="none"
+                                          stroke-miterlimit="10" transform="translate(20,10)"></polygon>
+                                      </g>
+                                      <g class="am-weather-moon">
+                                        <path
+                                          d="M14.5,13.2c0-3.7,2-6.9,5-8.7   c-1.5-0.9-3.2-1.3-5-1.3c-5.5,0-10,4.5-10,10s4.5,10,10,10c1.8,0,3.5-0.5,5-1.3C16.5,20.2,14.5,16.9,14.5,13.2z"
+                                          fill="orange" stroke="orange" stroke-linejoin="round" stroke-width="0"></path>
+                                      </g>
+                                    </g>
+                                  </g>
+                                </svg>
+                              </div>
+                              <div class="jsx-1569952112 eaw-forecast-item-temp">17°C</div>
+                            </div>
+                          </div>
+                          <div class="menu-item-wrapper" tabindex="1" role="button" style="display: inline-block;">
+                            <div class="jsx-1569952112 eaw-forecast-item-component">
+                              <div class="jsx-1569952112 eaw-forecast-item-date">8 PM</div>
+                              <div class="jsx-1569952112 eaw-forecast-item-icon">
+                                <svg viewBox="4 4 58 58">
+                                  <defs>
+                                    <filter id="blur" width="200%" height="200%">
+                                      <feGaussianBlur in="SourceAlpha" stdDeviation="3"></feGaussianBlur>
+                                      <feOffset dx="0" dy="4" result="offsetblur"></feOffset>
+                                      <feComponentTransfer>
+                                        <feFuncA type="linear" slope="0.05"></feFuncA>
+                                      </feComponentTransfer>
+                                      <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                      </feMerge>
+                                    </filter>
+                                  </defs>
+                                  <g filter="url(#blur)" id="01d">
+                                    <g transform="translate(32,32)">
+                                      <g class="am-weather-sun am-weather-sun-shiny am-weather-easing-ease-in-out">
+                                        <g>
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(45)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(90)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(135)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(180)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(225)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(270)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(315)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                      </g>
+                                      <circle class="am-weather-sun-circle" cx="0" cy="0" fill="orange" r="5"
+                                        stroke="orange" stroke-width="2"></circle>
+                                    </g>
+                                  </g>
+                                </svg>
+                              </div>
+                              <div class="jsx-1569952112 eaw-forecast-item-temp">21°C</div>
+                            </div>
+                          </div>
+                          <div class="menu-item-wrapper" tabindex="1" role="button" style="display: inline-block;">
+                            <div class="jsx-1569952112 eaw-forecast-item-component">
+                              <div class="jsx-1569952112 eaw-forecast-item-date">9 PM</div>
+                              <div class="jsx-1569952112 eaw-forecast-item-icon">
+                                <svg viewBox="4 4 58 58">
+                                  <defs>
+                                    <filter id="blur" width="200%" height="200%">
+                                      <feGaussianBlur in="SourceAlpha" stdDeviation="3"></feGaussianBlur>
+                                      <feOffset dx="0" dy="4" result="offsetblur"></feOffset>
+                                      <feComponentTransfer>
+                                        <feFuncA type="linear" slope="0.05"></feFuncA>
+                                      </feComponentTransfer>
+                                      <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                      </feMerge>
+                                    </filter>
+                                  </defs>
+                                  <g filter="url(#blur)" id="01d">
+                                    <g transform="translate(32,32)">
+                                      <g class="am-weather-sun am-weather-sun-shiny am-weather-easing-ease-in-out">
+                                        <g>
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(45)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(90)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(135)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(180)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(225)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(270)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(315)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                      </g>
+                                      <circle class="am-weather-sun-circle" cx="0" cy="0" fill="orange" r="5"
+                                        stroke="orange" stroke-width="2"></circle>
+                                    </g>
+                                  </g>
+                                </svg>
+                              </div>
+                              <div class="jsx-1569952112 eaw-forecast-item-temp">22°C</div>
+                            </div>
+                          </div>
+                          <div class="menu-item-wrapper" tabindex="1" role="button" style="display: inline-block;">
+                            <div class="jsx-1569952112 eaw-forecast-item-component">
+                              <div class="jsx-1569952112 eaw-forecast-item-date">10 PM</div>
+                              <div class="jsx-1569952112 eaw-forecast-item-icon">
+                                <svg viewBox="4 4 58 58">
+                                  <defs>
+                                    <filter id="blur" width="200%" height="200%">
+                                      <feGaussianBlur in="SourceAlpha" stdDeviation="3"></feGaussianBlur>
+                                      <feOffset dx="0" dy="4" result="offsetblur"></feOffset>
+                                      <feComponentTransfer>
+                                        <feFuncA type="linear" slope="0.05"></feFuncA>
+                                      </feComponentTransfer>
+                                      <feMerge>
+                                        <feMergeNode></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                      </feMerge>
+                                    </filter>
+                                  </defs>
+                                  <g filter="url(#blur)" id="01d">
+                                    <g transform="translate(32,32)">
+                                      <g class="am-weather-sun am-weather-sun-shiny am-weather-easing-ease-in-out">
+                                        <g>
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(45)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(90)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(135)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(180)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(225)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(270)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                        <g transform="rotate(315)">
+                                          <line fill="none" stroke="orange" stroke-linecap="round" stroke-width="2"
+                                            transform="translate(0,9)" x1="0" x2="0" y1="0" y2="3"></line>
+                                        </g>
+                                      </g>
+                                      <circle class="am-weather-sun-circle" cx="0" cy="0" fill="orange" r="5"
+                                        stroke="orange" stroke-width="2"></circle>
+                                    </g>
+                                  </g>
+                                </svg>
+                              </div>
+                              <div class="jsx-1569952112 eaw-forecast-item-temp">24°C</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="scroll-menu-arrow">
+                      <div href="#hours-slide"
+                        class="jsx-3927339588 eaw-forecast-arrow eaw-forecast-next carousel-control-next"
+                        data-slide="next">
+                        <svg viewBox="4 0 8 16" width="12" height="16"
+                          class="jsx-3927339588 eaw-forecast-iconRight eaw-forecast-icon">
+                          <path
+                            d="M11.7,7.3l-6-5.9c-0.4-0.4-1.1-0.4-1.5,0c-0.4,0.4-0.4,1.1,0,1.5L9.5,8l-5.2,5.2 c-0.4,0.4-0.4,1.1,0,1.5c0.4,0.4,1.1,0.4,1.5,0l6-6C12.1,8.3,12.1,7.7,11.7,7.3z"
+                            class="jsx-3927339588"></path>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <!-- partial -->
+    <div class="main-panel">
+
+      <div class="content-wrapper cc" *ngIf="SelectedFarm.FarmId ==BSPC">
+        <router-outlet></router-outlet>
+      </div>
+      <div class="content-wrapper" *ngIf="SelectedFarm.FarmId ==BSP">
+        <router-outlet></router-outlet>
+      </div>
+      <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+          <span class="text-primary text-center text-sm-left d-block d-sm-inline-block">© 2020 Smart Poultry. All
+            rights reserved.</span>
+          <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center text-primary"><a
+              href="javascript:void(0);" class="text-primary">Privacy <i
+                class="mdi mdi-thermostat text-primary"></i></a></span>
+        </div>
+      </footer>
+      <!-- partial -->
+    </div>
+    <!-- main-panel ends -->
+  </div>
+  <!-- page-body-wrapper ends -->
+</div>
+
+
+
+<div class="top_bar d-none" *ngIf="isload">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12 col-sm-12 pointer">
+        <div class="tb_left pull-left item-flex col-xs-8 col-sm-9 col-md-10">
+          <ul class="poultry-name">
+            <li *ngFor="let farm of userFarms">
+              <a href="" (click)="OnFarmSelect(farm)" [ngClass]="{'Colorli': farm.FarmId!==SelectedFarm.FarmId}"
+                class="text-truncate">
+                <i class="fa fa-paw"
+                  [ngClass]="{'Colorli': farm.FarmId!==SelectedFarm.FarmId}"></i>{{farm.FarmName}}</a>
+            </li>
+          </ul>
+        </div>
+        <!-- <div class="tb_center pull-left">
+                        <ul>
+                            <li>
+                                <a href="">
+                                    <i class="fa fa-paw"></i> Bala Balaji Srinivasa Poultries</a>
+                            </li>
+                        </ul>
+                    </div> -->
+        <div class="tb_right pull-right item-flex col-xs-4 col-sm-3 col-md-2">
+          <!-- <li>
+                            <div class="tb_right tbr-info">
+                                <span class="glyphicon glyphicon-bell">
+                                </span>
+                                <div class="badge badge-notif">
+                                    <b>{{ReadAlerts?.length}}</b>
+                                </div>
+                                <div class="tbr-inner scroll">
+                                    <a *ngFor="let alert of Alerts">
+                                        <p *ngIf="!alert.IsRead" href="#" routerLink="/alerts">
+                                            <b>{{alert.Name}}</b>
+                                            <b><span class="pull-right">{{alert.NotificationGeneratedOn}}</span></b>
+                                        </p>
+                                        <p *ngIf="alert.IsRead" href="#" routerLink="/alerts">
+                                            {{alert.Name}}
+                                            <span class="pull-right">{{alert.NotificationGeneratedOn}}</span>
+                                        </p>
+                                    </a>
+                                </div>
+                            </div>
+                        </li> -->
+          <ul class="user-name pull-right">
+            <li>
+              <div class="tb_right tbr-info">
+                <span class="glyphicon glyphicon-user">&nbsp;{{userData.UserName}}
+                  <i class="fa fa-caret-down"></i>
+                </span>
+                <div class="tbr-inner pull-right ">
+                  <a routerLink="/changePassword">Change Password
+                    <!-- <i class="fa fa-unlock-alt "></i> -->
+                  </a>
+                  <a (click)="logout()">Log Out</a>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="navbar navbar-default d-none" *ngIf="isload">
+  <nav class="navbar navbar-height">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-2 col-lg-2 col-sm-12 col-xs-12">
+          <div class="navbar-header logo-section">
+            <!-- <a class="site_title">
+                            <i class="fa fa-paw"></i> bala balaji srinivasa poultries </a> -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar"
+              aria-controls="collapsing-nav-bar">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <!-- <li> -->
+            <a href="">
+              <!-- <img src="assets/images/poultry-farm-logo.jpg" class="img-responsive" style="height:50px;width:120px;"> -->
+              <!-- <i class="fa fa-paw"></i> Bala Balaji Srinivasa Poultries</a> -->
+            </a>
+            <!-- </li> -->
+          </div>
+        </div>
+        <div class="col-md-10 col-lg-10 col-sm-12 col-xs-12">
+          <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav center-block text-center nav-menu">
+              <li style="cursor: pointer;" routerLink="/dashboard" routerLinkActive="active">
+                <a data-toggle="collapse" data-target=".navbar-collapse.in"> Dashboard</a>
+              </li>
+              <li class="dropdown" routerLinkActive="active"
+                *ngIf="userActivityRights.CanViewVisitLogs||userActivityRights.CanManageVisitLogs||userActivityRights.CanViewEggProductionLogs||userActivityRights.CanManageEggProductionLogs||userActivityRights.CanViewEggSaleRegister||userActivityRights.CanManageEggSaleRegister">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Daily Activity Logs
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <!-- <li routerLink="/log/addlog" *ngIf="userActivityRights.CanManageVisitLogs">
+                                        <a data-toggle="collapse" data-target=".navbar-collapse.in">Add Visit Logs</a>
+                                    </li> -->
+                  <li routerLink="/log/adddailylog" routerLinkActive="active"
+                    *ngIf="userActivityRights.CanManageVisitLogs">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Add Daily Logs</a>
+                  </li>
+                  <li routerLink="/log/viewlog" routerLinkActive="active" *ngIf="userActivityRights.CanViewVisitLogs">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">View Visit Logs</a>
+                  </li>
+                  <li routerLink="/log/eggprotection" routerLinkActive="active"
+                    *ngIf="userActivityRights.CanViewEggProductionLogs||userActivityRights.CanManageEggProductionLogs">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Egg Stock
+                      Register</a>
+                  </li>
+                  <li routerLink="/log/eggsalereg" routerLinkActive="active"
+                    *ngIf="userActivityRights.CanViewEggSaleRegister||userActivityRights.CanManageEggSaleRegister">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Egg Sale
+                      Register</a>
+                  </li>
+                </ul>
+              </li>
+              <li class="dropdown" routerLinkActive="active"
+                *ngIf="userActivityRights.CanViewBatchDetails||userActivityRights.CanManageBatchDetails ||userActivityRights.CanViewShedDetails ||userActivityRights.CanManageShedDetails||userActivityRights.CanViewFeedPurchase||userActivityRights.CanManageFeedPurchase
+                                                        ||userActivityRights.CanViewVaccinationDetails||userActivityRights.CanManageVaccinationDetails||userActivityRights.CanViewInorOutRegistration||userActivityRights.CanManageInorOutRegistration || userActivityRights.CanViewIncomeExpenses||userActivityRights.CanManageIncomeExpenses">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Farm Activities
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li routerLink="/farm/batchdetails" routerLinkActive="active"
+                    *ngIf="userActivityRights.CanViewBatchDetails||userActivityRights.CanManageBatchDetails">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Batch Details</a>
+                  </li>
+                  <li routerLink="/farm/sheddetails" routerLinkActive="active"
+                    *ngIf="userActivityRights.CanViewShedDetails ||userActivityRights.CanManageShedDetails">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Shed Details</a>
+                  </li>
+                  <li routerLink="/farm/feedpurchase" routerLinkActive="active"
+                    *ngIf="userActivityRights.CanViewFeedPurchase||userActivityRights.CanManageFeedPurchase">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Feed Purchase</a>
+                  </li>
+                  <li routerLink="/farm/feedgrinding" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Feed Grinding</a>
+                  </li>
+                  <li routerLink="/farm/incomeexpenses" routerLinkActive="active"
+                    *ngIf="userActivityRights.CanViewIncomeExpenses||userActivityRights.CanManageIncomeExpenses">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Income Expenses</a>
+                  </li>
+                  <li routerLink="/farm/vaccinationdetails" routerLinkActive="active"
+                    *ngIf="userActivityRights.CanViewVaccinationDetails||userActivityRights.CanManageVaccinationDetails">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Chick
+                      Vaccinations</a>
+                  </li>
+                  <li routerLink="/farm/inoutregister" routerLinkActive="active"
+                    *ngIf="userActivityRights.CanViewInorOutRegistration||userActivityRights.CanManageInorOutRegistration">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">In/Out Register</a>
+                  </li>
+                </ul>
+              </li>
+              <!-- <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Chick Transitions
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li routerLink="/chick/chickshed">
+                                        <a data-toggle="collapse" data-target=".navbar-collapse.in">Chick Shed Transitions</a>
+                                    </li>
+                                    <li routerLink="/chick/growershed">
+                                        <a data-toggle="collapse" data-target=".navbar-collapse.in">Grower Shed Transitions</a>
+                                    </li>
+                                    <li routerLink="/chick/layershed">
+                                        <a data-toggle="collapse" data-target=".navbar-collapse.in">Layer Shed Transitions</a>
+                                    </li>
+                                    <li routerLink="/chick/cullingbirds">
+                                        <a data-toggle="collapse" data-target=".navbar-collapse.in">Culling Birds</a>
+                                    </li>
+                                </ul>
+                            </li> -->
+              <li class="dropdown" routerLinkActive="active" *ngIf="userActivityRights.CanViewReports">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Reports
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu ">
+                  <li routerLink="/reports/dailyproduction" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Daily Production
+                      Report</a>
+                  </li>
+                  <li routerLink="/reports/feedpurchase" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Feed Purchase
+                      Report</a>
+                  </li>
+                  <li routerLink="/reports/eggsale" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Egg Sale
+                      Register</a>
+                  </li>
+                  <li routerLink="/reports/eggstock" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Egg Stock
+                      Register</a>
+                  </li>
+                  <li routerLink="/reports/cullbirds" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Cull Birds
+                      Report</a>
+                  </li>
+                  <li routerLink="/reports/monthlybalance">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Monthly Balance
+                      Report</a>
+                  </li>
+                  <!-- <li routerLink="/reports/vaccination">
+                                        <a data-toggle="collapse" data-target=".navbar-collapse.in">Vaccination Report</a>
+                                    </li> -->
+                </ul>
+              </li>
+              <li class="dropdown" routerLinkActive="active"
+                *ngIf="userActivityRights.CanViewComanyInfo||userActivityRights.CanViewFarmsInfo||userActivityRights.CanViewUserInfo||userActivityRights.CanViewRoleInfo||userActivityRights.CanManageComanyInfo||userActivityRights.CanManageFarmsInfo||userActivityRights.CanManageUserInfo||userActivityRights.CanManageRoleInfo">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Security
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li routerLink="/userdata/companyinfo" routerLinkActive="active"
+                    *ngIf="userActivityRights.CanViewComanyInfo||userActivityRights.CanManageComanyInfo">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Company Info</a>
+                  </li>
+                  <li routerLink="/userdata/forminfo" routerLinkActive="active"
+                    *ngIf="userActivityRights.CanViewFarmsInfo||userActivityRights.CanManageFarmsInfo">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Farms Info</a>
+                  </li>
+                  <li routerLink="/userdata/userinfo" routerLinkActive="active"
+                    *ngIf="userActivityRights.CanViewUserInfo||userActivityRights.CanManageUserInfo">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">User Info</a>
+                  </li>
+                  <li routerLink="/userdata/addrole" routerLinkActive="active"
+                    *ngIf="userActivityRights.CanViewRoleInfo||userActivityRights.CanManageRoleInfo">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Role Info</a>
+                  </li>
+                </ul>
+              </li>
+              <li class="dropdown" routerLinkActive="active"
+                *ngIf="userActivityRights.CanViewMasters||userActivityRights.CanManageMasters">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Masters
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li routerLink="/masters/feed" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Feed</a>
+                  </li>
+                  <li routerLink="/masters/feedbroker" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Feed Brokers</a>
+                  </li>
+                  <!-- <li routerLink="/masters/paymentcondition">
+                                        <a>Payment Conditions</a>
+                                    </li> -->
+                  <li routerLink="/masters/materials" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Materials</a>
+                  </li>
+                  <li routerLink="/masters/vaccination" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Vaccination</a>
+                  </li>
+                  <li routerLink="/masters/eggtrader" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Egg Traders</a>
+                  </li>
+                  <li routerLink="/benchmark/temprature" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Temparature</a>
+                  </li>
+                  <li routerLink="/masters/hatcheries" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Hatcheries</a>
+                  </li>
+                </ul>
+              </li>
+              <li class="dropdown" routerLinkActive="active" *ngIf="userActivityRights.CanViewVaccination">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Benchmark
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li routerLink="/benchmark/vaccination" routerLinkActive="active">
+                    <a data-toggle="collapse" data-target=".navbar-collapse.in">Vaccination</a>
+                  </li>
+                </ul>
+              </li>
+              <!-- <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown">
+                                    <i class="fa fa-bell-o"></i>
+                                    <span class="label label-warning">{{Alerts?.length}}</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <ul class="menu" style="margin-left:-25px">
+                                            <li *ngFor="let alert of Alerts">
+                                                <a href="#" routerLink="/alerts">
+                                                    <p *ngIf="!alert.IsRead">
+                                                        <b>{{alert.Name}}</b>
+                                                        <br/>
+                                                        <span class="pull-right">{{alert.NotificationGeneratedOn}}</span>
+                                                    </p>
+                                                    <p *ngIf="alert.IsRead">
+                                                        {{alert.Name}}
+                                                        <br />
+                                                        <span class="pull-right">{{alert.NotificationGeneratedOn}}</span>
+                                                    </p>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li> -->
+              <!-- <li class="">
+                                <a href="javascript:;" class="user-profile dropdown-toggle " data-toggle="dropdown" aria-expanded="false">
+                                    <img src="images/img.jpg" alt="">{{userData.UserName}}
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-usermenu">
+                                    <li routerLink="/changePassword">
+                                        <i class="fa fa-unlock-alt pull-right" aria-hidden="true"></i>
+                                        <a>Change Password</a>
+                                    </li>
+                                    <li>
+                                        <a (click)="logout()">
+                                            <i class="fa fa-sign-out pull-right"></i> Log Out</a>
+                                    </li>
+    
+                                </ul>
+                            </li> -->
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="col-md-2 col-lg-2 col-sm-6 col-xs-12">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="">
+                            <a href="javascript:;" class="user-profile dropdown-toggle " data-toggle="dropdown"
+                                aria-expanded="false">
+                                <img src="images/img.jpg" alt="">Admin
+                                <span class=" fa fa-angle-down"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-usermenu  pull-right">
+                                <li><a (click)="logout()"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                            </ul>
+                        </li>
+    
+                    </ul>
+                </div> -->
+    </div>
+  </nav>
+  <!-- page content -->
+  <div class="container" style="margin-bottom:50px">
+    <!-- margin-left:10%;margin-right:10%;  -->
+    <!-- <router-outlet></router-outlet> -->
+
+  </div>
+  <div></div>
+  <span></span>
+  <!-- /page content -->
+
+  <!-- footer content -->
+  <footer>
+    <div class="pull-right">
+      All rights reserved
+    </div>
+    <div class="clearfix"></div>
+  </footer>
+  <!-- /footer content -->
+</div>
+<!-- </html> -->
+<div *ngIf="!isload">
+  <app-login></app-login>
+</div>
+<!-- <app-chick-shed></app-chick-shed> -->
+<!-- <router-outlet></router-outlet> -->

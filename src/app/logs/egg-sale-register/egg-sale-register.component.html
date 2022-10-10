@@ -1,0 +1,698 @@
+
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Egg Sale Register</h3>
+  </div>
+  <div class="clearfix"></div>
+  <!-- Add Register -->
+  <div class="purchase-popup" *ngIf="isAddingSaleReg">
+    <div class="header text-primary">
+      <h4>Add Egg Sale Register</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div>
+      <form class="form-horizontal form-label-left" [formGroup]="AddEggSaleRegForm">
+        <div class="row">
+          <mat-form-field class="col-12 col-sm-6 col-md-3">
+            <input matInput [matDatepicker]="picker" placeholder="Select Date" formControlName="Saledate" [max]="date"
+              required readonly (dateChange)="DateChangeEvent($event)">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="col-12 col-sm-6 col-md-3">
+            <mat-select placeholder="Select Trader" formControlName="trader" required [(ngModel)]="selectedTrader"
+               (selectionChange)="onSelectTraderType($event.value)" >
+              <mat-option *ngFor="let trader of traders" [value]="trader.Id">
+                {{trader.Name}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="AddEggSaleRegForm.get('trader').invalid && AddEggSaleRegForm.get('trader').touched">
+                <span *ngIf="AddEggSaleRegForm.controls['trader'].hasError('required') ">
+                  Please Select Trader
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-12 col-sm-6 col-md-3">
+            <input matInput placeholder="No.of Cartons" required formControlName="numberofboxes" (change)="onCartonsChange($event.target.value)">
+            <mat-error>
+              <span
+                *ngIf="AddEggSaleRegForm.get('numberofboxes').invalid && AddEggSaleRegForm.get('numberofboxes').touched">
+                <span *ngIf="AddEggSaleRegForm.controls['numberofboxes'].hasError('required') ">
+                  Please Enter Cartons
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-12 col-sm-6 col-md-3">
+            <input matInput placeholder="Damaged"  formControlName="damaged"
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-12 col-sm-6 col-md-3">
+            <input matInput placeholder="Pulp Rate" required formControlName="neccrate"
+              (change)="onSearchChange($event.target.value)" [(ngModel)] ="PulpRate"
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+            <mat-error>
+              <span *ngIf="AddEggSaleRegForm.get('neccrate').invalid && AddEggSaleRegForm.get('neccrate').touched">
+                <span *ngIf="AddEggSaleRegForm.controls['neccrate'].hasError('required') ">
+                  Please Enter NECC Rate
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-xs-12 col-sm-6 col-md-3" *ngIf="!LocalTrader">
+            <input matInput placeholder="Bill Rate" required [(ngModel)]="BillRate" formControlName="billrate" (input)="onBillRateChange($event.target.value)"
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+            <mat-error>
+              <span *ngIf="AddEggSaleRegForm.get('billrate').invalid && AddEggSaleRegForm.get('billrate').touched">
+                <span *ngIf="AddEggSaleRegForm.controls['billrate'].hasError('required') ">
+                  Please Enter Bill Rate
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-xs-12 col-sm-6 col-md-3" *ngIf="LocalTrader">
+            <input matInput placeholder="Bill Rate" required [(ngModel)]="BillRate" formControlName="billrate"
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" readonly>
+            <mat-error>
+              <span *ngIf="AddEggSaleRegForm.get('billrate').invalid && AddEggSaleRegForm.get('billrate').touched">
+                <span *ngIf="AddEggSaleRegForm.controls['billrate'].hasError('required') ">
+                  Please Enter Bill Rate
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-xs-12 col-sm-6 col-md-3" *ngIf="LocalTrader">
+            <input matInput placeholder="Amount" required formControlName="amount" [(ngModel)]="Amount" (input)="onAmountChange()" 
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+            <mat-error>
+              <span *ngIf="AddEggSaleRegForm.get('amount').invalid && AddEggSaleRegForm.get('amount').touched">
+                <span *ngIf="AddEggSaleRegForm.controls['amount'].hasError('required') ">
+                  Please Enter Amount
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-xs-12 col-sm-6 col-md-3" *ngIf="!LocalTrader" >
+            <input matInput placeholder="Amount" required formControlName="amount" [(ngModel)]="Amount" readonly
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" >
+            <mat-error>
+              <span *ngIf="AddEggSaleRegForm.get('amount').invalid && AddEggSaleRegForm.get('amount').touched">
+                <span *ngIf="AddEggSaleRegForm.controls['amount'].hasError('required') ">
+                  Please Enter Amount
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-xs-12 col-sm-6 col-md-3">
+            <input matInput placeholder="Lorry Number"  formControlName="lorrynumber">
+          </mat-form-field>
+          <mat-form-field class="col-xs-12 col-sm-6 col-md-3">
+            <textarea matInput placeholder="Remarks" maxlength="500" formControlName="remarks"></textarea>
+          </mat-form-field>
+          <!-- <mat-form-field class="col-xs-12 col-sm-6 col-md-3">
+              <mat-select placeholder="Select Payment Mode" formControlName="paymentMode" [(ngModel)]="payMode" (selectionChange)="onPaymentModeSelect($event)">
+                <mat-option *ngFor="let mode of paymentModeList" [value]="mode.TypeCdId">
+                  {{mode.Desc}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          <mat-form-field class="col-xs-12 col-sm-6 col-md-3" *ngIf="payMode!=null">
+            <input matInput placeholder="Received Amount" formControlName="receivedamount" [required]="payMode!=null ? 'required' : null" >
+            <mat-error>
+              <span *ngIf="AddEggSaleRegForm.get('receivedamount').invalid && AddEggSaleRegForm.get('receivedamount').touched">
+                <span *ngIf="AddEggSaleRegForm.controls['receivedamount'].hasError('required') ">
+                  Please Enter Received Amount
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field> -->
+        </div> 
+        <div class="clearfix"></div>
+        <div class="form-group">
+          <div class="pull-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleAddClick()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="onSaveClick();clicked=true" [disabled]="!AddEggSaleRegForm.valid ||clicked"
+              [disabled]="!AddEggSaleRegForm.valid">Save</button>
+          </div>
+        </div>
+      </form>
+      <div class="clearfix"></div>
+    </div>
+  </div>
+  <!--/Add Register
+  <-- Main Grid -->
+  <div *ngIf="!isEditingSaleReg && !isAddingSaleReg && !isAddAmount">
+  <div class="row">
+    <div class="col-12">
+    <span class="d-flex align-items-center purchase-popup">
+      <form class="form-inline w-100" [formGroup]="eggSaleRegFilterForm">
+        <mat-form-field class="form-group">
+          <mat-label aria-required="true">Trader</mat-label>
+          <mat-select formControlName="trader">
+            <mat-option *ngFor="let trader of traders" [value]="trader.Id">
+              {{trader.Name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="form-group mx-sm-3">
+          <input matInput [matDatepicker]="picker" placeholder="From Date" [(ngModel)]="FROMDATE"
+            formControlName="fromDate" readonly [max]="date" (dateChange)="onDateChange($event)">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field class="form-group">
+          <input matInput [matDatepicker]="picker1" placeholder="To Date" [(ngModel)]="selectedDate"
+            formControlName="toDate" readonly [min]="FROMDATE" [max]="date">
+          <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+          <mat-datepicker #picker1></mat-datepicker>
+        </mat-form-field>
+        <div class="form-group mx-sm-3">
+          <button type="button" class="btn btn-primary" title="Search" data-toggle="tooltip" (click)="GetSaleRegister()"
+            [disabled]="">Search</button>
+          <button type="button" class="btn btn-primary" title="Clear" data-toggle="tooltip" (click)="onClearSearch()"
+            [disabled]="">Clear</button>
+        </div>
+        <div class="form-group ml-auto">
+          <button type="button" class="btn btn-primary" title="Export" data-toggle="tooltip"
+            (click)="download()" [disabled]='!traders?.length>0'>Export</button>
+            <!-- <i class="mdi mdi-file-export text-white"></i> -->
+            <!-- <button class="btn btn-success" (click)="toggleFilter()" *ngIf="isFiltersEnabled">
+              <i class="fa fa-filter" aria-hidden="true"></i>
+              &nbsp;{{filterTooltip}}
+            </button>
+      
+            <button class="btn btn-primary" (click)="toggleFilter()" [disabled]="isDataLoading"  *ngIf="!isFiltersEnabled">
+              <i class="fa fa-filter" aria-hidden="true"></i>
+              &nbsp;{{filterTooltip}}
+            </button> -->
+        </div>
+      </form>
+    </span>
+  </div>
+  </div>
+<!-- <div class="row">
+      <div class="pull-left" style="padding:4px 10px;border-bottom: 0 none;">
+        <p-calendar placeholder="Select Date Range" [showIcon]="true" [(ngModel)]="rangeDates" (onSelect)="chickDetails()" selectionMode="range"></p-calendar>
+      </div>
+      <div class="pull-left" style="padding:4px 10px;border-bottom: 0 none;margin-bottom:10px;">
+        <input type="text" class="form-control" pInputText size="50" placeholder="Search" (input)="dt.filterGlobal($event.target.value, 'contains')"
+          style="width:auto">
+      </div>
+      <div *ngIf="!isAddingSaleReg && !isEditChickShed">
+        <button type="button" class="btn btn-primary pull-right" title="Export" data-toggle="tooltip" (click)="download()">Export</button>
+        <button type="button" class="btn btn-primary pull-right" title="Add Egg Sale" data-toggle="tooltip" (click)="onAddEggSale()">
+          Add Egg Sale
+        </button>
+      </div>
+    </div> -->
+<div class="row">
+  <div class="col-12">
+    <span class="d-flex align-items-center grid-margin">
+      <div class="ml-auto">
+    <button type="button" class="btn btn-primary " *ngIf="ActivityRights.CanManageEggSaleRegister"
+      title="Add Receive Amount" data-toggle="tooltip" (click)="onAddAmountClick()">Add Receive Amount</button>
+    <button type="button" class="btn btn-primary" *ngIf="ActivityRights.CanManageEggSaleRegister" title="Add Egg Sale"
+      data-toggle="tooltip" (click)="onAddEggSale()">Add Egg Sale</button>
+    </div>
+      </span>
+  </div>
+</div>
+<div *ngFor="let reg of finalreq">
+  <div class="row">
+    <div class="col-12">
+      <span class="d-flex align-items-center purchase-popup">
+      <h4>{{reg.traderName}}</h4>
+      </span>
+  </div>
+  </div>
+  <div class="row">
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+      <div class="card bg-gradient-primary card-img-holder text-white">
+        <div class="card-body p-4">
+          <!-- <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" /> -->
+          <h4 class="font-weight-bold mb-3" *ngIf="reg.billingAmount !=null">Billing Amt<img width="24" src="assets/images/icons/rupee.svg" class="float-right" />
+          </h4>
+          <h4 class="mb-2 mt-3 mr font-weight-bold"><span class="float-right">&#x20B9;{{reg.billingAmount  | currency}}</span></h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+      <div class="card bg-gradient-info card-img-holder text-white">
+        <div class="card-body p-4">
+          <!-- <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" /> -->
+          <h4 class="font-weight-bold mb-3" *ngIf="reg.numberofBoxes !=null">No.Of Cartons<img width="24" src="assets/images/icons/box.svg" class="float-right" />
+          </h4>
+          <h4 class="mb-2 mt-3 mr font-weight-bold"><span class="float-right">{{reg.numberofBoxes  |currency}}</span></h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+      <div class="card bg-gradient-success card-img-holder text-white">
+        <div class="card-body p-4">
+          <!-- <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" /> -->
+          <h4 class="font-weight-bold mb-3" *ngIf="reg.numberofBoxes !=null">Received Amt. <img width="24" src="assets/images/icons/rupee.svg" class="float-right" />
+          </h4>
+          <h4 class="mb-2 mt-3 mr font-weight-bold"><span class="float-right">&#x20B9;{{reg.receivedAmount  | currency}}</span></h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+      <div class="card bg-gradient-danger card-img-holder text-white">
+        <div class="card-body p-4">
+          <!-- <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" /> -->
+          <h4 class="font-weight-bold mb-3" *ngIf="reg.billingAmount !=null">Due Amt <img width="24" src="assets/images/icons/rupee.svg" class="float-right" />
+          </h4>
+          <h4 class="mb-2 mt-3 mr font-weight-bold"><span class="float-right">&#x20B9;{{reg.dueAmount  | currency}}</span></h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 d-none">
+      <div class="card-s">
+        <div class="card-body-s">
+          <div class="media-s">
+            <div class="media-body-s overflow-hidden">
+              <p class="text-truncate font-size-16 font-weight-500 mb-4" *ngIf="reg.billingAmount !=null">Billing Amt
+              </p>
+              <h4 class="mb-0">{{reg.billingAmount  | currency}}</h4>
+            </div>
+            <div class="text-primary">
+              <i class="ri-stack-line font-size-24"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 d-none">
+      <div class="card-s">
+        <div class="card-body-s">
+          <div class="media-s">
+            <div class="media-body-s overflow-hidden">
+              <p class="text-truncate font-size-16 font-weight-500 mb-4" *ngIf="reg.numberofBoxes !=null">No.Of Cartons
+              </p>
+              <h4 class="mb-0">{{reg.numberofBoxes  | currency}</h4>
+            </div>
+            <div class="text-primary">
+              <i class="ri-store-2-line font-size-24"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 d-none">
+      <div class="card-s">
+        <div class="card-body-s">
+          <div class="media-s">
+            <div class="media-body-s overflow-hidden">
+              <p class="text-truncate font-size-16 font-weight-500 mb-4" *ngIf="reg.billingAmount !=null">Received Amt
+              </p>
+              <h4 class="mb-0">{{reg.receivedAmount  | currency}}</h4>
+            </div>
+            <div class="text-primary">
+              <i class="ri-briefcase-4-line font-size-24"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 d-none">
+      <div class="card-s">
+        <div class="card-body-s">
+          <div class="media-s">
+            <div class="media-body-s overflow-hidden">
+              <p class="text-truncate font-size-16 font-weight-500 mb-4" *ngIf="reg.billingAmount !=null">Due Amt</p>
+              <h4 class="mb-0">{{reg.dueAmount  | currency}}</h4>
+            </div>
+            <div class="text-primary">
+              <i class="ri-briefcase-4-line font-size-24"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="row">
+          <Label class="col-12 col-sm-6 col-md-3" style="font-size:17px;margin-top: 12px; padding:6px 30px;border-bottom: 0 none;" *ngIf="reg.billingAmount !=null">Billing Amt:
+              <b class="text-danger">{{reg.billingAmount  | currency: 'INR'}}</b>
+            </Label>
+            <Label class="col-12 col-sm-6 col-md-3" style="font-size:17px;margin-top: 12px; padding:6px 30px;border-bottom: 0 none;"  *ngIf="reg.numberofBoxes !=null" >No.Of Cartons:
+              <b class="text-danger">{{reg.numberofBoxes }}</b>
+            </Label>
+            <Label class="col-12 col-sm-6 col-md-3" style="font-size:17px;margin-top: 12px; padding:6px 30px;border-bottom: 0 none;" *ngIf="reg.billingAmount !=null">Received Amt:
+              <b class="text-danger"> {{reg.receivedAmount  | currency: 'INR'}}</b>
+            </Label>
+            <Label class="col-12 col-sm-6 col-md-3" style="font-size:17px;margin-top: 12px; padding:6px 30px;border-bottom: 0 none;" *ngIf="reg.billingAmount !=null">Due Amt:
+              <b class="text-danger"> {{reg.dueAmount  | currency: 'INR'}}</b>
+            </Label>
+      </div> -->
+      <div class="row">
+  <div class="col-md-12 grid-margin">
+    <p-table #dt [value]="reg.saleTransactions" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand" [rows]="10" [paginator]="true"
+      [rowsPerPageOptions]="[10,20,30]"
+      [globalFilterFields]="['Date','LorryNumber','numberofBoxes','NECCRate','BillRate','BillAmount']">
+      <ng-template pTemplate="header">
+        <tr>
+          <th [pSortableColumn]="'Date'">Date
+            <p-sortIcon [field]="'Date'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'LorryNumber'">Lorry Number
+            <p-sortIcon [field]="'LorryNumber'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'NumberofBoxes'">No.of Carton(s)
+            <p-sortIcon [field]="'NumberofBoxes'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'Damaged'">Damaged
+            <p-sortIcon [field]="'Damaged'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'NECCRate'">Pulp Rate
+            <p-sortIcon [field]="'NECCRate'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'BillRate'">Bill Rate
+            <p-sortIcon [field]="'BillRate'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'BillAmount'">Bill Amount(Rs)
+            <p-sortIcon [field]="'BillAmount'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'CummulativeBillAmount'">Cumulative Amount(Rs)
+            <p-sortIcon [field]="'CummulativeBillAmount'"></p-sortIcon>
+          </th>
+          <th *ngIf="ActivityRights.CanManageEggSaleRegister">Action(s)</th>
+        </tr>
+        <!-- <tr *ngIf="isFiltersEnabled">
+          <th>
+            <input pInputText type="text" (input)="dt.filter($event.target.value, 'Date','contains')">
+          </th>
+          <th>
+            <input pInputText type="text" (input)="dt.filter($event.target.value, 'LorryNumber','contains')">
+          </th>
+          <th>
+            <input pInputText type="text" (input)="dt.filter($event.target.value, 'NumberofBoxes','contains')">
+          </th>
+          <th>
+            <input pInputText type="text" (input)="dt.filter($event.target.value, 'Damaged','contains')">
+          </th>
+          <th>
+            <input pInputText type="text" (input)="dt.filter($event.target.value, 'NECCRate','contains')">
+          </th>
+          <th>
+            <input pInputText type="text" (input)="dt.filter($event.target.value, 'BillRate','contains')">
+          </th>
+          <th>
+            <input pInputText type="text" (input)="dt.filter($event.target.value, 'BillAmount','contains')">
+          </th>
+          <th>
+            <input pInputText type="text" (input)="dt.filter($event.target.value, 'CummulativeBillAmount','contains')">
+          </th>
+          <th></th>
+        </tr> -->
+      </ng-template>
+      <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+        <tr>
+          <td class="text-left">{{row.Date| date:'dd/MM/yyyy'}}</td>
+          <td class="text-left">{{row.LorryNumber}}</td>
+          <td class="textright">{{row.NumberofBoxes |currency}}</td>
+          <td class="textright">{{row.Damaged}}</td> 
+          <td class="textright">{{row.NECCRate| currency}}</td>
+          <td class="textright">{{row.BillRate| currency}}</td>
+          <td class="textright">{{row.BillAmount|currency}}</td>
+          <td class="textright">{{row.CummulativeBillAmount | currency}}</td>
+          <td *ngIf="ActivityRights.CanManageEggSaleRegister">
+            <div class="text-left">
+              <button type="button" class="btn btn-primary btn-xs" title="Edit" data-toggle="tooltip"
+                (click)="onEditClick(row)">
+                <i class="mdi mdi-table-edit" aria-hidden="true"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage" let-columns>
+        <tr>
+          <td colspan="9" class="ui-datatable-emptymessage text-center">No Records Found</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <div class="col-md-12 grid-margin">
+    <p-table #dt [value]="reg.salePayment" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]"
+      [globalFilterFields]="['TransactionDate','ReceivedAmount','PaymentMode']" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand">
+      <ng-template pTemplate="header">
+        <tr>
+          <th [pSortableColumn]="'TransactionDate'">Transaction Date
+            <p-sortIcon [field]="TransactionDate"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'PaymentMode'">Mode Of Payment
+            <p-sortIcon [field]="PaymentMode"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'ReceivedAmount'">Received Amount
+            <p-sortIcon [field]="ReceivedAmount"></p-sortIcon>
+          </th>
+          <th *ngIf="ActivityRights.CanManageEggSaleRegister">Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+        <tr>
+          <td class="text-left">{{rowData.TransactionDate| date:'dd/MM/yyyy'}}</td>
+          <td class="text-left">{{rowData.PaymentMode}}</td>
+          <td class="textright">{{rowData.ReceivedAmount | currency}}</td>
+          <td *ngIf="ActivityRights.CanManageEggSaleRegister">
+            <div class="text-left">
+              <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip"
+                (click)="onTrasactionDelete(rowData)">
+                <i class="mdi mdi-delete" aria-hidden="true"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage" let-columns>
+        <tr>
+          <td colspan="4" class="ui-datatable-emptymessage text-center">No Records Found</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+</div>
+</div>
+<!--/Main Grid -->
+<!-- Edit -->
+<div class="purchase-popup grid-margin" *ngIf="isEditingSaleReg">
+  <div class="header text-primary">
+    <h4>Update Egg Sale Register</h4>
+    <div class="clearfix"></div>
+  </div>
+  <div>
+    <form class="form-horizontal form-label-left" [formGroup]="EditEggSaleRegForm">
+      <div class="row">
+        <mat-form-field class="col-12 col-sm-6 col-md-3">
+          <input matInput [matDatepicker]="picker" placeholder="Select Date" formControlName="date" [max]="date"
+            [(ngModel)]="rowData.Date" required readonly>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field class="col-12 col-sm-6 col-md-3">
+          <mat-select placeholder="Select Trader" formControlName="trader" [(ngModel)]="rowData.TraderId"
+            (selectionChange)="onSelectTraderType($event.value)" >
+            <mat-option *ngFor="let trader of traders" [value]="trader.Id">
+              {{trader.Name}}
+            </mat-option>
+          </mat-select>
+          <mat-error>
+            <span *ngIf="EditEggSaleRegForm.get('trader').invalid && EditEggSaleRegForm.get('trader').touched">
+              <span *ngIf="EditEggSaleRegForm.controls['trader'].hasError('required') ">
+                Please Select Trader
+              </span>
+            </span>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col-12 col-sm-6 col-md-3">
+          <input matInput placeholder="No.of Cartons" required formControlName="numberofboxes" (change)="onEditCartonsChange($event.target.value)"
+            [(ngModel)]="rowData.NumberofBoxes">
+          <mat-error>
+            <span
+              *ngIf="EditEggSaleRegForm.get('numberofboxes').invalid && EditEggSaleRegForm.get('numberofboxes').touched">
+              <span *ngIf="EditEggSaleRegForm.controls['numberofboxes'].hasError('required') ">
+                Please Enter Cartons
+              </span>
+            </span>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col-12 col-sm-6 col-md-3">
+          <input matInput placeholder="Damaged"  formControlName="damaged"
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"  [(ngModel)]="rowData.Damaged">
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field class="col-12 col-sm-6 col-md-3">
+          <input matInput placeholder="NECC Rate" required formControlName="neccrate" [(ngModel)]="rowData.NECCRate"
+            (input)="onChange($event.target.value)"
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+          <mat-error>
+            <span *ngIf="EditEggSaleRegForm.get('neccrate').invalid && EditEggSaleRegForm.get('neccrate').touched">
+              <span *ngIf="EditEggSaleRegForm.controls['neccrate'].hasError('required') ">
+                Please Enter NECC Rate
+              </span>
+            </span>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col-xs-12 col-sm-6 col-md-3" *ngIf="!LocalTrader">
+          <input matInput placeholder="Bill Rate" required formControlName="billrate" [(ngModel)]="rowData.BillRate" (input)="onBillRateChange($event.target.value)"
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+          <mat-error>
+            <span *ngIf="EditEggSaleRegForm.get('billrate').invalid && EditEggSaleRegForm.get('billrate').touched">
+              <span *ngIf="EditEggSaleRegForm.controls['billrate'].hasError('required') ">
+                Please Enter Pulp Rate
+              </span>
+            </span>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col-xs-12 col-sm-6 col-md-3" *ngIf="LocalTrader">
+          <input matInput placeholder="Bill Rate" required formControlName="billrate" [(ngModel)]="rowData.BillRate"
+            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" readonly>
+          <mat-error>
+            <span *ngIf="EditEggSaleRegForm.get('billrate').invalid && EditEggSaleRegForm.get('billrate').touched">
+              <span *ngIf="EditEggSaleRegForm.controls['billrate'].hasError('required') ">
+                Please Enter Pulp Rate
+              </span>
+            </span>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col-xs-12 col-sm-6 col-md-3" *ngIf="LocalTrader">
+          <input matInput placeholder="Amount" required formControlName="amount" [(ngModel)]="rowData.BillAmount" (input)="onAmountChange()"
+          oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" >
+          <mat-error>
+            <span *ngIf="EditEggSaleRegForm.get('amount').invalid && EditEggSaleRegForm.get('amount').touched">
+              <span *ngIf="EditEggSaleRegForm.controls['amount'].hasError('required') ">
+                Please Enter Amount
+              </span>
+            </span>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col-xs-12 col-sm-6 col-md-3" *ngIf="!LocalTrader" >
+          <input matInput placeholder="Amount" required formControlName="amount" [(ngModel)]="rowData.BillAmount" readonly >
+          <mat-error>
+            <span *ngIf="EditEggSaleRegForm.get('amount').invalid && EditEggSaleRegForm.get('amount').touched">
+              <span *ngIf="EditEggSaleRegForm.controls['amount'].hasError('required') ">
+                Please Enter Amount
+              </span>
+            </span>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="col-12 col-sm-6 col-md-3">
+          <input matInput placeholder="Lorry Number" required formControlName="lorrynumber"
+            [(ngModel)]="rowData.LorryNumber">
+        </mat-form-field>
+        
+      </div>
+      <div class="row">
+        <mat-form-field class="col-12 col-sm-3 col-md-3">
+          <input matInput placeholder="Remarks" formControlName="remarks" [(ngModel)]="rowData.Remarks">
+        </mat-form-field>
+      </div>
+      <div class="clearfix"></div>
+      <div class="form-group">
+        <div class="float-right">
+          <button type="button" class="btn btn-light text-dark" (click)="onCancleEditClick()">Cancel</button>
+          <button type="submit" class="btn btn-primary" (click)="onUpdateClick();clicked=true"
+            [disabled]="!EditEggSaleRegForm.dirty || clicked">Update</button>
+        </div>
+      </div>
+    </form>
+    <div class="clearfix"></div>
+  </div>
+</div>
+<!-- /Edit -->
+<div class="purchase-popup grid-margin" *ngIf="isAddAmount">
+  <div class="header text-primary">
+    <h4>Add Receive Amount</h4>
+    <div class="clearfix"></div>
+  </div>
+    <form class="form-horizontal form-label-left" [formGroup]="addAmountForm">
+      <div class="row">
+        <mat-form-field class="col-12 col-sm-6 col-md-3">
+          <input matInput [matDatepicker]="picker" placeholder="Select Date" formControlName="Receiveddate" [max]="date"
+            required readonly>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field class="col-12 col-sm-6 col-md-3">
+          <mat-select placeholder="Select Trader" formControlName="trader" required [(ngModel)]="selectedTrader"
+            [disabled]="selectedTrader">
+            <mat-option *ngFor="let trader of traders" [value]="trader.Id">
+              {{trader.Name}}
+            </mat-option>
+          </mat-select>
+          <mat-error>
+            <span *ngIf="addAmountForm.get('trader').invalid && addAmountForm.get('trader').touched">
+              <span *ngIf="addAmountForm.controls['trader'].hasError('required') ">
+                Please Select Trader
+              </span>
+            </span>
+          </mat-error>
+        </mat-form-field>
+        <!-- <mat-form-field class="col-12 col-sm-6 col-md-3">
+              <mat-select placeholder="Payment Mode" formControlName="paymentMode" required>
+                <mat-option *ngFor="let mode of paymentModeList" [value]="mode.TypeCdId">
+                  {{mode.Desc}}
+                </mat-option>
+              </mat-select>
+              <mat-error>
+                <span *ngIf="addAmountForm.get('paymentMode').invalid && addAmountForm.get('paymentMode').touched">
+                  <span *ngIf="addAmountForm.controls['paymentMode'].hasError('required') ">
+                    Please Select Payment Mode
+                  </span>
+                </span>
+              </mat-error>
+            </mat-form-field> -->
+        <mat-form-field class="col-12 col-sm-6 col-md-3">
+          <mat-select placeholder="Select Payment Mode" formControlName="paymentMode" [(ngModel)]="payMode"
+            (selectionChange)="onPaymentModeSelect($event)">
+            <mat-option *ngFor="let mode of paymentModeList" [value]="mode.TypeCdId">
+              {{mode.Desc}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="col-12 col-sm-6 col-md-3" *ngIf="isShowItemNameAdd">
+          <input matInput placeholder="Cheque Number" formControlName="ChequeNumber">
+          <mat-error>
+            <span *ngIf="addAmountForm.get('ChequeNumber').invalid && addAmountForm.get('ChequeNumber').touched">
+              <span *ngIf="addAmountForm.controls['ChequeNumber'].hasError('required') ">
+                Please Enter ChequeNumber
+              </span>
+            </span>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="col-12 col-sm-6 col-md-3">
+          <input matInput placeholder="Received Amount" required formControlName="receivedAmount"
+            (keypress)="onlyNumber(event)">
+          <mat-error>
+            <span *ngIf="addAmountForm.get('receivedAmount').invalid && addAmountForm.get('receivedAmount').touched">
+              <span *ngIf="addAmountForm.controls['receivedAmount'].hasError('required') ">
+                Please Enter Receive Amount
+              </span>
+            </span>
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="ln_solid"></div>
+      <div class="form-group">
+        <div class="float-right">
+          <button type="button" class="btn btn-light text-dark" (click)="onCancleAmountAddClick()">Cancel</button>
+          <button type="submit" class="btn btn-primary" (click)="onSaveAmountClick();clicked=true"
+            [disabled]="addAmountForm.invalid ||clicked">Add</button>
+        </div>
+      </div>
+    </form>
+    <div class="clearfix"></div>
+</div>
+</div>

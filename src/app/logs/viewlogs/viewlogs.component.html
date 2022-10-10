@@ -1,0 +1,781 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+    <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+        <p style="font-size: 20px; color: white">Loading...</p>
+    </ngx-spinner>
+  </div>
+<div class="page-header">
+    <h3 class="page-title">View Production</h3>
+  </div>
+<div role="main">
+    <!-- style="height :900px;" -->
+    <!-- <div class="pull-left">
+        <h3 class="header">View Log Details</h3>
+    </div>
+    <div class="clearfix"></div> -->
+    <!-- Main Grid -->
+    <div *ngIf="!isAddlogDetails && !isEditlogDetails">
+        <div class="row">
+            <div class="col-12">
+              <span class="d-flex align-items-center purchase-popup">
+                <mat-form-field>
+                    <input matInput [matDatepicker]="Datepicker" placeholder="Date" [max]="curDate"
+                        [(ngModel)]="selectedDate" (dateChange)="GetVisitLogs()">
+                    <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+                    <mat-datepicker #Datepicker></mat-datepicker>
+                </mat-form-field>
+                <div class="clearfix d-block d-sm-none"></div>
+                <div class="ml-auto">
+                    <button type="button"  *ngIf ="ActivityRights.CanManageVisitLogs" class="btn btn-primary" title="Manage Rate" data-toggle="tooltip" (click)="onManegeRateClick()" >
+                        Manage Rate </button>
+                    <button type="button" class="btn btn-primary" title="Export" data-toggle="tooltip" (click)="download()"
+                    [disabled]='!viewLogs?.visitLogSummary?.length>0'>
+                     Export
+                     <!-- <i class="mdi mdi-file-export text-white"></i> -->
+                </button>
+                <!-- <button class="btn btn-success" (click)="toggleFilter()" *ngIf="isFiltersEnabled">
+                    <i class="fa fa-filter" aria-hidden="true"></i>
+                    &nbsp;{{filterTooltip}}
+                  </button> <button class="btn btn-primary" (click)="toggleFilter()" [disabled]="isDataLoading"  *ngIf="!isFiltersEnabled">
+                    <i class="fa fa-filter" aria-hidden="true"></i>
+                    &nbsp;{{filterTooltip}}
+                  </button> -->
+                  </div>
+              </span>
+            </div>
+          </div>
+        <!-- <div class="pull-left" style="padding:4px 15px;border-bottom: 0 none;margin-bottom:10px;">
+                    <input type="text" class="form-control" pInputText size="50" placeholder="Search" (input)="dt.filterGlobal($event.target.value, 'contains')"
+                        style="width:auto">
+                </div> -->
+        <!-- <div class="pull-right">
+                <button type="button" class="btn btn-primary" title="Export" data-toggle="tooltip" (click)="download()"
+                    *ngIf='viewLogs?.visitLogSummary?.length>0'>
+                    Export
+                </button>
+            </div> -->
+        <!-- </div> -->
+        <!-- <div class="row">
+                    <Label style="padding:4px 10px;border-bottom: 0 none;" class="col-sm 6 col-md-3">
+                        <h4><b class="text-danger"> Summary </b></h4>
+                    </Label>
+                </div>
+                <div class="col-md-12" style="margin-bottom: 20px;">
+                    <p-table [value]="viewLogs.visitLogSummary" [tableStyle]="{'table-layout':'auto'}"
+                        [globalFilterFields]="['StatusType','OpeningBirds','Died','Hurt','RemainingBirds','Feed','DamagedEggs','NumberofEggs','TotalEggs','Percentage']">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th [pSortableColumn]="'StatusType'"> Shed Type
+                                    <p-sortIcon [field]="StatusType"></p-sortIcon>
+                                </th>
+                                <th [pSortableColumn]="'OpeningBirds'">Opening Birds
+                                    <p-sortIcon [field]="OpeningBirds"></p-sortIcon>
+                                </th>
+                                <th [pSortableColumn]="'Died'">Mortality
+                                    <p-sortIcon [field]="Died"></p-sortIcon>
+                                </th>
+                                <th [pSortableColumn]="'Hurt'">Mortality (Hurt)
+                                    <p-sortIcon [field]="Hurt"></p-sortIcon>
+                                </th>
+                                <th [pSortableColumn]="'RemainingBirds'">Remaining Birds
+                                    <p-sortIcon [field]="RemainingBirds"></p-sortIcon>
+                                </th>
+                                <th [pSortableColumn]="'Feed'">Feed (Tons)
+                                    <p-sortIcon [field]="Feed"></p-sortIcon>
+                                </th>
+                                <th [pSortableColumn]="'DamagedEggs'">Damaged Eggs
+                                    <p-sortIcon [field]="DamagedEggs"></p-sortIcon>
+                                </th>
+                                <th [pSortableColumn]="'NumberofEggs'">No.Of Eggs
+                                    <p-sortIcon [field]="NumberofEggs"></p-sortIcon>
+                                </th>
+                                <th [pSortableColumn]="'TotalEggs'">Total Eggs
+                                    <p-sortIcon [field]="TotalEggs"></p-sortIcon>
+                                </th>
+                                <th [pSortableColumn]="'Percentage'">Percentage (%)
+                                    <p-sortIcon [field]="Percentage"></p-sortIcon>
+                                </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row>
+                            <tr>
+                                <td class="text-left">{{row.StatusType}}</td>
+                                <td class="text-left">{{row.OpeningBirds}}</td>
+                                <td class="textright">{{row.Died}}</td>
+                                <td class="textright">{{row.Hurt}}</td>
+                                <td class="textright">{{row.RemainingBirds}}</td>
+                                <td class="textright">{{row.Feed}}</td>
+                                <td class="textright">{{row.DamagedEggs}}</td>
+                                <td class="textright">{{row.NumberofEggs}}</td>
+                                <td class="textright">{{row.TotalEggs}}</td>
+                                <td class="textright">{{row.Percentage}}</td>
+                            </tr>
+                
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage" let-columns>
+                            <tr>
+                                <td colspan="10" class="ui-datatable-emptymessage text-center">No Records Found</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div> -->
+        <div class="row">
+            <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+                <div class="card bg-gradient-primary text-white box-shadow">
+                  <div class="card-body">
+                    <!-- <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" /> -->
+                    <h3 class="font-weight-bold mb-3">Available Birds<img src="assets/images/icons/chicken.svg" width="24" class="float-right" /></h3>
+                    <ul class="list-unstyled">
+                      <li class="mb-1">
+                        <h4 class="mb-2 mr"><small>Available</small>
+                            <span class="float-right">{{AvaiableBirds |currency}}</span></h4>
+                      </li>
+                      <li class="mb-1">
+                        <h4 class="mb-2 mr"><small>Mortality</small>
+                            <span class="float-right">{{Mortality |currency}}</span></h4>
+                      </li>
+                      <li class="mb-1">
+                        <h4 class="mb-2 mr"><small>Remaining</small>
+                            <span class="float-right">{{RemainingBirds |currency}}</span></h4>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+                <div class="card bg-gradient-info text-white box-shadow">
+                  <div class="card-body">
+                    <!-- <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" /> -->
+                    <h3 class="font-weight-bold mb-3">Eggs<img width="24" src="assets/images/icons/egg.svg" class="float-right" /></h3>
+                    <ul class="list-unstyled">
+                      <li class="mb-1">
+                        <h4 class="mb-2 mr"><small>No. Of Eggs</small>
+                            <span class="float-right">{{NoOfEggs |currency}}</span></h4>
+                      </li>
+                      <li class="mb-1">
+                        <h4 class="mb-2 mr"><small>Damaged Eggs</small>
+                            <span class="float-right">{{damagedEggs |currency}}</span></h4>
+                      </li>
+                      <li class="mb-1">
+                        <h4 class="mb-2 mr"><small>Total Eggs</small>
+                            <span class="float-right">{{TotalEggs |currency}}</span></h4>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+                <div class="card bg-gradient-success text-white box-shadow">
+                  <div class="card-body">
+                    <!-- <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" /> -->
+                    <h3 class="font-weight-bold mb-3">Production<img width="24" src="assets/images/icons/egg.svg" class="float-right" /></h3>
+                    <ul class="list-unstyled">
+                      <li class="mb-1">
+                        <h4 class="mb-2 mr"><small>Feed</small>
+                            <span class="float-right">{{Feed |currency}}</span></h4>
+                      </li>
+                      <li class="mb-1">
+                        <h4 class="mb-2 mr"><small>Production <small>(%)</small></small>
+                            <span class="float-right">{{finalreq[0]?.Summaries[0]?.Percentage |currency}}</span></h4>
+                      </li>
+                      <li class="mb-1">
+                        <h4 class="mb-2 mr"><small>Production <small>(Cartons)</small></small>
+                            <span class="float-right">{{finalreq[0]?.Summaries[0]?.Cartons |currency}}</span></h4>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row d-none">
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6">
+                <div class="card">
+                    <div class="card-header card-header-warningp card-header-icon">
+                        <div class="card-icon card-HeaderLabel">
+                            <span>Available Birds</span>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="card-body-s">
+                            <div class="media-s">
+                                <div class="media-body-s overflow-hidden">
+                                    <!-- <p class="text-truncate font-size-16 font-weight-500 mb-4">Available Birds</p> -->
+                                    <div class="d-block">
+                                        <h5 class="text-left d-inline-block pull-left">Available</h5>
+                                        <h4 class="mt-2 text-right d-inline-block pull-right">{{AvaiableBirds |currency}}</h4>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="d-block">
+                                        <h5 class="text-left d-inline-block pull-left">Mortality</h5>
+                                        <h4 class="mt-2 text-right d-inline-block pull-right">{{Mortality |currency}}</h4>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="d-block">
+                                        <h5 class="text-left d-inline-block pull-left">Remaining</h5>
+                                        <h4 class="mt-2 text-right d-inline-block pull-right">{{RemainingBirds} |currency}</h4>
+                                    </div>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="ri-stack-line font-size-24"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6">
+                <div class="card">
+                    <div class="card-header card-header-warningp card-header-icon">
+                        <div class="card-icon card-HeaderLabel">
+                            <span>Eggs</span>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="card-body-s">
+                            <div class="media-s">
+                                <div class="media-body-s overflow-hidden">
+                                    <!-- <p class="text-truncate font-size-16 font-weight-500 mb-4">Mortality</p> -->
+                                    <div class="d-block">
+                                        <h5 class="text-left d-inline-block pull-left">No. Of Eggs</h5>
+                                        <h4 class="mt-2 text-right d-inline-block pull-right">{{NoOfEggs |currency}}</h4>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="d-block">
+                                        <h5 class="text-left d-inline-block pull-left">Damaged Eggs</h5>
+                                        <h4 class="mt-2 text-right d-inline-block pull-right">{{damagedEggs |currency}}</h4>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="d-block">
+                                        <h5 class="text-left d-inline-block pull-left">Total Eggs</h5>
+                                        <h4 class="mt-2 text-right d-inline-block pull-right">{{TotalEggs |currency}}</h4>
+                                    </div>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="ri-store-2-line font-size-24"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                <div class="card">
+                    <div class="card-header card-header-warningp card-header-icon">
+                        <div class="card-icon card-HeaderLabel">
+                            <span>Feed</span>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="card-body-s">
+                            <div class="media-s">
+                                <div class="media-body-s overflow-hidden">
+                                    <!-- <p class="text-truncate font-size-16 font-weight-500 mb-4">Remaining Birds</p> -->
+                                    <div class="d-block">
+                                        <h5 class="text-left d-inline-block pull-left">Feed</h5>
+                                        <h4 class="mt-2 text-right d-inline-block pull-right">{{Feed |currency}}</h4>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="d-block">
+                                        <h5 class="text-left d-inline-block pull-left">Production <small class="clr-fff">(%)</small></h5>
+                                        <h4 class="mt-2 text-right d-inline-block pull-right">{{finalreq[0]?.Summaries[0]?.Percentage |currency}}</h4>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="d-block">
+                                        <h5 class="text-left d-inline-block pull-left">Production <small class="clr-fff">(Cartons)</small></h5>
+                                        <h4 class="mt-2 text-right d-inline-block pull-right">{{finalreq[0]?.Summaries[0]?.Cartons |currency}}</h4>
+                                    </div>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="ri-briefcase-4-line font-size-24"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row d-none">
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6">
+                <div class="card">
+                    <div class="card-header card-header-warningp card-header-icon">
+                        <div class="card-icon card-HeaderLabel">
+                            <span>No. Of Eggs</span>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="card-body-s">
+                            <div class="media-s">
+                                <div class="media-body-s overflow-hidden">
+                                    <!-- <p class="text-truncate font-size-16 font-weight-500 mb-4">No. Of Eggs</p> -->
+                                    <h4 class="mt-2">{{NoOfEggs |currency}}</h4>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="ri-briefcase-4-line font-size-24"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6">
+                <div class="card">
+                    <div class="card-header card-header-warningp card-header-icon">
+                        <div class="card-icon card-HeaderLabel">
+                            <span>Damaged Eggs</span>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="card-body-s">
+                            <div class="media-s">
+                                <div class="media-body-s overflow-hidden">
+                                    <!-- <p class="text-truncate font-size-16 font-weight-500 mb-4">Damaged Eggs</p> -->
+                                    <h4 class="mt-2">{{damagedEggs |currency}}</h4>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="ri-briefcase-4-line font-size-24"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                <div class="card">
+                    <div class="card-header card-header-warningp card-header-icon">
+                        <div class="card-icon card-HeaderLabel">
+                            <span>Total Eggs</span>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="card-body-s">
+                            <div class="media-s">
+                                <div class="media-body-s overflow-hidden">
+                                    <!-- <p class="text-truncate font-size-16 font-weight-500 mb-4">Total Eggs</p> -->
+                                    <h4 class="mt-2">{{TotalEggs |currency}}</h4>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="ri-briefcase-4-line font-size-24"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row d-none">
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6">
+                <div class="card">
+                    <div class="card-header card-header-warningp card-header-icon">
+                        <div class="card-icon card-HeaderLabel">
+                            <span>Feed</span>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="card-body-s">
+                            <div class="media-s">
+                                <div class="media-body-s overflow-hidden">
+                                    <!-- <p class="text-truncate font-size-16 font-weight-500 mb-4">Feed</p> -->
+                                    <h4 class="mb-0">{{Feed |currency}}</h4>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="ri-briefcase-4-line font-size-24"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6">
+                <div class="card">
+                    <div class="card-header card-header-warningp card-header-icon">
+                        <div class="card-icon card-HeaderLabel">
+                            <span>Production (%)</span>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="card-body-s">
+                            <div class="media-s">
+                                <div class="media-body-s overflow-hidden">
+                                    <!-- <p class="text-truncate font-size-16 font-weight-500 mb-4">Production (%)</p> -->
+                                    <h4 class="mb-0" *ngIf="finalreq[0]?.Summaries.length ==0">0</h4>
+                                    <h4 class="mb-0" *ngIf="finalreq[0]?.Summaries.length !=0">
+                                        {{finalreq[0]?.Summaries[0]?.Percentage |currency}}</h4>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="ri-briefcase-4-line font-size-24"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                <div class="card">
+                    <div class="card-header card-header-warningp card-header-icon">
+                        <div class="card-icon card-HeaderLabel">
+                            <span>Production <small>(Cartons)</small></span>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="card-body-s">
+                            <div class="media-s">
+                                <div class="media-body-s overflow-hidden">
+                                    <!-- <p class="text-truncate font-size-16 font-weight-500 mb-4">Production (Cartons)</p> -->
+                                    <h4 class="mb-0" *ngIf="finalreq[0]?.Summaries.length ==0">0</h4>
+                                    <h4 class="mb-0" *ngIf="finalreq[0]?.Summaries.length !=0">
+                                        {{finalreq[0]?.Summaries[0]?.Cartons}}</h4>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="ri-briefcase-4-line font-size-24"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div>
+                    <Label class="col-md-2" style="font-size:17px;margin-top: 13px;">Available Birds :
+                        <b class="text-danger">{{AvaiableBirds}}</b>
+                      </Label>
+                    <Label class="col-md-2" style="font-size:17px;margin-top: 13px;">Mortality :
+                      <b class="text-danger">{{Mortality}}</b>
+                    </Label>
+                    <Label class="col-md-3" style="font-size:17px;margin-top: 13px;">Remaining Birds :
+                        <b class="text-danger">{{RemainingBirds}}</b>
+                      </Label>
+                    <Label class="col-md-2" style="font-size:17px;margin-top: 13px;">Feed :
+                      <b class="text-danger">{{Feed}}</b>
+                    </Label>
+                    <Label class="col-md-2" style="font-size:17px;margin-top: 13px;">Total Eggs :
+                        <b class="text-danger">{{TotalEggs}}</b>
+                      </Label> -->
+        <!-- <Label class="col-md-2" style="font-size:17px;margin-top: 13px;">Prod Total (%):
+                        <b class="text-danger">{{TotalEggs}}</b>
+                      </Label> -->
+        <!-- </div> -->
+    <div *ngFor="let reg of finalreq">
+        <div class="row">
+                <div class="col-12">
+                  <span class="d-flex align-items-center purchase-popup">
+                    <h4 class="mb-0 pb-0">{{reg.shedType}}</h4>
+                    <button type="button" class="btn btn-primary ml-auto" title="Approve All" data-toggle="tooltip"
+                    (click)="approveAll(reg.logs)"><i class="mdi mdi-checkbox-marked-circle-outline" *ngIf ="ActivityRights.CanManageVisitLogs"></i> Approve All</button>
+                  </span>
+                </div>
+            <div class="clearfix"></div>
+            <div class="col-md-12">
+                <div class="table-responsive mb-3">
+                    <p-table [value]="reg.logs" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand"
+                        [globalFilterFields]="['StatusType','ShedName','BatchName','AgeinWeeks','OpeningBirds','Died','Hurt','RemainingBirds','Feed','DamagedEggs','NumberofEggs','TotalEggs','Percentage']">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th [pSortableColumn]="'ShedName'"> <span class="d-inline-flex">Shed#
+                                    <p-sortIcon [field]="'ShedName'"></p-sortIcon></span>
+                                </th>
+                                <th [pSortableColumn]="'BatchName'"><span class="d-inline-flex">Batch#
+                                    <p-sortIcon [field]="'BatchName'"></p-sortIcon></span>
+                                </th>
+                                <th [pSortableColumn]="'AgeinWeeks'"><span class="d-inline-flex">Age
+                                    <p-sortIcon [field]="'AgeinWeeks'"></p-sortIcon></span>
+                                </th>
+                                <th [pSortableColumn]="'OpeningBirds'">Opening <span class="d-inline-flex">Birds
+                                    <p-sortIcon [field]="'OpeningBirds'"></p-sortIcon></span>
+                                </th>
+                                <th [pSortableColumn]="'Died'"><span class="d-inline-flex">Mortality
+                                    <p-sortIcon [field]="'Died'"></p-sortIcon></span>
+                                </th>
+                                <th [pSortableColumn]="'Hurt'"><span class="d-inline-flex">Hurt
+                                    <p-sortIcon [field]="'Hurt'"></p-sortIcon></span>
+                                </th>
+                                <th [pSortableColumn]="'RemainingBirds'">Remaining <span class="d-inline-flex">Birds
+                                    <p-sortIcon [field]="'RemainingBirds'"></p-sortIcon></span>
+                                </th>
+                                <th [pSortableColumn]="'Feed'">Feed <span class="d-inline-flex">(Bags)<p-sortIcon [field]="'Feed'"></p-sortIcon></span>
+                                </th>
+                                <th [pSortableColumn]="'DamagedEggs'" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>Damaged
+                                    <span class="d-inline-flex">Eggs
+                                    <p-sortIcon [field]="'DamagedEggs'"></p-sortIcon></span>
+                                </th>
+                                <th [pSortableColumn]="'NumberofEggs'" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>No.Of
+                                    <span class="d-inline-flex">Eggs <p-sortIcon [field]="'NumberofEggs'"></p-sortIcon></span>
+                                </th>
+                                <th [pSortableColumn]="'TotalEggs'" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>Total
+                                    <span class="d-inline-flex">Eggs <p-sortIcon [field]="'TotalEggs'"></p-sortIcon></span>
+                                </th>
+                                <th [pSortableColumn]="'IsProduction'" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>In <span class="d-inline-flex">
+                                    Production<p-sortIcon [field]="'IsProduction'"></p-sortIcon></span>
+                                </th>
+                                <th [pSortableColumn]="'Percentage'" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>
+                                   <span class="d-inline-flex">Percentage(%)&nbsp;
+                                       <p-sortIcon [field]="'Percentage'"></p-sortIcon></span>
+                                </th>
+                                <th [pSortableColumn]="'StatusType'"><span class="d-inline-flex">Status
+                                    <p-sortIcon [field]="'StatusType'"></p-sortIcon></span></th>
+                                <th *ngIf ="ActivityRights.CanManageVisitLogs">Actions&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                            </tr>
+                            <!-- <tr *ngIf="isFiltersEnabled">
+                                <th>
+                                  <input pInputText type="text" (input)="dt.filter($event.target.value, 'ShedName','contains')">
+                                </th>
+                                <th>
+                                  <input pInputText type="text" (input)="dt.filter($event.target.value, 'BatchName','contains')">
+                                </th>
+                                <th>
+                                  <input pInputText type="text" (input)="dt.filter($event.target.value, 'AgeinWeeks','contains')">
+                                </th>
+                                <th>
+                                  <input pInputText type="text" (input)="dt.filter($event.target.value, 'OpeningBirds','contains')">
+                                </th>
+                                <th>
+                                    <input pInputText type="text" (input)="dt.filter($event.target.value, 'Died','contains')">
+                                  </th>
+                                  <th>
+                                    <input pInputText type="text" (input)="dt.filter($event.target.value, 'Hurt','contains')">
+                                  </th>
+                                  <th>
+                                    <input pInputText type="text" (input)="dt.filter($event.target.value, 'RemainingBirds','contains')">
+                                  </th>
+                                  <th>
+                                    <input pInputText type="text" (input)="dt.filter($event.target.value, 'Feed','contains')">
+                                  </th>
+                                  <th>
+                                    <input pInputText type="text" (input)="dt.filter($event.target.value, 'DamagedEggs','contains')">
+                                  </th>
+                                  <th>
+                                    <input pInputText type="text" (input)="dt.filter($event.target.value, 'NumberofEggs','contains')">
+                                  </th>
+                                  <th>
+                                    <input pInputText type="text" (input)="dt.filter($event.target.value, 'TotalEggs','contains')">
+                                  </th>
+                                  <th>
+                                    <input pInputText type="text" (input)="dt.filter($event.target.value, 'IsProduction','contains')">
+                                  </th>
+                                  <th>
+                                    <input pInputText type="text" (input)="dt.filter($event.target.value, 'Percentage','contains')">
+                                  </th>
+                                  <th>
+                                    <input pInputText type="text" (input)="dt.filter($event.target.value, 'ShedName','contains')">
+                                  </th>
+                                <th></th>
+                              </tr> -->
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                            <tr>
+                                <td class="text-left">{{row.ShedName}}</td>
+                                <td class="text-left">{{row.BatchName}}</td>
+                                <td class="textright" *ngIf="row.AgeinDays==0">{{row.AgeinWeeks |currency}}</td>
+                                <td class="textright" *ngIf="row.AgeinDays!=0">{{row.AgeinWeeks |currency}} / {{row.AgeinDays |currency}}
+                                </td>
+                                <td class="textright">{{row.OpeningBirds|currency}}</td>
+                                <td class="textright" *ngIf="!row.isEditingvisitlog">{{row.Died| currency}}</td>
+                                <td class="textright" *ngIf="row.isEditingvisitlog">
+                                    <input type="text" class="form-control" [(ngModel)]="row.Died"
+                                        (keypress)="onlyNumber(event)">
+                                </td>
+                                <td class="textright" *ngIf="!row.isEditingvisitlog">{{row.Hurt}}</td>
+                                <td class="textright" *ngIf="row.isEditingvisitlog">
+                                    <input type="text" class="form-control" [(ngModel)]="row.Hurt"
+                                        (keypress)="onlyNumber(event)">
+                                </td>
+
+                                <td class="textright">{{row.RemainingBirds |currency}}</td>
+                                <!-- <td class="textright" *ngIf="!row.isEditingvisitlog">{{row.Feed}}</td> -->
+                                <td class="textright">
+                                    <input *ngIf="row.isEditingvisitlog" type="text" class="form-control"
+                                        [(ngModel)]="row.Feed" (keypress)="onlyNumber(event)">
+                                    <span *ngIf="!row.isEditingvisitlog">{{row.Feed |currency}}</span>
+                                </td>
+                                <td class="textright" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>
+                                    <input *ngIf="row.isEditingvisitlog && reg.shedType!='Chick Shed'" type="text"
+                                        class="form-control" [(ngModel)]="row.DamagedEggs"
+                                        (keypress)="onlyNumber(event)">
+                                    <span *ngIf="!row.isEditingvisitlog">{{row.DamagedEggs |currency}}</span>
+                                </td>
+                                <!-- <td class="textright" ></td> -->
+                                <td class="textright" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>
+                                    <input *ngIf="row.isEditingvisitlog && reg.shedType!='Chick Shed'" type="text"
+                                        class="form-control" [(ngModel)]="row.NumberofEggs"
+                                        (keypress)="onlyNumber(event)">
+                                    <span *ngIf="!row.isEditingvisitlog">{{row.NumberofEggs |currency}}</span>
+                                </td>
+                                <td class="textright" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>{{row.TotalEggs |currency}}</td>
+                                <!-- <td class="textright" ></td> -->
+                                <td class="text-center" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>
+                                    <mat-checkbox *ngIf="row.isEditingvisitlog && reg.shedType!='Chick Shed'"
+                                        color="primary" [(ngModel)]="row.IsProduction"></mat-checkbox>
+                                    <mat-checkbox *ngIf="!row.isEditingvisitlog" color="primary"
+                                        [(ngModel)]="row.IsProduction" [disabled]="true"></mat-checkbox>
+                                </td>
+                                <!-- <td class="text-left" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>{{row.IsProduction}}</td> -->
+                                <td class="textright" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>{{row.Percentage |currency}}</td>
+                                <td class="text-left">{{row.StatusType}}</td>
+                                <td>
+                                    <div *ngIf='row.StatusTypeId==status.Pending && !row.isEditingvisitlog && ActivityRights.CanManageVisitLogs'
+                                        class="text-center">
+                                        <button type="button" class="btn btn-success btn-xs" title="Approve"
+                                            (click)="approveOrDecline(row,'Approve')" data-toggle="tooltip">
+                                            <i class="mdi mdi-thumb-up-outline" aria-hidden="true"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-xs" title="Edit"
+                                            (click)="onEditvisitClick(row,rowIndex,reg)" data-toggle="tooltip">
+                                            <i class="mdi mdi-table-edit" aria-hidden="true"></i>
+                                        </button>
+                                        <button mat-raised-button type="button" class="btn btn-primary btn-xs"
+                                            title="View Note" data-toggle="tooltip" (click)="openModal(row,template)"
+                                            *ngIf="row.Remarks!=null">
+                                            <i class="mdi mdi-eye"></i></button>
+                                    </div>
+                                    <div *ngIf="row.isEditingvisitlog">
+                                        <button type="button" class="btn btn-success btn-xs" title="Update"
+                                            data-toggle="tooltip" (click)="UpdateVisitLog(row)"
+                                            *ngIf="row.isEditingvisitlog">
+                                            <i class="mdi mdi-content-save"></i></button>
+                                        <button type="button" class="btn btn-primary btn-xs" title="Cancel"
+                                            data-toggle="tooltip" (click)="onCancleEditvisit(row)"
+                                            *ngIf="row.isEditingvisitlog">
+                                            <i class="mdi mdi-block-helper"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="footer" *ngIf='reg.logs.length>0'>
+                            <tr>
+                                <td style="border-right:0px !important"></td>
+                                <td></td>
+                                <td class="textright">Total</td>
+                                <td class="textright">{{reg?.Summaries[0]?.OpeningBirds |currency}}</td>
+                                <td class="textright">{{reg?.Summaries[0]?.Died |currency}}</td>
+                                <td class="textright">{{reg?.Summaries[0]?.Hurt |currency}}</td>
+                                <td class="textright">{{reg?.Summaries[0]?.RemainingBirds |currency}}</td>
+                                <td class="textright">{{reg?.Summaries[0]?.Feed |currency}}</td>
+                                <td class="textright" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>
+                                    {{reg?.Summaries[0]?.DamagedEggs}}</td>
+                                <td class="textright" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>
+                                    {{reg?.Summaries[0]?.NumberofEggs}}</td>
+                                <td class="textright" *ngIf='reg.ShedTypeId!=ShedType.ChickShed'>
+                                    {{reg?.Summaries[0]?.TotalEggs}}</td>
+                                <td></td>
+                                <td class="textright"
+                                    *ngIf='reg.Summaries[0].Percentage==null && reg.ShedTypeId!=ShedType.ChickShed'>
+                                    {{reg?.Summaries[0]?.Percentage}}</td>
+                                <td class="textright"
+                                    *ngIf='reg.Summaries[0].Percentage!=null && reg.ShedTypeId!=ShedType.ChickShed'>
+                                    {{reg?.Summaries[0]?.Percentage}}%</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage" let-columns>
+                            <tr>
+                                <td colspan="15" class="ui-datatable-emptymessage text-center">No Records Found</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main Grid End -->
+</div>
+<ng-template #template>
+    <div class="modal-header">
+        <h3 class="modal-title pull-left" style="color:#337ab7">Log Note</h3>
+        <!-- <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button> -->
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <Label style="font-size:17px;margin-top: 5px;border-bottom: 0 none;">Batch # :
+                <b class="text-danger">{{rowNote.batch}}</b>
+            </Label>
+        </div>
+        <div class="row">
+            <Label style="font-size:17px;margin-top: 5px;border-bottom: 0 none;">Shed # :
+                <b class="text-danger">{{rowNote.shed}}</b>
+            </Label>
+        </div>
+        <div class="row">
+            <Label style="font-size:17px;margin-top: 5px;border-bottom: 0 none;">Note :
+                <b class="text-danger">{{rowNote.note}}</b>
+            </Label>
+        </div>
+    </div>
+</ng-template>
+
+
+
+
+
+<p-dialog [(visible)]="isManageRate" styleClass="mydialog" modal="fade" [closable]="false"
+  [contentStyle]="{'width': '500px','overflow':'visible','height':'auto'}">
+  <p-header>
+    Manage Rate
+  </p-header>
+  <form [formGroup]="manageRateForm">
+
+    <mat-form-field class="col-md-12">
+      <input matInput [matDatepicker]="picker3" placeholder=" Date " readonly [max]="curDate"
+        formControlName="date" [(ngModel)]="manageDate" (dateChange)="OnManageDateChange()">
+      <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+      <mat-datepicker #picker3></mat-datepicker>
+      <mat-error>
+        <span *ngIf="!manageRateForm.get('date').valid && manageRateForm.get('date').touched">
+          <span *ngIf="manageRateForm.controls['date'].hasError('required') ">
+            Please select Date
+          </span>
+        </span>
+      </mat-error>
+    </mat-form-field>
+
+    
+      <mat-form-field class="col-md-12"  >
+        <input matInput placeholder="Cull Bird  Rate" [(ngModel)]="ManageData.CullRate" formControlName="cullRate"   maxlength="10" required
+        oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+        <mat-error>
+          <span *ngIf="!manageRateForm.get('cullRate').valid && manageRateForm.get('cullRate').touched">
+            <span *ngIf="manageRateForm.controls['cullRate'].hasError('required') ">
+              Please enter Cull Rate
+            </span>
+          </span>
+        </mat-error>
+      </mat-form-field>
+  
+      <mat-form-field class="col-md-12"  >
+        <input matInput placeholder="Paper Rate"  [(ngModel)]="ManageData.NECCRate" formControlName="neccRate"  maxlength="10"  required
+        oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+        <mat-error>
+          <span *ngIf="!manageRateForm.get('neccRate').valid && manageRateForm.get('neccRate').touched">
+            <span *ngIf="manageRateForm.controls['neccRate'].hasError('required') ">
+              Please enter NECC Rate
+            </span>
+          </span>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="col-md-12"  >
+        <input matInput placeholder="Pulp Rate"  [(ngModel)]="ManageData.PulpRate" formControlName="pulpRate"  maxlength="10" required
+        oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+        <mat-error>
+          <span *ngIf="!manageRateForm.get('pulpRate').valid && manageRateForm.get('pulpRate').touched">
+            <span *ngIf="manageRateForm.controls['pulpRate'].hasError('required') ">
+              Please enter Pulp Rate
+            </span>
+          </span>
+        </mat-error>
+      </mat-form-field>    
+    
+    <p-footer>
+        <div class="col-12">
+            <div class="float-right ml-auto">
+              <p-button icon="pi pi-check" label="Save" styleClass="ui-button-success mr-2 bg-primary" (onClick)="onSaveManageRateClick()"
+              [disabled]="!manageRateForm.valid"></p-button>
+              <p-button icon="pi pi-cross" label="Cancel" styleClass="ui-button-danger bg-light text-dark" icon="pi pi-times"
+              (onClick)="onCancelManageRateClick()"></p-button>
+            </div>
+            <div class="clearfix"></div>
+          </div>     
+    </p-footer>
+  </form>
+  <div class="clearfix"></div>
+</p-dialog>

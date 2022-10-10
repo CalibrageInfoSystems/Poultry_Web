@@ -1,0 +1,468 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+<div role="main" >
+  <div class="page-header">
+    <h3 class="page-title">Farm Details</h3>
+    <div class="float-right ml-auto" *ngIf="mainBtns">
+      <button type="button" class="btn btn-primary" title="  Add New Farm" data-toggle="tooltip" (click)="onAddFormClick()" *ngIf='ActivityRights.CanManageFarmsInfo'>
+        Add New Farm
+      </button>      
+      <button type="button" class="btn btn-primary" title="Export" data-toggle="tooltip" (click)="download()">
+        Export
+      </button>
+      <button class="btn btn-primary " (click)="toggleFilter()"
+          *ngIf="!isFiltersEnabled && FormInfoData.length>0 ">          
+          {{filterTooltip}}
+        </button>&nbsp;&nbsp;
+        <button class="btn btn-warning " (click)="toggleFilter()"
+          *ngIf="isFiltersEnabled && FormInfoData.length>0 ">
+                    {{filterTooltip}}
+        </button> 
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <!-- Add Farm Form -->
+      <div class="purchase-popup" *ngIf="isAddFormDetails">
+          <div class="header text-primary">
+            <h4 class="pl-3">Add New Farm Details</h4>
+            <div class="clearfix"></div>
+          </div>
+          <div>
+            <form class="form-horizontal form-label-left" [formGroup]="AddFormInfoForm">
+              <div class="row">
+                <mat-form-field class="col-md-3 col-12">
+                  <input matInput placeholder="Farm Name" required formControlName="FarmName">
+                  <mat-error>
+                      <span *ngIf="AddFormInfoForm.get('FarmName').invalid && AddFormInfoForm.get('FarmName').touched">
+                        <span *ngIf="AddFormInfoForm.controls['FarmName'].hasError('required') ">
+                          Please Enter FarmName
+                        </span>
+                      </span>
+                    </mat-error>
+                </mat-form-field>
+          
+                <mat-form-field class="col-md-3 col-12">
+                  <mat-select placeholder="Select Company" required formControlName="Company" required [(ngModel)]="selectedCompany" [disabled]="selectedCompany">
+                    <mat-option *ngFor="let Company of CompanyList" [value]="Company.Id">
+                      {{Company.Name}}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>
+                      <span *ngIf="AddFormInfoForm.get('Company').invalid && AddFormInfoForm.get('Company').touched">
+                        <span *ngIf="AddFormInfoForm.controls['Company'].hasError('required') ">
+                          Please Enter Bill Rate
+                        </span>
+                      </span>
+                    </mat-error>
+                </mat-form-field>
+          
+          
+                <mat-form-field class="col-md-3 col-12">
+                  <input matInput placeholder="AddressLine1" required formControlName="AddressLine1">
+                  <mat-error>
+                      <span *ngIf="AddFormInfoForm.get('AddressLine1').invalid && AddFormInfoForm.get('AddressLine1').touched">
+                        <span *ngIf="AddFormInfoForm.controls['AddressLine1'].hasError('required') ">
+                          Please Enter AddressLine1
+                        </span>
+                      </span>
+                    </mat-error>
+                </mat-form-field>
+          
+                <mat-form-field class="col-md-3 col-12">
+                  <input matInput placeholder="AddressLine2" required formControlName="AddressLine2">
+                  <mat-error>
+                      <span *ngIf="AddFormInfoForm.get('AddressLine2').invalid && AddFormInfoForm.get('AddressLine2').touched">
+                        <span *ngIf="AddFormInfoForm.controls['AddressLine2'].hasError('required') ">
+                          Please Enter AddressLine2
+                        </span>
+                      </span>
+                    </mat-error>
+                </mat-form-field>
+              </div>
+          
+              <div class="row">
+                <mat-form-field class="col-md-3 col-12">
+                  <input matInput placeholder="Village" required formControlName="Village">
+                  <mat-error>
+                      <span *ngIf="AddFormInfoForm.get('Village').invalid && AddFormInfoForm.get('Village').touched">
+                        <span *ngIf="AddFormInfoForm.controls['Village'].hasError('required') ">
+                          Please Enter Village
+                        </span>
+                      </span>
+                    </mat-error>
+                </mat-form-field>
+          
+                <mat-form-field class="col-md-3 col-12">
+                  <input matInput placeholder="Mandal" required formControlName="Mandal">
+                  <mat-error>
+                      <span *ngIf="AddFormInfoForm.get('Mandal').invalid && AddFormInfoForm.get('Mandal').touched">
+                        <span *ngIf="AddFormInfoForm.controls['Mandal'].hasError('required') ">
+                          Please Enter Mandal
+                        </span>
+                      </span>
+                    </mat-error>
+                </mat-form-field>
+          
+                <mat-form-field class="col-md-3 col-12">
+                  <input matInput placeholder="District" required formControlName="District">
+                  <mat-error>
+                      <span *ngIf="AddFormInfoForm.get('District').invalid && AddFormInfoForm.get('District').touched">
+                        <span *ngIf="AddFormInfoForm.controls['District'].hasError('required') ">
+                          Please Enter District
+                        </span>
+                      </span>
+                    </mat-error>
+                </mat-form-field>
+          
+                <mat-form-field class="col-md-3 col-12">
+                  <input matInput placeholder="State" required formControlName="State">
+                  <mat-error>
+                      <span *ngIf="AddFormInfoForm.get('State').invalid && AddFormInfoForm.get('State').touched">
+                        <span *ngIf="AddFormInfoForm.controls['State'].hasError('required') ">
+                          Please Enter State
+                        </span>
+                      </span>
+                    </mat-error>
+                </mat-form-field>
+              </div>
+          
+              <div class="row">
+                <mat-form-field class="col-md-3 col-12">
+                  <input matInput placeholder="PinCode" required (keypress)="onlyNumber(event)" formControlName="PinCode">
+                  <mat-error>
+                      <span *ngIf="AddFormInfoForm.get('PinCode').invalid && AddFormInfoForm.get('FarmName').touched">
+                        <span *ngIf="AddFormInfoForm.controls['PinCode'].hasError('required') ">
+                          Please Enter PinCode
+                        </span>
+                      </span>
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="col-md-3 col-12">
+                  <input matInput placeholder="Area" required formControlName="Area" (keypress)="onlyNumber(event)">
+                  <mat-error>
+                      <span *ngIf="AddFormInfoForm.get('Area').invalid && AddFormInfoForm.get('Area').touched">
+                        <span *ngIf="AddFormInfoForm.controls['Area'].hasError('required') ">
+                          Please Enter Area
+                        </span>
+                      </span>
+                    </mat-error>
+                </mat-form-field>
+          
+                <mat-form-field class="col-md-3 col-12">
+                  <input matInput placeholder="Mobile Number" required formControlName="MobileNumber" (keypress)="onlyNumber(event)">
+                  <mat-error>
+                      <span *ngIf="AddFormInfoForm.get('MobileNumber').invalid && AddFormInfoForm.get('MobileNumber').touched">
+                        <span *ngIf="AddFormInfoForm.controls['MobileNumber'].hasError('required') ">
+                          Please Enter MobileNumber
+                        </span>
+                      </span>
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="col-md-3 col-12">
+                  <mat-label>Poultry Breeds</mat-label>
+                  <mat-select placeholder="Select Poultry Breeds" required formControlName="Breed" required [(ngModel)]="selectedBreed" [disabled]="selectedBreed">
+                    <mat-option *ngFor="let Breed of BreedList" [value]="Breed.TypeCdId">
+                      {{Breed.Desc}}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>
+                      <span *ngIf="AddFormInfoForm.get('Breed').invalid && AddFormInfoForm.get('Breed').touched">
+                        <span *ngIf="AddFormInfoForm.controls['Breed'].hasError('required') ">
+                          Please Enter Breed
+                        </span>
+                      </span>
+                    </mat-error>
+                </mat-form-field>
+                <div class="clearfix"></div>
+                  <mat-checkbox class="col-md-3 col-sm-3 col-12 mt-2" formControlName="IsActive" [ngModel]="true">IsActive</mat-checkbox>
+              </div>
+              <div class="ln_solid"></div>
+              <div class="form-group">
+                <div class="float-right">
+                  <button type="button" class="btn btn-light text-dark" (click)="onCancleFormAdding()">Cancel</button>
+                  <button type="submit" class="btn btn-primary" (click)="onSaveFormClick();clicked=true" [disabled]="!AddFormInfoForm.valid||clicked"> Save</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+  <!-- Add Farm Form End -->
+<!-- Main Grid -->
+<div class="row" *ngIf="mainGrid">
+  <div class="col-12">
+      <!-- <div class="pull-left" style="padding:4px 10px;border-bottom: 0 none;margin-bottom:10px;">
+        <input type="text" class="form-control" pInputText size="50" placeholder="Search" (input)="dt.filterGlobal($event.target.value, 'contains')"
+          style="width:auto">
+      </div> -->
+    <p-table  #fi [value]="FormInfoData" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand" paginatorDropdownAppendTo="body" [rows]="10" [paginator]="true" [globalFilterFields]="['FarmName','CompanyName','Address1','TotalArea','MobileNumber']">
+      <ng-template pTemplate="header">
+        <tr>
+          <th [pSortableColumn]="'FarmName'"><span class="d-inline-flex">Farm Name
+            <p-sortIcon [field]="'FarmName'"></p-sortIcon></span>
+          </th>
+          <th [pSortableColumn]="'CompanyName'">Company <span class="d-inline-flex">Name
+            <p-sortIcon [field]="'CompanyName'"></p-sortIcon></span>
+          </th>
+          <th [pSortableColumn]="'AddressLine1'">Address Line1
+            <p-sortIcon [field]="'AddressLine1'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'AddressLine2'">Address Line2
+              <p-sortIcon [field]="'AddressLine2'"></p-sortIcon>
+            </th>
+
+          <th [pSortableColumn]="'Area'"><span class="d-inline-flex">Area
+            <p-sortIcon [field]="'Area'"></p-sortIcon></span>
+          </th>
+          <th [pSortableColumn]="'MobileNumber'">Mobile <span class="d-inline-flex">Number
+            <p-sortIcon [field]="'MobileNumber'"></p-sortIcon></span>
+          </th>
+          <th [pSortableColumn]="'BreedType'">Breed <span class="d-inline-flex">Name
+            <p-sortIcon [field]="'BreedType'"></p-sortIcon></span>
+          </th>
+          <th [pSortableColumn]="'IsActive'"><span class="d-inline-flex">Active
+              <p-sortIcon [field]="'IsActive'"></p-sortIcon></span>
+            </th>
+          <th  *ngIf='ActivityRights.CanManageFarmsInfo'><span class="mr-3">Action(s)</span></th>
+        </tr>
+        <tr *ngIf="isFiltersEnabled">  
+          
+          <th>
+            <input type="text" class="form-control" maxlength="50"
+              (input)="fi.filter($event.target.value, 'FarmName', 'contains')">
+          </th>
+          <th>
+            <input type="text" class="form-control" maxlength="50"
+              (input)="fi.filter($event.target.value, 'CompanyName', 'contains')">
+          </th>
+          <th>
+            <input type="text" class="form-control" maxlength="50"
+              (input)="fi.filter($event.target.value, 'AddressLine1', 'contains')">
+          </th>
+          <th>
+            <input type="text" class="form-control" maxlength="50"
+              (input)="fi.filter($event.target.value, 'AddressLine2', 'contains')">
+          </th>                   
+          <th>
+            <input type="text" class="form-control" maxlength="50"
+              (input)="fi.filter($event.target.value, 'Area', 'contains')">
+          </th>
+          <th>
+            <input type="text" class="form-control" maxlength="50"
+              (input)="fi.filter($event.target.value, 'MobileNumber', 'contains')">
+          </th>
+          <th>
+            <input type="text" class="form-control" maxlength="50"
+              (input)="fi.filter($event.target.value, 'BreedType', 'contains')">
+          </th>
+          <th>
+            <input type="text" class="form-control" maxlength="5"
+              (input)="fi.filter($event.target.value, 'IsActive', 'contains')">
+          </th>
+         <th></th>           
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>{{row.FarmName}}</td>
+          <td>{{row.CompanyName}}</td>
+          <td>{{row.AddressLine1}}{{',\n'}}{{row.AddressLine2}}</td>
+          <td>{{row.Village}}{{',\n'}}{{row.Mandal}}{{',\n'}}{{row.District}}{{',\n'}}{{row.State}}{{',\n'}}{{row.Pincode}}</td>
+          <!-- <td>{{row.Village}}{{row.Mandal}}{{row.District}}{{row.state}}</td> -->
+          <td class="textright">{{row.Area}}</td>
+          <td class="textright">{{row.MobileNumber}}</td>
+          <td>{{row.BreedType}}</td>
+          <td>{{row.IsActive}}</td>
+          <td>
+            <div *ngIf='ActivityRights.CanManageFarmsInfo'>
+              <button type="button" class="btn btn-primary btn-xs" title="Edit" data-toggle="tooltip" (click)="onEditFormClick(row)">
+                <i class="mdi mdi-table-edit"></i>
+              </button>
+              <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip" (click)="onDeleteClick(row)">
+                <i class="mdi mdi-delete"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage" let-columns>
+        <tr>
+          <td colspan="9" class="ui-datatable-emptymessage text-center">No Records Found</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  </div>
+  <!-- Main Grid End -->
+  <!-- Edit Farm Form -->
+  <div class="purchase-popup" *ngIf="isEditFormDetails">
+    <div class="header text-primary">
+      <h4 class="pl-3">Edit Farm Details</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div class="clearfix"></div>
+    <div>
+      <form class="form-horizontal form-label-left" [formGroup]="EditFormInfoForm">
+        <div class="row">
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder="Farm Name" [(ngModel)]="rowData.FarmName" formControlName="FarmName" required>
+            <mat-error>
+                <span *ngIf="EditFormInfoForm.get('FarmName').invalid && EditFormInfoForm.get('FarmName').touched">
+                  <span *ngIf="EditFormInfoForm.controls['FarmName'].hasError('required') ">
+                    Please Enter FarmName
+                  </span>
+                </span>
+              </mat-error>
+          </mat-form-field>
+
+          <!-- <mat-form-field class="col-md-3">
+            <input matInput placeholder="Company Name" [(ngModel)]="rowData.CompanyName" formControlName="Company" required>
+          </mat-form-field> -->
+          <mat-form-field class="col-md-3 col-12">
+              <mat-select placeholder="Select Company" required formControlName="Company" required [(ngModel)]="rowData.CompanyId" >
+                <mat-option *ngFor="let Company of CompanyList" [value]="Company.Id">
+                  {{Company.Name}}
+                </mat-option>
+              </mat-select>
+              <mat-error>
+                  <span *ngIf="EditFormInfoForm.get('Company').invalid && EditFormInfoForm.get('Company').touched">
+                    <span *ngIf="EditFormInfoForm.controls['Company'].hasError('required') ">
+                      Please Enter Company
+                    </span>
+                  </span>
+                </mat-error>
+            </mat-form-field>
+
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder="AddressLine1" [(ngModel)]="rowData.AddressLine1" formControlName="AddressLine1" required>
+            <mat-error>
+                <span *ngIf="EditFormInfoForm.get('AddressLine1').invalid && EditFormInfoForm.get('AddressLine1').touched">
+                  <span *ngIf="EditFormInfoForm.controls['AddressLine1'].hasError('required') ">
+                    Please Enter AddressLine1
+                  </span>
+                </span>
+              </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3 col-12">
+              <input matInput placeholder="AddressLine2" [(ngModel)]="rowData.AddressLine2" formControlName="AddressLine2" required>
+              <mat-error>
+                  <span *ngIf="EditFormInfoForm.get('AddressLine2').invalid && EditFormInfoForm.get('AddressLine2').touched">
+                    <span *ngIf="EditFormInfoForm.controls['AddressLine2'].hasError('required') ">
+                      Please Enter AddressLine2
+                    </span>
+                  </span>
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder=" Village" [(ngModel)]="rowData.Village" formControlName="Village" required>
+            <mat-error>
+                <span *ngIf="EditFormInfoForm.get('Village').invalid && EditFormInfoForm.get('Village').touched">
+                  <span *ngIf="EditFormInfoForm.controls['Village'].hasError('required') ">
+                    Please Enter Village
+                  </span>
+                </span>
+              </mat-error>
+          </mat-form-field>
+        
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder=" Mandal" [(ngModel)]="rowData.Mandal" formControlName="Mandal" required>
+            <mat-error>
+                <span *ngIf="EditFormInfoForm.get('Mandal').invalid && EditFormInfoForm.get('Mandal').touched">
+                  <span *ngIf="EditFormInfoForm.controls['Mandal'].hasError('required') ">
+                    Please Enter Mandal
+                  </span>
+                </span>
+              </mat-error>
+          </mat-form-field>
+        
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder=" District" [(ngModel)]="rowData.District" formControlName="District" required>
+            <mat-error>
+                <span *ngIf="EditFormInfoForm.get('District').invalid && EditFormInfoForm.get('District').touched">
+                  <span *ngIf="EditFormInfoForm.controls['District'].hasError('required') ">
+                    Please Enter District
+                  </span>
+                </span>
+              </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder=" State" [(ngModel)]="rowData.State" formControlName="State" required>
+            <mat-error>
+                <span *ngIf="EditFormInfoForm.get('State').invalid && EditFormInfoForm.get('State').touched">
+                  <span *ngIf="EditFormInfoForm.controls['State'].hasError('required') ">
+                    Please Enter State
+                  </span>
+                </span>
+              </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+            <mat-form-field class="col-md-3 col-12">
+                <input matInput placeholder="PinCode" [(ngModel)]="rowData.Pincode" formControlName="PinCode" required (keypress)="onlyNumber(event)">
+                <mat-error>
+                    <span *ngIf="EditFormInfoForm.get('PinCode').invalid && EditFormInfoForm.get('PinCode').touched">
+                      <span *ngIf="EditFormInfoForm.controls['PinCode'].hasError('required') ">
+                        Please Enter PinCode
+                      </span>
+                    </span>
+                  </mat-error>
+              </mat-form-field>
+            <mat-form-field class="col-md-3 col-12">
+                <input matInput placeholder=" Area" [(ngModel)]="rowData.Area" formControlName="Area" required (keypress)="onlyNumber(event)">
+                <mat-error>
+                    <span *ngIf="EditFormInfoForm.get('Area').invalid && EditFormInfoForm.get('Area').touched">
+                      <span *ngIf="EditFormInfoForm.controls['Area'].hasError('required') ">
+                        Please Enter Area
+                      </span>
+                    </span>
+                  </mat-error>
+              </mat-form-field>
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder="Mobile Number" [(ngModel)]="rowData.MobileNumber" formControlName="MobileNumber"
+              required (keypress)="onlyNumber(event)">
+              <mat-error>
+                  <span *ngIf="EditFormInfoForm.get('MobileNumber').invalid && EditFormInfoForm.get('MobileNumber').touched">
+                    <span *ngIf="EditFormInfoForm.controls['MobileNumber'].hasError('required') ">
+                      Please Enter MobileNumber
+                    </span>
+                  </span>
+                </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="col-md-3 col-12">
+            <mat-label>Poultry Breeds</mat-label>
+            <mat-select placeholder="Select Poultry Breeds" required formControlName="Breed" required [(ngModel)]="rowData.BreedTypeId" >
+                      <mat-option *ngFor="let Breed of BreedList" [value]="Breed.TypeCdId">
+                  {{Breed.Desc}}
+                </mat-option>
+            </mat-select>
+            <mat-error>
+                <span *ngIf="EditFormInfoForm.get('Breed').invalid && EditFormInfoForm.get('Breed').touched">
+                  <span *ngIf="EditFormInfoForm.controls['Breed'].hasError('required') ">
+                    Please Enter Breed
+                  </span>
+                </span>
+              </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+            <mat-checkbox class="col-md-3 col-sm-3 col-12 mt-2" formControlName="IsActive" [ngModel]="rowData.IsActive">IsActive</mat-checkbox>
+          </div>
+        <div class="ln_solid"></div>
+        <div class="form-group">
+          <div class="float-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleFormAdding()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="onUpdateForm();clicked=true" [disabled]="!EditFormInfoForm.valid ||clicked">Update</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <!-- Edit Farm Form End -->
+</div>

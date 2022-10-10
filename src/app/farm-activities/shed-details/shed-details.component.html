@@ -1,0 +1,241 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Shed Details</h3>
+    <div class="ml-auto" *ngIf="!isAddShedDetails && !isEditShedDetails">
+      <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="onAddShedClick()" *ngIf='ActivityRights.CanManageShedDetails'>
+        Add Shed Details
+      </button>
+      <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="download()" *ngIf='shedDetailsList?.length>0'>
+        Export
+      </button>
+      <button class="btn btn-success" (click)="toggleFilter()" *ngIf="isFiltersEnabled">        
+        {{filterTooltip}}
+      </button>
+       <button class="btn btn-primary" (click)="toggleFilter()" [disabled]="isDataLoading||shedDetailsList.length==0"  *ngIf="!isFiltersEnabled">
+       {{filterTooltip}}
+      </button>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <div class="purchase-popup" *ngIf="isAddShedDetails">
+    <div class="header text-primary mb-2">
+      <h4>Add New Shed Details</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div>
+      <form class="form-horizontal form-label-left" [formGroup]="addShedDetailsForm">
+        <div class="row">
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Shed #" formControlName="shedNumber">
+            <mat-error>
+              <span *ngIf="!addShedDetailsForm.get('shedNumber').valid && addShedDetailsForm.get('shedNumber').touched">
+                <span *ngIf="addShedDetailsForm.controls['shedNumber'].hasError('required') ">
+                  Please enter Shed name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <!-- <mat-form-field class="col-md-3">
+            <mat-select placeholder="Select Farms" formControlName="farmName" [(ngModel)]="selectedFarm.Id">
+              <mat-option *ngFor="let farm of farmsList" [value]="farm.Id">
+                {{farm.FarmName}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="!addShedDetailsForm.get('farmName').valid && addShedDetailsForm.get('farmName').touched">
+                <span *ngIf="addShedDetailsForm.controls['farmName'].hasError('required') ">
+                  Please enter farm name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field> -->
+          <mat-form-field class="col-md-3">
+            <mat-select placeholder="Select Shed Type" formControlName="shedType">
+              <mat-option *ngFor="let shed of shedTypeList" [value]="shed.TypeCdId">
+                {{shed.Desc}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="!addShedDetailsForm.get('shedType').valid && addShedDetailsForm.get('shedType').touched">
+                <span *ngIf="addShedDetailsForm.controls['shedType'].hasError('required') ">
+                  Please enter ShedType name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Shed Capacity" (keypress)="onlyNumber(event)" formControlName="capacity">
+            <mat-error>
+              <span *ngIf="!addShedDetailsForm.get('capacity').valid && addShedDetailsForm.get('capacity').touched">
+                <span *ngIf="addShedDetailsForm.controls['capacity'].hasError('required') ">
+                  Please enter shed capacity
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-checkbox class="col-12 col-sm-6 col-md-3 mt-2" color="primary" formControlName="isActive">Is Active</mat-checkbox>
+        </div>
+        <div class="ln_solid"></div>
+        <div class="form-group">
+          <div class="float-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleShedAdding()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="onShedSave();clicked=true" [disabled]="!addShedDetailsForm.valid||clicked">Save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="row" *ngIf="!isAddShedDetails && !isEditShedDetails">
+      <!-- <div class="pull-left" style="padding:4px 10px;border-bottom: 0 none;margin-bottom:10px;">
+        <input type="text" class="form-control" pInputText size="50" placeholder="Search" (input)="sd.filterGlobal($event.target.value, 'contains')"
+          style="width:auto">
+      </div> -->
+      <!-- <div class="col-12">
+      <div class="d-flex align-items-center purchase-popup" *ngIf="!isAddShedDetails && !isEditShedDetails">
+        
+        </div>
+    </div> -->
+    <div class="col-12">
+    <p-table #dt [value]="shedDetailsList" sortField="UpdatedDate" sortOrder="-1" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand">
+      <ng-template pTemplate="header" class="table table-striped">
+        <tr>
+          <th [pSortableColumn]="'ShedName'" >Shed#
+            <p-sortIcon [field]="'ShedName'"></p-sortIcon>
+          </th>
+          <!-- <th [pSortableColumn]="'FarmName'">Farm Name
+            <p-sortIcon [field]="FarmName"></p-sortIcon>
+          </th> -->
+          <th [pSortableColumn]="'ShedType'">Shed Type
+            <p-sortIcon [field]="'ShedType'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'Capacity'">Capacity
+            <p-sortIcon [field]="'Capacity'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'IsActive'">Active
+            <p-sortIcon [field]="'IsActive'"></p-sortIcon>
+          </th>
+          <th>Action(s)</th>
+        </tr>
+        <tr *ngIf="isFiltersEnabled">
+          <th>
+            <input pInputText type="text" (input)="dt.filter($event.target.value, 'ShedName','contains')">
+          </th>
+          <th>
+            <input pInputText type="text" (input)="dt.filter($event.target.value, 'ShedType','contains')">
+          </th>
+          <th>
+            <input pInputText type="text" (input)="dt.filter($event.target.value, 'Capacity','contains')">
+          </th>
+          <th>
+            <input pInputText type="text" (input)="dt.filter($event.target.value, 'IsActive','contains')">
+          </th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>{{row.ShedName}}</td>
+          <!-- <td>{{row.FarmName}}</td> -->
+          <td>{{row.ShedType}}</td>
+          <td class="textright">{{row.Capacity |currency}}</td>
+          <td>{{row.IsActive}}</td>
+          <td>
+            <div *ngIf='ActivityRights.CanManageShedDetails'>
+              <button type="button" class="btn btn-primary btn-circle btn-xs" title="Edit" data-toggle="tooltip" (click)="onEditShedDetailsClick(row)">
+                <i class="mdi mdi-table-edit"></i>
+              </button>
+              <button type="button" class="btn btn-danger btn-circle btn-xs" title="Delete" data-toggle="tooltip"  [disabled]='!row.IsActive' (click)="onDeleteShedDetailsClick(row)">
+                <i class="mdi mdi-delete"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage" let-columns>
+        <tr style="text-align: center" *ngIf="!isDataLoading">
+          <td colspan="5" class="ui-datatable-emptymessage text-center">No Records Found</td>
+        </tr>
+        <tr style="text-align: center" *ngIf="isDataLoading">
+          <td colspan="5">
+            <i class="fa fa-spinner"></i>&nbsp; Loading ... Please Wait!</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  </div>
+  <div class="purchase-popup" *ngIf="isEditShedDetails">
+    <div class="header text-primary mb-2">
+      <h4>Update Shed Details</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div>
+      <form class="form-horizontal form-label-left" [formGroup]="editShedDetailsForm">
+        <div class="row">
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Shed #" formControlName="shedNumber" [(ngModel)]="rowData.ShedName">
+            <mat-error>
+              <span *ngIf="!editShedDetailsForm.get('shedNumber').valid && editShedDetailsForm.get('shedNumber').touched">
+                <span *ngIf="editShedDetailsForm.controls['shedNumber'].hasError('required') ">
+                  Please enter Shed name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <!-- <mat-form-field class="col-md-3">
+            <mat-select placeholder="Select Farms" formControlName="farmName" [(ngModel)]="rowData.FarmId">
+              <mat-option *ngFor="let farm of farmsList" [value]="farm.Id">
+                {{farm.FarmName}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="!editShedDetailsForm.get('farmName').valid && editShedDetailsForm.get('farmName').touched">
+                <span *ngIf="editShedDetailsForm.controls['farmName'].hasError('required') ">
+                  Please enter farm name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field> -->
+          <mat-form-field class="col-md-3">
+            <mat-select placeholder="Select Shed Type" formControlName="shedType" [(ngModel)]="rowData.ShedTypeId">
+              <mat-option *ngFor="let shed of shedTypeList" [value]="shed.TypeCdId">
+                {{shed.Desc}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="!editShedDetailsForm.get('shedType').valid && editShedDetailsForm.get('shedType').touched">
+                <span *ngIf="editShedDetailsForm.controls['shedType'].hasError('required') ">
+                  Please enter shedType
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Shed Capacity" (keypress)="onlyNumber(event)" formControlName="capacity" [(ngModel)]="rowData.Capacity">
+            <mat-error>
+              <span *ngIf="!editShedDetailsForm.get('capacity').valid && editShedDetailsForm.get('capacity').touched">
+                <span *ngIf="editShedDetailsForm.controls['capacity'].hasError('required') ">
+                  Please enter capacity
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-checkbox class="col-12 col-sm-6 col-md-3" style="margin-top: 21px;" formControlName="isActive" [(ngModel)]="rowData.IsActive">Is Active</mat-checkbox>
+        </div>
+        <div class="ln_solid"></div>
+        <div class="form-group">
+          <div class="float-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleShedEdit()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="onShedUpdate();clicked=true" [disabled]="!editShedDetailsForm.valid || !editShedDetailsForm.dirty ||clicked">Update</button>
+          </div>
+        </div>
+      </form>
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</div>

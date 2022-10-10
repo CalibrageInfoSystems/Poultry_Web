@@ -1,0 +1,213 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Company Details</h3>
+    <div class="float-right ml-auto">
+      <button type="button" class="btn btn-primary" title=" Edit" data-toggle="tooltip"
+        (click)="onEditCompanyInfoClick()" *ngIf='ActivityRights.CanManageComanyInfo'>
+        Edit Details
+      </button>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <!-- Edit Company Details Form -->
+  <div class="purchase-popup">
+    <div *ngIf="isEditCompanyInfoDetails">
+      <div class="header text-primary mb-2">
+        <h4>Edit Company Details</h4>
+        <div class="clearfix"></div>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+    <div>
+      <form class="form-horizontal form-label-left" [formGroup]="editCompanyDetails">
+        <div class="row">
+          <mat-form-field class="col-lg-3 col-md-3 col-sm-3">
+            <input matInput placeholder="Poultry Name" [ngModel]="companyInfo?.Name" [disabled]="!isEnable" required
+              class="textColor" formControlName="Name">
+            <mat-error>
+              <span *ngIf="!editCompanyDetails.get('Name').valid && editCompanyDetails.get('Name').touched">
+                <span *ngIf="editCompanyDetails.controls['Name'].hasError('required') ">
+                  Please enter company name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="col-lg-3 col-md-3 col-sm-3">
+            <input matInput placeholder="Display Name" [ngModel]="companyInfo?.DisplayName" [disabled]="!isEnable"
+              required class="textColor" formControlName="DisplayName">
+            <mat-error>
+              <span
+                *ngIf="!editCompanyDetails.get('DisplayName').valid && editCompanyDetails.get('DisplayName').touched">
+                <span *ngIf="editCompanyDetails.controls['DisplayName'].hasError('required') ">
+                  Please enter display name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class=" col-lg-3 col-md-3 col-sm-3">
+            <input matInput placeholder="Registration Number" [ngModel]="companyInfo?.RegistrationNumber"
+              [disabled]="!isEnable" class="textColor" required formControlName="RegistrationNumber">
+          </mat-form-field>
+
+          <mat-form-field class=" col-lg-3 col-md-3 col-sm-3">
+            <input matInput placeholder="Owner Name" [ngModel]="companyInfo?.OwnerName" [disabled]="!isEnable"
+              class="textColor" required formControlName="OwnerName">
+            <mat-error>
+              <span *ngIf="!editCompanyDetails.get('OwnerName').valid && editCompanyDetails.get('OwnerName').touched">
+                <span *ngIf="editCompanyDetails.controls['OwnerName'].hasError('required') ">
+                  Please enter owner name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-3 col-sm-3">
+            <input matInput placeholder="Address Line 1" [ngModel]="companyInfo?.AddressLine1" [disabled]="!isEnable"
+              class="textColor" required formControlName="AddressLine1">
+            <mat-error>
+              <span
+                *ngIf="!editCompanyDetails.get('AddressLine1').valid && editCompanyDetails.get('AddressLine1').touched">
+                <span *ngIf="editCompanyDetails.controls['AddressLine1'].hasError('required') ">
+                  Please enter Address
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="col-md-3 col-sm-3">
+            <input matInput placeholder="Address Line 2" [ngModel]="companyInfo?.AddressLine2" [disabled]="!isEnable"
+              class="textColor" required formControlName="AddressLine2">
+          </mat-form-field>
+
+          <mat-form-field class="col-md-3 col-sm-3">
+            <input matInput placeholder="Village" [ngModel]="companyInfo?.Village" required [disabled]="!isEnable"
+              class="textColor" formControlName="Village">
+            <mat-error>
+              <span *ngIf="!editCompanyDetails.get('Village').valid && editCompanyDetails.get('Village').touched">
+                <span *ngIf="editCompanyDetails.controls['Village'].hasError('required') ">
+                  Please enter Village
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3 col-sm-3">
+            <input matInput placeholder="Mandal" [ngModel]="companyInfo?.Mandal" required [disabled]="!isEnable"
+              class="textColor" formControlName="Mandal">
+            <mat-error>
+              <span *ngIf="!editCompanyDetails.get('Mandal').valid && editCompanyDetails.get('Mandal').touched">
+                <span *ngIf="editCompanyDetails.controls['Mandal'].hasError('required') ">
+                  Please enter Mandal
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field class="col-md-3 col-sm-3">
+            <input matInput placeholder="District" [ngModel]="companyInfo?.District" required [disabled]="!isEnable"
+              class="textColor" formControlName="District">
+            <mat-error>
+              <span *ngIf="!editCompanyDetails.get('District').valid && editCompanyDetails.get('District').touched">
+                <span *ngIf="editCompanyDetails.controls['District'].hasError('required') ">
+                  Please enter district
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+
+
+          <mat-form-field class="col-md-3 col-sm-3">
+            <input matInput placeholder="State" [ngModel]="companyInfo?.State" [disabled]="!isEnable" required
+              class="textColor" formControlName="State">
+            <mat-error>
+              <span *ngIf="!editCompanyDetails.get('State').valid && editCompanyDetails.get('State').touched">
+                <span *ngIf="editCompanyDetails.controls['State'].hasError('required') ">
+                  Please enter State
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="col-md-3 col-sm-3">
+            <input matInput placeholder="Pin Code" [ngModel]="companyInfo?.Pincode" [disabled]="!isEnable" required
+              (keypress)="onlyNumber($event)" class="textColor" formControlName="Pincode">
+            <mat-error>
+              <span *ngIf="!editCompanyDetails.get('Pincode').valid && editCompanyDetails.get('Pincode').touched">
+                <span *ngIf="editCompanyDetails.controls['Pincode'].hasError('required') ">
+                  Please enter Pincode
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3 col-sm-3">
+            <input matInput placeholder="Mobile Number" [ngModel]="companyInfo?.MobileNumber" [disabled]="!isEnable"
+              required (keypress)="onlyNumber($event)" class="textColor" formControlName="MobileNumber">
+            <mat-error>
+              <span
+                *ngIf="!editCompanyDetails.get('MobileNumber').valid && editCompanyDetails.get('MobileNumber').touched">
+                <span *ngIf="editCompanyDetails.controls['MobileNumber'].hasError('required') ">
+                  Please enter Mobile Number
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-3 col-sm-3">
+            <input matInput placeholder="Email Id" [ngModel]="companyInfo?.Email" required [disabled]="!isEnable"
+              class="textColor" formControlName="Email">
+            <mat-error>
+              <span *ngIf="!editCompanyDetails.get('Email').valid && editCompanyDetails.get('Email').touched">
+                <span *ngIf="editCompanyDetails.controls['Email'].hasError('required') ">
+                  Please enter Email
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="col-md-3 col-sm-3">
+            <input matInput [matDatepicker]="Datepicker" placeholder="Established Date" class="textColor"
+              [disabled]="!isEnable" [max]="curDate" [ngModel]="companyInfo?.YearOfEstablishment"
+              formControlName="YearOfEstablishment">
+            <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+            <mat-datepicker #Datepicker></mat-datepicker>
+            <mat-error>
+              <span
+                *ngIf="!editCompanyDetails.get('YearOfEstablishment').valid && editCompanyDetails.get('YearOfEstablishment').touched">
+                <span *ngIf="editCompanyDetails.controls['YearOfEstablishment'].hasError('required') ">
+                  Please select Date
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-checkbox class="col-md-3 col-sm-3 mt-3" formControlName="IsActive" color="primary"
+            [disabled]="!isEnable" [ngModel]="companyInfo?.IsActive">IsActive</mat-checkbox>
+        </div>
+
+        <div class="ln_solid"></div>
+        <div class="col-12">
+        <div class="form-group" *ngIf="isEditCompanyInfoDetails">
+          <div class="float-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleCompanyInfoAdding()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="onUpdate()"
+              [disabled]="!editCompanyDetails.valid || !editCompanyDetails.dirty">Update</button>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+      </form>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <!-- Edit Company Details  End -->
+</div>

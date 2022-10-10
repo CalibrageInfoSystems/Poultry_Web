@@ -1,0 +1,104 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+<!-- top tiles -->
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">
+      Add Daily Log</h3>
+  </div>
+  <!-- <h3 class="header pull-left">Add Daily Log</h3> -->
+  <div class="clearfix"></div>
+  <!-- Add Log Form -->
+  <div>
+    <!-- <div class="x_title">
+                <h4 class="header">Add Visit Log</h4>
+                <div class="clearfix"></div>
+            </div> -->
+    <form [formGroup]="addDaiyLogForm">
+      <div class="row">
+        <mat-form-field class="col-md-3">
+          <input matInput [matDatepicker]="Datepicker" placeholder="select Log Date"
+            (dateChange)="onChangeLogDate($event)" formControlName="seleclogDate" [(ngModel)]="selectedDate"
+            [max]="curDate" required readonly>
+          <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+          <mat-datepicker #Datepicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+    </form>
+    <div class="row" *ngFor="let shed of logDataByShedType">
+      <div class="col-12">
+        <span class="d-flex align-items-center purchase-popup">
+          <h4 class="mb-0 pb-0">{{shed.shedType}}</h4>
+        </span>
+      </div>
+      <div class="clearfix"></div>
+      <div class="col-12 stretch-card grid-margin">
+        <div class="card text-primary">
+          <div class="card-body p-4">
+            <div class="font-8" *ngFor="let item of shed.shedLogData; let i=index">
+              <div class="row">
+                <!-- <mat-checkbox class="col-12 col-sm-12 col-md-12 mb-3" color="primary" [(ngModel)]="item.IsProduction" [disabled]="isCheckShed(item.ShedTypeId)  ? null : 'required' ">Consider in Production</mat-checkbox> -->
+                <div class="clearfix"></div>
+                <div class="d-flex">
+                <div class="d-inline-block mt-2">
+                  <mat-checkbox class="text-truncate pl-2" color="primary" [(ngModel)]="item.IsProduction"
+                    [disabled]="isCheckShed(item.ShedTypeId)  ? null : 'required' "></mat-checkbox>
+                  <!-- Consider in Production -->
+                </div>
+                <div class="d-inline-block">
+                  <mat-form-field class="col-12 col-sm-6 col-md-2">
+                    <input matInput placeholder="Shed #" readonly [(ngModel)]='item.ShedBatch'>
+                  </mat-form-field>
+                  <mat-form-field class="col-12 col-sm-6 col-md-2">
+                    <input matInput placeholder="Remaining Birds" readonly [(ngModel)]='item.RemainingBirds'>
+                  </mat-form-field>
+                  <mat-form-field class="col-12 col-sm-6 col-md-1">
+                    <input matInput placeholder="Mortality" (keypress)="onlyNumber(event)" [(ngModel)]='item.Died'
+                      [readonly]="isApprovedOrDeclined(item.StatusTypeId)  ? null : 'required' ">
+                  </mat-form-field>
+                  <mat-form-field class="col-12 col-sm-6  col-md-1">
+                    <input matInput placeholder="Hurt" (keypress)="onlyNumber(event)" [(ngModel)]='item.Hurt'
+                      [readonly]="isApprovedOrDeclined(item.StatusTypeId)  ? null : 'required' ">
+                  </mat-form-field>
+                  <mat-form-field class="col-12 col-sm-6 col-md-2">
+                    <input matInput placeholder="Number Of Eggs" (keypress)="onlyNumber(event)"
+                      [(ngModel)]='item.NumberofEggs'
+                      [readonly]="isApprovedOrDeclined(item.StatusTypeId)  ? null : 'required' ">
+                  </mat-form-field>
+                  <mat-form-field class="col-12 col-sm-6 col-md-1">
+                    <input matInput placeholder="Damaged Eggs" (keypress)="onlyNumber(event)"
+                      [(ngModel)]='item.DamagedEggs'
+                      [readonly]="isApprovedOrDeclined(item.StatusTypeId)  ? null : 'required' ">
+                  </mat-form-field>
+                  <mat-form-field class="col-12 col-sm-6 col-md-1">
+                    <input matInput placeholder="Feed (Bags)" (keypress)="onlyNumber(event)" [(ngModel)]='item.Feed==0||item.Feed==0.0?null:item.Feed'
+                      [readonly]="isApprovedOrDeclined(item.StatusTypeId)  ? null : 'required' ">
+                  </mat-form-field>
+                  <mat-form-field class="col-12 col-sm-6 col-md-2">
+                    <input matInput placeholder="Remarks" [(ngModel)]='item.Remarks' maxlength="500">
+                  </mat-form-field>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="form-group row">
+      <div class="col-12">
+        <div class="pull-right">
+          <button type="button" class="btn btn-light text-dark">Cancel</button>
+          <button type="submit" class="btn btn-primary" (click)="addVisitLog();clicked=true" [disabled]="clicked">
+            <i *ngIf="isDataLoading" class="fa fa-spinner fa-spin"></i>Save</button>
+        </div>
+      </div>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <!-- Add Log Form End -->
+</div>

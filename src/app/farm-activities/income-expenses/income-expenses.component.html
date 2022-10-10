@@ -1,0 +1,405 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Income Expenses</h3>
+  </div>
+  <div class="clearfix"></div>
+  <div class="purchase-popup">
+    <div class="row">
+      <!-- <mat-form-field class="col-md-2">
+      <mat-select placeholder="Income/Expense" [(value)]="selectedIncome">
+        <mat-option *ngFor="let expense of expensesTypeList" [value]="expense.Id">
+          {{expense.Name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field> -->
+      <mat-form-field class="col-md-2 col-12">
+        <input matInput [matDatepicker]="picker" placeholder="From Date" readonly [max]="currentDate"
+          [(ngModel)]="fromDate">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field class="col-md-2 col-12">
+        <input matInput [matDatepicker]="picker1" placeholder="To Date" readonly [min]="fromDate" [max]="currentDate"
+          [(ngModel)]="toDate">
+        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1></mat-datepicker>
+      </mat-form-field>
+      <div class="col-md-3 col-12">
+        <button type="button" class="btn btn-primary" title="Search" data-toggle="tooltip" (click)="onSearchClick()"
+          [disabled]="">Search</button>
+        <button type="button" class="btn btn-primary" title="Clear" data-toggle="tooltip" (click)="onClearSearch()"
+          [disabled]="">Clear</button>
+      </div>
+      <div class="col-md-5 col-12">
+        <div class="float-right">
+          <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="onAddIncomeClick()"
+            *ngIf="ActivityRights.CanManageIncomeExpenses">Add Income</button>
+          <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="onAddExpenseClick()"
+            *ngIf="ActivityRights.CanManageIncomeExpenses">Add Expense</button>
+          <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip"
+            (click)="download()">Export</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <nav class="nav text-center bg-white">
+        <div class="nav nav-tabs " id="nav-tab" role="tablist">
+          <a class="nav-item nav-link active" id="tab1-tab" data-toggle="tab" href="#tab1" role="tab"
+            aria-controls="tab1" aria-selected="true">Income</a>
+          <a class="nav-item nav-link" id="tab2-tab" data-toggle="tab" href="#tab2" role="tab" aria-controls="tab2"
+            aria-selected="false">Expenses</a>
+        </div>
+      </nav>
+      <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+          <div class="float-right">
+            <button class="btn btn-primary " (click)="toggleFilter()" *ngIf="!isFiltersEnabled && incomeList.length>0 ">
+              {{filterTooltip}}
+            </button>&nbsp;&nbsp;
+            <button class="btn btn-warning " (click)="toggleFilter()" *ngIf="isFiltersEnabled && incomeList.length>0 ">
+              {{filterTooltip}}
+            </button>
+          </div>
+          <div class="pt-5"></div>
+
+          <p-table #IN [value]="incomeList" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true"
+            columnResizeMode="expand" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">
+            <ng-template pTemplate="header">
+              <tr>
+                <th [pSortableColumn]="'IEDate'">Date
+                  <p-sortIcon [field]="'IEDate'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'IncomeType'"> Income Type
+                  <p-sortIcon [field]="'IncomeType'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'Amount'">Amount(Rs)
+                  <p-sortIcon [field]="'Amount'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'CreatedBy'">Created By
+                  <p-sortIcon [field]="'CreatedBy'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'CreatedDate'">Created Date
+                  <p-sortIcon [field]="'CreatedDate'"></p-sortIcon>
+                </th>
+
+                <th *ngIf='ActivityRights.CanManageIncomeExpenses'>Action(s)</th>
+              </tr>
+              <tr *ngIf="isFiltersEnabled">
+                <th>
+                  <input type="text" class="form-control" maxlength="50"
+                    (input)="IN.filter($event.target.value, 'IEDate', 'contains')">
+                </th>
+                <th>
+                  <input type="text" class="form-control" maxlength="50"
+                    (input)="IN.filter($event.target.value, 'IncomeType', 'contains')">
+                </th>
+                <th>
+                  <input type="text" class="form-control" maxlength="50"
+                    (input)="IN.filter($event.target.value, 'Amount', 'contains')">
+                </th>
+                <th>
+                  <input type="text" class="form-control" maxlength="50"
+                    (input)="IN.filter($event.target.value, 'CreatedBy', 'contains')">
+                </th>
+                <th>
+                  <input type="text" class="form-control" maxlength="5"
+                    (input)="IN.filter($event.target.value, 'CreatedDate', 'contains')">
+                </th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td>{{row.IEDate| date:'dd/MM/yyyy'}}</td>
+                <td>{{row.IncomeType}}</td>
+                <td>{{row.Amount | currency}}</td>
+                <td>{{row.CreatedBy}}</td>
+                <td>{{row.CreatedDate| date:'dd/MM/yyyy'}}</td>
+
+                <td>
+                  <div *ngIf="ActivityRights.CanManageIncomeExpenses">
+                    <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip" (click)="  onDeleteIncomeDetailsClick(row) 
+              (row)"
+                      [disabled]="(row.IncomeTypeId == incomeTypes.Production)|| (row.IncomeTypeId == incomeTypes.culling)||(row.IncomeTypeId == expenseTypes.BatchCost)||(row.IncomeTypeId == expenseTypes.FeedPurchase) ">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr *ngIf="incomeList.length>0">
+                <td class="textright">Total Amount(Rs) : </td>
+                <td class="text-center" colspan="5">{{totalData.Amount| currency}}</td>               
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage" let-columns>
+              <tr>
+                <td colspan="6" class="ui-datatable-emptymessage text-center">No Records Found</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+          <div class="float-right">
+            <button class="btn btn-primary " (click)="toggle()"
+              *ngIf="!isFiltersEnable && expensesList.length>0 ">
+              {{Tooltip}}
+            </button>&nbsp;&nbsp;
+            <button class="btn btn-warning " (click)="toggle()"
+              *ngIf="isFiltersEnable && expensesList.length>0 ">
+              {{Tooltip}}
+            </button>
+          </div>
+          <div class="pt-5"></div>
+          <p-table #ex [value]="expensesList" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true"
+            columnResizeMode="expand" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">
+            <ng-template pTemplate="header">
+              <tr>
+                <th [pSortableColumn]="'IEDate'">Date
+                  <p-sortIcon [field]="IEDate"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'IncomeType'"> Income Type
+                  <p-sortIcon [field]="IncomeType"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'Amount'">Amount(Rs)
+                  <p-sortIcon [field]="Amount"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'CreatedBy'">Created By
+                  <p-sortIcon [field]="CreatedBy"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'CreatedDate'">Created Date
+                  <p-sortIcon [field]="CreatedDate"></p-sortIcon>
+                </th>
+
+                <th *ngIf='ActivityRights.CanManageIncomeExpenses'>Action(s)</th>
+              </tr>
+              <tr *ngIf="isFiltersEnable">
+                <th>
+                  <input type="text" class="form-control" maxlength="50"
+                    (input)="ex.filter($event.target.value, 'IEDate', 'contains')">
+                </th>
+                <th>
+                  <input type="text" class="form-control" maxlength="50"
+                    (input)="ex.filter($event.target.value, 'IncomeType', 'contains')">
+                </th>
+                <th>
+                  <input type="text" class="form-control" maxlength="50"
+                    (input)="ex.filter($event.target.value, 'Amount', 'contains')">
+                </th>
+                <th>
+                  <input type="text" class="form-control" maxlength="50"
+                    (input)="ex.filter($event.target.value, 'CreatedBy', 'contains')">
+                </th>
+                <th>
+                  <input type="text" class="form-control" maxlength="5"
+                    (input)="ex.filter($event.target.value, 'CreatedDate', 'contains')">
+                </th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td>{{row.IEDate| date:'dd/MM/yyyy'}}</td>
+                <td>{{row.IncomeType}}</td>
+                <td>{{row.Amount| currency}}</td>
+                <td>{{row.CreatedBy}}</td>
+                <td>{{row.CreatedDate| date:'dd/MM/yyyy'}}</td>
+
+                <td>
+                  <div *ngIf="ActivityRights.CanManageIncomeExpenses">
+                    <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip" (click)="  onDeleteIncomeDetailsClick(row) 
+            (row)" [disabled]="(row.IncomeTypeId == incomeTypes.Production)|| (row.IncomeTypeId == incomeTypes.culling)||(row.IncomeTypeId == expenseTypes.BatchCost)||(row.IncomeTypeId == expenseTypes.FeedPurchase) ">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr *ngIf="expensesList.length>0">
+                <td class="textright">Total Amount(Rs) : </td>
+                <td class="text-center" colspan="5">{{totalData.ExpensesAmount| currency}}</td>               
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage" let-columns>
+              <tr>
+                <td colspan="6" class="ui-datatable-emptymessage text-center">No Records Found</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <!-- <p-tabView >
+    <p-tabPanel header="Income">
+  <p-table [value]="incomeList" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand" [rows]="10" [paginator]="true"
+    [rowsPerPageOptions]="[10,20,30]">
+    <ng-template pTemplate="header">
+      <tr>
+        <th [pSortableColumn]="'IEDate'">Date
+          <p-sortIcon [field]="IEDate"></p-sortIcon>
+        </th>
+        <th [pSortableColumn]="'IncomeType'"> Income Type
+          <p-sortIcon [field]="IncomeType"></p-sortIcon>
+        </th>
+        <th [pSortableColumn]="'Amount'">Amount
+          <p-sortIcon [field]="Amount"></p-sortIcon>
+        </th>
+        <th [pSortableColumn]="'CreatedBy'">Created By
+          <p-sortIcon [field]="CreatedBy"></p-sortIcon>
+        </th>
+        <th [pSortableColumn]="'CreatedDate'">Created Date
+          <p-sortIcon [field]="CreatedDate"></p-sortIcon>
+        </th>
+
+        <th>Action(s)</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td>{{row.IEDate| date:'dd/MM/yyyy'}}</td>
+        <td>{{row.IncomeType}}</td>
+        <td>{{row.Amount | currency}}</td>
+        <td>{{row.CreatedBy}}</td>
+        <td>{{row.CreatedDate| date:'dd/MM/yyyy'}}</td>
+
+        <td>
+          <div>
+            <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip" (click)="  onDeleteIncomeDetailsClick(row) 
+              (row)"[disabled]="(row.IncomeTypeId == incomeTypes.Production)|| (row.IncomeTypeId == incomeTypes.culling)||(row.IncomeTypeId == expenseTypes.BatchCost)||(row.IncomeTypeId == expenseTypes.FeedPurchase) ">
+              <i class="fa fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage" let-columns>
+      <tr>
+        <td colspan="6" class="ui-datatable-emptymessage text-center">No Records Found</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-tabPanel>
+<p-tabPanel header="Expenses">
+  <p-table [value]="expensesList" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand" [rows]="10" [paginator]="true"
+  [rowsPerPageOptions]="[10,20,30]">
+  <ng-template pTemplate="header">
+    <tr>
+      <th [pSortableColumn]="'IEDate'">Date
+        <p-sortIcon [field]="IEDate"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'IncomeType'"> Income Type
+        <p-sortIcon [field]="IncomeType"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'RAmount'">Amount
+        <p-sortIcon [field]="RAmount"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'CreatedBy'">Created By
+        <p-sortIcon [field]="CreatedBy"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'CreatedDate'">Created Date
+        <p-sortIcon [field]="CreatedDate"></p-sortIcon>
+      </th>
+
+      <th>Action(s)</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-row>
+    <tr>
+      <td>{{row.IEDate| date:'dd/MM/yyyy'}}</td>
+      <td>{{row.IncomeType}}</td>
+      <td>{{row.RAmount}}</td>
+      <td>{{row.CreatedBy}}</td>
+      <td>{{row.CreatedDate| date:'dd/MM/yyyy'}}</td>
+
+      <td>
+        <div>
+          <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip" (click)="  onDeleteIncomeDetailsClick(row) 
+            (row)"[disabled]="(row.IncomeTypeId == incomeTypes.Production)|| (row.IncomeTypeId == incomeTypes.culling)||(row.IncomeTypeId == expenseTypes.BatchCost)||(row.IncomeTypeId == expenseTypes.FeedPurchase) ">
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage" let-columns>
+    <tr>
+      <td colspan="6" class="ui-datatable-emptymessage text-center">No Records Found</td>
+    </tr>
+  </ng-template>
+</p-table>
+</p-tabPanel>
+</p-tabView> -->
+      </div>
+    </div>
+  </div>
+  <p-dialog [(visible)]="isAdding" styleClass="mydialog" modal="fade" [closable]="false"
+    [contentStyle]="{'width': '500px','overflow':'visible','height':'auto'}">
+    <p-header>
+      {{ExpenseName}}
+    </p-header>
+    <form [formGroup]="AddForm" class="row">
+      <mat-form-field class="col-md-12">
+        <input matInput [matDatepicker]="picker2" placeholder=" Date " readonly [max]="currentDate"
+          formControlName="date">
+        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field class="col-md-12">
+        <mat-select placeholder="Select Income/Expensive" formControlName="Income"
+          (selectionChange)="onSelectIncomeType($event.value)" required>
+          <mat-option *ngFor="let income of incomeOrExpensiveDetails" [value]="income.TypeCdId">
+            {{income.Desc}}
+          </mat-option>
+        </mat-select>
+        <mat-error>
+          <span *ngIf="AddForm.get('Income').invalid && AddForm.get('Income').touched">
+            <span *ngIf="AddForm.controls['Income'].hasError('required') ">
+              Please Select Income/Expense Type
+            </span>
+          </span>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="col-md-12" *ngIf="isName">
+        <input matInput placeholder="Name" formControlName="name" (keypress)="onlyLetters(event)" required>
+        <mat-error>
+          <span *ngIf="!AddForm.get('name').valid && AddForm.get('name').touched">
+            <span *ngIf="AddForm.controls['name'].hasError('required') ">
+              Please enter Name
+            </span>
+          </span>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="col-md-12">
+        <input matInput placeholder="Amount (Rs)" formControlName="amount" required
+          oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+        <mat-error>
+          <span *ngIf="!AddForm.get('amount').valid && AddForm.get('amount').touched">
+            <span *ngIf="AddForm.controls['amount'].hasError('required') ">
+              Please enter Amount
+            </span>
+          </span>
+        </mat-error>
+      </mat-form-field>
+      <p-footer>
+        <div class="col-12">
+          <div class="float-right ml-auto">
+            <p-button icon="pi pi-check" label="Save" styleClass="ui-button-success mr-2 bg-primary"
+              (onClick)="onSaveClick();clicked=true" [disabled]="!AddForm.valid || clicked" ></p-button>
+            <p-button icon="pi pi-cross" label="Cancel" styleClass="ui-button-danger bg-light text-dark"
+              icon="pi pi-times" (onClick)="onAddCancelClick()"></p-button>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </p-footer>
+    </form>
+    <div class="clearfix"></div>
+  </p-dialog>

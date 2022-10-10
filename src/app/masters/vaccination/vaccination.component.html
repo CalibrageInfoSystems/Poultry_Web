@@ -1,0 +1,140 @@
+<div role="main">
+    <div class="page-header">
+      <h3 class="page-title">Vaccination Details</h3>
+      <div class="pull-right ml-auto">
+        <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="addRow()" *ngIf="ActivityRights.CanManageVaccination">
+          Add New Vaccination
+        </button>
+        <button type="button" class="btn btn-primary " title="Export" data-toggle="tooltip" (click)="download()" *ngIf='VaccinationData?.length>0'>
+          Export
+        </button>
+        <button class="btn btn-success" (click)="toggleFilter()" >
+          {{filterTooltip}}
+        </button>
+        <button class="btn btn-primary" (click)="toggleFilter()" >
+          {{filterTooltip}}
+        </button>
+      </div>
+    </div>
+    <div class="clearfix"></div>
+      <!-- <div class="pull-left" style="padding:4px 10px; border-bottom: 0 none;margin-bottom:10px;">
+        <input #gb type="text" class="form-control" pInputText size="50" placeholder="Search" style="width:auto">
+      </div> -->
+    <form class="form" [formGroup]="AddVaccinationForm">
+      <p-dataTable [value]="VaccinationData" [tableStyle]="{'table-layout':'auto'}" styleClass="bg-white"
+      [resizableColumns]="true" columnResizeMode="expand" [editable]="true" [sortField]="['Name','VaccinationType','Dosage','Comments','IsActive']">
+        <p-column field="Name" header="Name" [sortable]="true">
+          <ng-template let-row="rowData" pTemplate="body">
+            <div *ngIf="!row.isEditable">{{row.Name}}</div>
+            <div *ngIf="row.isEditable || row.isAdd">
+              <input type="text" class="form-control" [(ngModel)]="row.Name" formControlName="Name" >
+              <mat-error>
+                <span *ngIf="AddVaccinationForm.get('Name').invalid && AddVaccinationForm.get('Name').touched">
+                  <span *ngIf="AddVaccinationForm.controls['Name'].hasError('required') ">
+                    Please enter Name
+                  </span>
+                </span>
+              </mat-error>
+            </div>
+          </ng-template>
+        </p-column>
+        <p-column field="VaccinationType" header="Vaccination Type" [sortable]="true">
+          <ng-template let-row="rowData" pTemplate="body">
+            <div *ngIf="!row.isEditable">{{row.VaccinationType}}</div>
+            <div *ngIf="row.isEditable || row.isAdd">
+              <mat-select placeholder="Select Vaccination" [(ngModel)]="row.VaccinationTypeId" formControlName="VaccinationType" >
+                <mat-option *ngFor="let Vaccination of VaccinationList" [value]="Vaccination.TypeCdId">
+                  {{Vaccination.Desc}}
+                </mat-option>
+              </mat-select>
+              <mat-error>
+                <div class="clearfix"></div>
+                <span *ngIf="AddVaccinationForm.get('VaccinationType').invalid && AddVaccinationForm.get('VaccinationType').touched">
+                  <span *ngIf="AddVaccinationForm.controls['VaccinationType'].hasError('required') ">
+                    Please select Vaccination type
+                  </span>
+                </span>
+              </mat-error>
+            </div>
+          </ng-template>
+        </p-column>
+        <p-column field="Dosage" header="Dosage" [sortable]="true">
+          <ng-template let-row="rowData" pTemplate="body">
+            <div *ngIf="!row.isEditable" class="pull-right">{{row.Dosage}}</div>
+            <div *ngIf="row.isEditable || row.isAdd">
+              <input type="text" class="form-control" [(ngModel)]="row.Dosage" formControlName="Dosage" (keypress)="onlyNumber(event)">
+              <mat-error>
+                <span *ngIf="AddVaccinationForm.get('Dosage').invalid && AddVaccinationForm.get('Dosage').touched">
+                  <span *ngIf="AddVaccinationForm.controls['Dosage'].hasError('required') ">
+                    Please enter Dosage
+                  </span>
+                </span>
+              </mat-error>
+            </div>
+          </ng-template>
+        </p-column>
+        <!-- <p-column field="Age" header="Age" [sortable]="true">
+          <ng-template let-row="rowData" pTemplate="body">
+            <div *ngIf="!row.isEditable" class="pull-right">{{row.Age}}</div>
+            <div *ngIf="row.isEditable || row.isAdd">
+              <input type="text" class="form-control" [(ngModel)]="row.Age" formControlName="Age" (keypress)="onlyNumber(event)">
+            </div>
+          </ng-template>
+        </p-column> -->
+        <p-column field="Comments" header="Comments" [sortable]="true">
+          <ng-template let-row="rowData" pTemplate="body">
+            <div *ngIf="!row.isEditable">{{row.Comments}}</div>
+            <div *ngIf="row.isEditable || row.isAdd">
+              <input type="text" class="form-control" [(ngModel)]="row.Comments" formControlName="Comments">
+              <!-- <mat-error>
+                <span *ngIf="AddVaccinationForm.get('Comments').invalid && AddVaccinationForm.get('Comments').touched">
+                  <span *ngIf="AddVaccinationForm.controls['Comments'].hasError('required') ">
+                    Please enter Comments
+                  </span>
+                </span>
+              </mat-error> -->
+            </div>
+          </ng-template>
+        </p-column>
+        <p-column header="Active" [style]="{'text-align':'center'}">
+          <ng-template let-row="rowData" pTemplate="body">
+              <div *ngIf="!row.isEditable">{{row.IsActive}}</div>
+              <div *ngIf="row.isEditable || row.isAdd">
+          <mat-checkbox [(ngModel)]="row.IsActive" [disabled]="false" color="primary" formControlName="IsActive"></mat-checkbox>
+        </div>
+          </ng-template>
+        </p-column>
+  
+        <p-column field="" header="Actions" [style]="{'text-align':'center'}">
+          <ng-template let-row="rowData" let-rowIndex="rowIndex" pTemplate="body">
+            <button type="button" class="btn btn-success btn-xs" title="Save" data-toggle="tooltip"
+              (click)="addVaccinationClick(row);clicked=true" *ngIf="row.isEditable && row.isAdd==true" [disabled]="!AddVaccinationForm.valid||clicked">
+              <i class="mdi mdi-plus-circle"></i></button>
+            <button type="button" class="btn btn-danger btn-xs" title="Cancel" data-toggle="tooltip"
+              (click)="cancelvaccinationAddClick(row)" *ngIf="row.isEditable && row.isAdd==true">
+              <i class="mdi mdi-block-helper"></i></button>
+            <button type="button" class="btn btn-primary btn-xs" title="Edit" data-toggle="tooltip"
+              (click)="editRow(row)" *ngIf="!row.isEditable && ActivityRights.CanManageVaccination">
+              <i class="mdi mdi-table-edit"></i></button>
+            <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip"
+              (click)="delete(row,rowIndex)" *ngIf="!row.isEditable && ActivityRights.CanManageVaccination" [disabled]='!row.IsActive'>
+              <i class="mdi mdi-delete"></i></button>
+            <button type="button" class="btn btn-success btn-xs" title="Update" data-toggle="tooltip"
+              (click)="onUpdateRow(row);clicked=true" *ngIf="row.isEditable && row.isAdd==false" [disabled]="!AddVaccinationForm.valid|| clicked">
+              <i class="mdi mdi-content-save"></i></button>
+            <button type="button" class="btn btn-danger btn-xs" title="Cancel" data-toggle="tooltip"
+              (click)="cancelVaccinationEditClick(row)" *ngIf="row.isEditable && row.isAdd==false">
+              <i class="mdi mdi-block-helper"></i></button>
+          </ng-template>
+        </p-column>
+        <ng-template pTemplate="emptymessage" let-columns>
+          <!-- <tr>
+            <td  colspan="6" class="ui-datatable-emptymessage text-center"> -->
+              No Records Found
+            <!-- </td>
+          </tr> -->
+        </ng-template>
+      </p-dataTable>
+    </form>
+   
+  </div>

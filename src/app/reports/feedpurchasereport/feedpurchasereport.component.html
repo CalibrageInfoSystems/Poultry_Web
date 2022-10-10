@@ -1,0 +1,121 @@
+
+<div class="page-breadcrumb">
+    <!-- style="height :900px;" -->
+  <!-- <div>
+    <div class="header">
+      <h3>Feed Purchase Report</h3>
+    </div>
+    
+  </div> -->
+
+  <div class="row">
+    <div class="col-12 d-flex no-block align-items-center">
+      <h3 class="page-title header">Feed Purchase Report</h3>
+    </div>
+</div>
+  <div class="clearfix"></div>
+  
+  <!-- <div class="row"></div>  -->
+    <!-- <div class="row"></div> -->
+    <div class="purchase-popup" style="margin-top: 12px;">
+      <form class="form-horizontal form-label-left" [formGroup]="feedPurchaseFilterForm">
+        <div class="row" style="padding:4px 20px;border-bottom: 0 none;">         
+              <mat-form-field class="col-md-2">
+                <input matInput [matDatepicker]="picker" placeholder="From Date" [(ngModel)]="FROMDATE" formControlName="fromDate" readonly [max]="date"  (dateChange)="onDateChange($event)" >
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+              <mat-form-field class="col-md-2">
+                <input matInput [matDatepicker]="picker1" placeholder="To Date" [(ngModel)]="date" formControlName="toDate" readonly [min]="FROMDATE"  [max]="date">
+                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                <mat-datepicker #picker1></mat-datepicker>
+              </mat-form-field>    
+              <div class="col-md-3">
+                <button type="button" class="btn btn-primary" title="Search" data-toggle="tooltip" (click)="GetFeedPurchaseDetails()" [disabled]="">Search</button>
+                <button type="button" class="btn btn-primary" title="Clear" data-toggle="tooltip" (click)="onClearSearch()" [disabled]="">Clear</button>                
+              </div> 
+              <div  class="col-md-5 col-12">
+              <div class="pull-right">
+              <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip"  [disabled]="feedPurchaseList.feedPurchaseDetails.length==0"
+              (click)="download()">Export</button>
+            </div>
+          </div>
+              <!-- <button type="button" class="btn btn-primary pull-right" title="Export" data-toggle="tooltip" (click)="download()">Export</button> -->
+        </div>
+      </form>
+    
+    <div class="col-md-12" style="margin-bottom: 20px;">
+      <p-table [value]="feedPurchaseList.feedPurchaseDetails" [tableStyle]="{'table-layout':'auto'}" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">
+        <ng-template pTemplate="header">
+          <tr>              
+            <th [pSortableColumn]="'Date'">Date
+              <p-sortIcon [field]="Date"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'FeedType'">Feed
+                <p-sortIcon [field]="FeedType"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'BrokerName'">Broker
+              <p-sortIcon [field]="BrokerName"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'Cost'">Rate Per Ton(Rs)
+              <p-sortIcon [field]="Cost"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'Weight'">Weight(KGS)
+              <p-sortIcon [field]="Weight"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'Name'">Name
+              <p-sortIcon [field]="Name"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'Town'">Town
+              <p-sortIcon [field]="Town"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'BillDate'">Bill No.Date
+              <p-sortIcon [field]="BillDate"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'LorryNumber'">Lorry Number
+              <p-sortIcon [field]="LorryNumber"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'Freight'">Freight
+              <p-sortIcon [field]="Freight"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'BillAmount'">Bill Amount(Rs)
+              <p-sortIcon [field]="BillAmount"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'NetAmount'">Net Amount(Rs)
+              <p-sortIcon [field]="NetAmount"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'ChequeNumber'">Cheque Number
+              <p-sortIcon [field]="ChequeNumber"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'ChequeDate'">Cheque Date
+              <p-sortIcon [field]="ChequeDate"></p-sortIcon>
+            </th> 
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>            
+            <td>{{row.Date | date:'dd/MM/yyyy'}}</td>
+            <td>{{row.FeedType}}</td>
+            <td>{{row.BrokerName}}</td>
+            <td class="textright">{{row.Cost | currency}}</td>
+            <td class="textright">{{row.Weight | currency}}</td>
+            <td>{{row.Name}}</td>
+            <td>{{row.Town}}</td>
+            <td>{{row.BillDate |date:'dd/MM/yyyy'}}</td>
+            <td class="textright">{{row.LorryNumber}}</td>
+            <td class="textright">{{row.Freight | currency}}</td>
+            <td class="textright">{{row.BillAmount | currency}}</td>
+            <td class="textright">{{row.NetAmount | currency}}</td>
+            <td class="textright">{{row.ChequeNumber}}</td>
+            <td class="textright">{{row.ChequeDate | date:'dd/MM/yyyy'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage" let-columns>
+          <tr>
+            <td colspan="14" class="ui-datatable-emptymessage text-center">No Records Found</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  
+</div>

@@ -1,0 +1,1212 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Feed Purchase</h3>
+  </div>
+  <div class="clearfix"></div>
+  <div class="row" *ngIf="!isAddFeedPurchase && !isEditFeedPurchase && !isAddMPFeedPurchase && !isEditMPFeedPurchase">
+  </div>
+  <div class="purchase-popup" *ngIf="isAddFeedPurchase">
+    <div class="header text-primary mb-2">
+      <h4>Add Feed Purchase</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div class="clearfix"></div>
+    <div>
+      <form class="form-horizontal form-label-left" [formGroup]="AddfeedPurchaseForm">
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <mat-select placeholder="Select Feed" formControlName="feedType" required>
+              <mat-option *ngFor="let farm of totalFeedData" [value]="farm.Id">
+                {{farm.NAME}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="AddfeedPurchaseForm.get('feedType').invalid && AddfeedPurchaseForm.get('feedType').touched">
+                <span *ngIf="AddfeedPurchaseForm.controls['feedType'].hasError('required') ">
+                  Please Enter feed
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="picker1" placeholder="Received Date" formControlName="receivedDate"
+              (dateChange)="onReceivedDate()" [max]='curDate' required>
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+            <mat-error>
+              <span
+                *ngIf="AddfeedPurchaseForm.get('receivedDate').invalid && AddfeedPurchaseForm.get('receivedDate').touched">
+                <span *ngIf="AddfeedPurchaseForm.controls['receivedDate'].hasError('required') ">
+                  Please Enter Received Date
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="Datepicker" placeholder="Bill Date" formControlName="BillDate"
+              [max]='curDate' required>
+            <!-- <input matInput [matDatepicker]="picker" placeholder="Date"> -->
+            <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+            <mat-datepicker #Datepicker></mat-datepicker>
+            <mat-error>
+              <span *ngIf="AddfeedPurchaseForm.get('BillDate').invalid && AddfeedPurchaseForm.get('BillDate').touched">
+                <span *ngIf="AddfeedPurchaseForm.controls['BillDate'].hasError('required') ">
+                  Please Enter Bill Date
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Invoice number" formControlName="invoiceNumber">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Lorry Number" formControlName="lorryNumber">
+            <!-- <mat-error>
+              <span
+                *ngIf="AddfeedPurchaseForm.get('lorryNumber').invalid && AddfeedPurchaseForm.get('lorryNumber').touched">
+                <span *ngIf="AddfeedPurchaseForm.controls['lorryNumber'].hasError('required') ">
+                  Please Enter lorryNumber
+                </span>
+              </span>
+            </mat-error> -->
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <mat-select placeholder="Select Broker" formControlName="brokerName" required>
+              <mat-option *ngFor="let broker of totalBrokerData" [value]="broker.BrokerId">
+                {{broker.Name}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span
+                *ngIf="AddfeedPurchaseForm.get('brokerName').invalid && AddfeedPurchaseForm.get('brokerName').touched">
+                <span *ngIf="AddfeedPurchaseForm.controls['brokerName'].hasError('required') ">
+                  Please Enter Broker
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <!-- <input matInput placeholder="Name" formControlName="Name" required> -->
+            <input matInput placeholder="Name" [matAutocomplete]="auto" formControlName="Name"
+              (input)="initSourceUser($event.target.value)" required>
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+              <mat-option class="opt" *ngFor="let n of namesList" [value]="n.Name">
+                <span style="font-size: 14px;">{{n.Name}}</span>
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error>
+              <span *ngIf="AddfeedPurchaseForm.get('Name').invalid && AddfeedPurchaseForm.get('Name').touched">
+                <span *ngIf="AddfeedPurchaseForm.controls['Name'].hasError('required') ">
+                  Please Enter Name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Town" [matAutocomplete]="auto1" formControlName="Town"
+              (input)="initSourceTown($event.target.value)" required>
+            <mat-autocomplete autoActiveFirstOption #auto1="matAutocomplete">
+              <mat-option class="opt" *ngFor="let town of townsList" [value]="town.Town">
+                <span style="font-size: 14px;">{{town.Town}}</span>
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error>
+              <span *ngIf="AddfeedPurchaseForm.get('Town').invalid && AddfeedPurchaseForm.get('Town').touched">
+                <span *ngIf="AddfeedPurchaseForm.controls['Town'].hasError('required') ">
+                  Please Enter Town
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <mat-select placeholder="Payment Terms" formControlName="paymentType" required
+              (selectionChange)="onSelectPaymentType($event.value)">
+              <mat-option *ngFor="let payment of paymentTerms" [value]="payment.TypeCdId">
+                {{payment.Desc}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="AddfeedPurchaseForm.controls['paymentType'].hasError('required') ">
+                Please Select Payment Terms
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="picker8" placeholder="Due Date" formControlName="DueDate"
+              [(ngModel)]="dueDate">
+            <mat-datepicker-toggle matSuffix [for]="picker8"></mat-datepicker-toggle>
+            <mat-datepicker #picker8></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <mat-select placeholder="UOM" formControlName="UOMType" (selectionChange)="onUOMChange($event.value)"
+              [ngModel]="selectedUOM" [style]="{'position': 'relative', 'overflow': 'visible', 'z-index': '1005'}"
+              required>
+              <!-- <mat-option>Select UOM</mat-option> -->
+              <mat-option *ngFor="let list of UOMTypes" [value]="list.TypeCdId"
+                [style]="{ 'z-index': '1005!important'}">
+                {{list.Desc}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="AddfeedPurchaseForm.get('UOMType').invalid && AddfeedPurchaseForm.get('UOMType').touched">
+                <span *ngIf="AddfeedPurchaseForm.controls['UOMType'].hasError('required') ">
+                  Please Select UOM
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Rate(Ton/Unit)" formControlName="Cost" required
+              (input)="onRateChange($event.target.value)">
+            <mat-error>
+              <span *ngIf="AddfeedPurchaseForm.get('Cost').invalid && AddfeedPurchaseForm.get('Cost').touched">
+                <span *ngIf="AddfeedPurchaseForm.controls['Cost'].hasError('required') ">
+                  Please Enter Rate Per Ton
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Weight/Units" formControlName="Weight" required
+              (input)="onWeightChange($event.target.value)" [(ngModel)]="enteredWeight" maxlength="10">
+            <mat-error>
+              <span *ngIf="AddfeedPurchaseForm.get('Weight').invalid && AddfeedPurchaseForm.get('Weight').touched">
+                <span *ngIf="AddfeedPurchaseForm.controls['Weight'].hasError('required') ">
+                  Please Enter Weight
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="GST (%)" formControlName="Gst" (input)="onGstChange($event.target.value)">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Additional Expenses" formControlName="AdditionalExpenses" maxlength="5"
+              (keypress)="onlyNumber(event)" (input)="onAdditionalExpensesChange($event.target.value)">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Freight" formControlName="Freight" maxlength="6" (keypress)="onlyNumber(event)"
+              (input)="onFreightChange($event.target.value)">
+            <!-- <mat-error>
+              <span *ngIf="AddfeedPurchaseForm.get('Freight').invalid && AddfeedPurchaseForm.get('Freight').touched">
+                  <span *ngIf="AddfeedPurchaseForm.controls['Freight'].hasError('required') ">
+                      Please Enter Freight
+                  </span>
+              </span>
+            </mat-error> -->
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Bill Amount" formControlName="billAmount"
+              (input)="onbillChange($event.target.value)" required maxlength="7">
+            <mat-error>
+              <span
+                *ngIf="AddfeedPurchaseForm.get('billAmount').invalid && AddfeedPurchaseForm.get('billAmount').touched">
+                <span *ngIf="AddfeedPurchaseForm.controls['billAmount'].hasError('required') ">
+                  Please Enter Bill Amount
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Net Amount" formControlName="totalAmount" readonly [(ngModel)]="TotalAmount">
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Total Amount" formControlName="finalAmount" readonly [(ngModel)]="finalAmount">
+          </mat-form-field>
+          <div class="col-md-2 col-12 mt-4 mp-0">
+            <mat-checkbox class="check" [(ngModel)]="checked" [ngModelOptions]="{standalone: true}"
+              (change)="onCheckedChange(checked)" required>Consider Freight</mat-checkbox>
+          </div>
+          <!-- <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Cheque Number" formControlName="ChequeNumber">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="picker" placeholder="Cheque Date" formControlName="ChequeDate"
+              [max]='curDate'>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field> -->
+          <mat-form-field class="col-md-4 col-12">
+            <textarea matInput placeholder="Remarks" maxlength="500" formControlName="remarks"></textarea>
+          </mat-form-field>
+          <div class="col-md-4 col-12 pt-4">
+            <input type="file" #myInput (change)="onSelectFile($event)" formControlName="uploadInvoice">
+          </div>
+        </div>
+        <div class="form-group col-md-4" *ngIf="image !=null">
+          <div class="file-uploded">
+            <a target="_blank">
+              <img [src]="image" class="img-fluid box-shadow " style="height:150px;">
+            </a>
+          </div>
+        </div>
+        <!-- <div class="row">  
+                    
+                <mat-form-field class="col-md-2 col-12">
+                  <input matInput placeholder="Difference Amount" formControlName="DifferenceAmount"  (input)="onDifferenceAmountChange($event.target.value)" maxlength="5" (keypress)="onlyNumber(event)">
+                </mat-form-field> 
+                
+               
+        </div>-->
+
+        <!-- <div class="ln_solid"></div> -->
+        <!-- <div class="form-group"> -->
+        <div class="float-right">
+          <button type="button" class="btn btn-light text-dark" (click)="onCancleFeeedPurchaseAdd()">Cancel</button>
+          <button type="button" class="btn btn-primary" [disabled]="AddfeedPurchaseForm.invalid ||clicked"
+            (click)="AddUpdateFeedPurchase();clicked=true">Save</button>
+        </div>
+        <!-- </div> -->
+      </form>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div *ngIf="!isAddFeedPurchase && !isEditFeedPurchase && !isAddMPFeedPurchase && !isEditMPFeedPurchase">
+    <div class="purchase-popup">
+      <form class="form-horizontal form-label-left mt-2" [formGroup]="feedPurchaseFilterForm">
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <mat-select placeholder="Payment Status Type" formControlName="paymentStatusType" (selectionChange)="onChange($event.value)"
+              [(ngModel)]="selectedPaymentType"
+              [style]="{'position': 'relative', 'overflow': 'visible', 'z-index': '1005'}">
+              <mat-option>Payment Status Type</mat-option>
+              <mat-option *ngFor="let list of paymentStatus" [value]="list.TypeCdId"
+                [style]="{ 'z-index': '1005!important'}">
+                {{list.Desc}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <mat-label aria-required="true">Feed Type</mat-label>
+            <mat-select formControlName="feed">
+              <mat-option *ngFor="let feed of feedTypes" [value]="feed.Id">
+                {{feed.NAME}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="picker" placeholder="From Date" [(ngModel)]="FROMDATE"
+              formControlName="fromDate" readonly [max]="date" (dateChange)="onDateChange($event)">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="picker1" placeholder="To Date" [(ngModel)]="selectedDate"
+              formControlName="toDate" readonly [min]="FROMDATE" [max]="date">
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+          </mat-form-field>
+          <div class="col-md-3 col-sm-6 col-12">
+            <button type="button" class="btn btn-primary" title="Search" data-toggle="tooltip"
+              (click)="GetFeedPurchaseDetails()" [disabled]="">Search</button>
+            <button type="button" class="btn btn-primary" title="Clear" data-toggle="tooltip" (click)="onClearSearch()"
+              [disabled]="">Clear</button>
+          </div>
+        </div>
+      </form>
+      <div class="clearfix"></div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex align-items-center purchase-popup">
+          <div class="mr-auto">
+            <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip"
+              (click)="onAddFeedPurchaseClick()" *ngIf="ActivityRights.CanManageFeedPurchase">
+              Add Feed Purchase
+            </button>
+            <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip"
+              (click)="onAddMPFeedPurchaseClick()" *ngIf="ActivityRights.CanManageFeedPurchase">
+              Add Medicine/Protein Purchase
+            </button>
+          </div>
+          <div class="ml-auto">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"
+              (click)="onStatusClick()">Summary</button>
+            <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip"
+              (click)="download()">Export</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row" *ngIf="feedPurchaseList != null">
+      <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+        <div class="card bg-gradient-primary card-img-holder text-white">
+          <div class="card-body p-4">
+            <h4 class="font-weight-bold mb-3">Total Due Amount <img width="24" src="assets/images/icons/rupee.svg"
+                class="float-right" /></h4>
+            <h4 class="mb-2 mt-3 mr font-weight-bold"><span
+                class="float-right">&#x20B9;{{outstandingAmount| currency}}</span></h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+        <div class="card bg-gradient-info card-img-holder text-white">
+          <div class="card-body p-4">
+            <h4 class="font-weight-bold mb-3">Total Paid Amount <img width="24" src="assets/images/icons/rupee.svg"
+                class="float-right" /></h4>
+            <h4 class="mb-2 mt-3 mr font-weight-bold"><span class="float-right">&#x20B9;{{paidAmount| currency}}</span>
+            </h4>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="feedPurchaseList != null" class="d-none">
+        <Label class="col-md-4" style="font-size:17px;margin-top: 13px;">Total Due Amount (Rs) :
+          <b class="text-danger">{{outstandingAmount|currency}}</b>
+        </Label>
+        <Label class="col-md-6" style="font-size:17px;margin-top: 13px;">Total Paid Amount (Rs) :
+          <b class="text-danger">{{paidAmount| currency}}</b>
+        </Label>
+        <!-- <div class="col-12 col-md-3 col-sm-2 col-lg-3 col-xl-3">
+         
+          <Label style="font-size:17px;margin-top: 13px;">Total Outstanding Amount (Rs) :
+            <b class="text-danger"> {{outstandingAmount| number: '.2'}}</b>
+          </Label>
+        </div>
+            <div class="col-12 col-md-2 col-sm-2 col-lg-2 col-xl-2">
+              <Label>Total Paid Amount (Rs) :
+                <b class="text-danger"> {{paidAmount| number: '.2'}}</b>
+              </Label>
+            </div> -->
+      </div>
+    </div>
+    <div class="row" *ngFor="let reg of finalreq">
+      <div class="col-12 mt-2">
+        <div class="d-flex align-items-center purchase-popup grid-margin">
+          <h4 class="mb-0">{{reg.Name}}</h4>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+      <!-- <div class="float-right">
+              <button type="button" class="btn btn-primary " *ngIf="ActivityRights.CanManageEggSaleRegister"
+                title="Add Receive Amount" data-toggle="tooltip" (click)="onAddAmountClick(reg.traderId)"
+                style="margin-right: 20px;">Add Receive Amount</button>
+              <button type="button" class="btn btn-primary" *ngIf="ActivityRights.CanManageEggSaleRegister" title="Add Egg Sale"
+                data-toggle="tooltip" (click)="onAddEggSale(reg.traderId)">Add Egg Sale</button>
+            </div> -->
+      <div class="col-12">
+        <p-table #sd [value]="reg.transactions" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true"
+          columnResizeMode="expand" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">
+          <ng-template pTemplate="header" class="table table-striped">
+            <tr>
+              <th [pSortableColumn]="'Receiveddate'"><span class="d-inline-flex">Date
+                  <p-sortIcon [field]="'Receiveddate'"></p-sortIcon></span>
+              </th>
+              <th [pSortableColumn]="'BrokerName'" *ngIf="reg.Name != 'Medicines' && reg.Name != 'Proteins'"><span
+                  class="d-inline-flex">Broker
+                  <p-sortIcon [field]="'BrokerName'"></p-sortIcon></span>
+              </th>
+              <th [pSortableColumn]="'MedicineName'" *ngIf="reg.Name == 'Medicines' || reg.Name == 'Proteins'">Medicine
+                Name
+                <p-sortIcon [field]="'MedicineName'"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'Cost'">Rate Per <span class="d-inline-flex">Ton(Rs)
+                  <p-sortIcon [field]="'Cost'"></p-sortIcon></span>
+              </th>
+              <th [pSortableColumn]="'Weight'"><span class="d-inline-flex">Weight(Kgs)
+                  <p-sortIcon [field]="'Weight'"></p-sortIcon></span>
+              </th>
+              <th [pSortableColumn]="'Name'">Name
+                <p-sortIcon [field]="'Name'"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'Freight'"><span class="d-inline-flex">Freight(Rs)
+                  <p-sortIcon [field]="'Freight'"></p-sortIcon></span>
+              </th>
+              <th [pSortableColumn]="'BillAmount'">Bill <span class="d-inline-flex">Amount(Rs)
+                  <p-sortIcon [field]="'BillAmount'"></p-sortIcon></span>
+              </th>
+              <th [pSortableColumn]="'NetAmount'">Net <span class="d-inline-flex">Amount(Rs)
+                  <p-sortIcon [field]="'NetAmount'"></p-sortIcon></span>
+              </th>
+              <th [pSortableColumn]="'FinalAmount'">Total <span class="d-inline-flex">Amount(Rs)
+                  <p-sortIcon [field]="'FinalAmount'"></p-sortIcon></span>
+              </th>
+              <th [pSortableColumn]="'DueAmount'">Due <span class="d-inline-flex">Amount(Rs)
+                  <p-sortIcon [field]="'DueAmount'"></p-sortIcon></span>
+              </th>
+              <th [pSortableColumn]="'DueDate'">Due <span class="d-inline-flex">Date
+                  <p-sortIcon [field]="'DueDate'"></p-sortIcon></span>
+              </th>
+              <th [pSortableColumn]="'PaymentStatus'"><span class="d-inline-flex">Status
+                  <p-sortIcon [field]="'PaymentStatus'"></p-sortIcon></span>
+              </th>
+              <th><span class="mr-3">Action(s)</span></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td
+                [ngClass]="{'outstanding': row.PaymentStatusId==PaymentStatus.Outstanding, 'paid': row.PaymentStatusId==PaymentStatus.Paid}">
+                {{row.Receiveddate | date:'dd/MM/yyyy'}}</td>
+              <td *ngIf="row.FeedType != 'Medicines' && row.FeedType != 'Proteins'"
+                [ngClass]="{'outstanding': row.PaymentStatusId==PaymentStatus.Outstanding, 'paid': row.PaymentStatusId==PaymentStatus.Paid}">
+                {{row.BrokerName}}</td>
+              <td *ngIf="row.FeedType == 'Medicines' || row.FeedType == 'Proteins'"
+                [ngClass]="{'outstanding': row.PaymentStatusId==PaymentStatus.Outstanding, 'paid': row.PaymentStatusId==PaymentStatus.Paid}">
+                {{row.MedicineName}}</td>
+              <td
+                [ngClass]="{'outstanding': row.PaymentStatusId==PaymentStatus.Outstanding, 'paid': row.PaymentStatusId==PaymentStatus.Paid}">
+                {{row.Cost| currency}}</td>
+              <td
+                [ngClass]="{'outstanding': row.PaymentStatusId==PaymentStatus.Outstanding, 'paid': row.PaymentStatusId==PaymentStatus.Paid}">
+                {{row.Weight}}</td>
+              <td
+                [ngClass]="{'outstanding': row.PaymentStatusId==PaymentStatus.Outstanding, 'paid': row.PaymentStatusId==PaymentStatus.Paid}">
+                {{row.Name}}</td>
+              <td
+                [ngClass]="{'outstanding': row.PaymentStatusId==PaymentStatus.Outstanding, 'paid': row.PaymentStatusId==PaymentStatus.Paid}">
+                {{row.Freight}}</td>
+              <td
+                [ngClass]="{'outstanding': row.PaymentStatusId==PaymentStatus.Outstanding, 'paid': row.PaymentStatusId==PaymentStatus.Paid}">
+                {{row.BillAmounts |currency}}</td>
+              <td
+                [ngClass]="{'outstanding': row.PaymentStatusId==PaymentStatus.Outstanding, 'paid': row.PaymentStatusId==PaymentStatus.Paid}">
+                {{row.NetAmount | currency}}</td>
+              <td
+                [ngClass]="{'outstanding': row.PaymentStatusId==PaymentStatus.Outstanding, 'paid': row.PaymentStatusId==PaymentStatus.Paid}">
+                {{row.FinalAmount | currency}}</td>
+              <td
+                [ngClass]="{'outstanding': row.PaymentStatusId==PaymentStatus.Outstanding, 'paid': row.PaymentStatusId==PaymentStatus.Paid}">
+                {{row.DueAmount | currency}}</td>
+              <td
+                [ngClass]="{'outstanding': row.PaymentStatusId==PaymentStatus.Outstanding, 'paid': row.PaymentStatusId==PaymentStatus.Paid}">
+                {{row.DueDate | date:'dd/MM/yyyy'}}</td>
+              <td
+                [ngClass]="{'outstanding': row.PaymentStatusId==PaymentStatus.Outstanding, 'paid': row.PaymentStatusId==PaymentStatus.Paid}">
+                {{row.PaymentStatus}}</td>
+              <!-- <td class="paid" *ngIf="row.PaymentStatusId==PaymentStatus.Paid">
+                  {{row.BrokerName}}</td>
+                <td class="paid" *ngIf="row.PaymentStatusId==PaymentStatus.Paid">{{row.Cost}}</td>
+                <td class="paid" *ngIf="row.PaymentStatusId==PaymentStatus.Paid">{{row.Weight}}</td>
+                <td class="paid" *ngIf="row.PaymentStatusId==PaymentStatus.Paid">
+                  {{row.Name}}</td>
+                <td class="paid" *ngIf="row.PaymentStatusId==PaymentStatus.Paid">
+                  {{row.Freight}}</td>
+                <td class="paid" *ngIf="row.PaymentStatusId==PaymentStatus.Paid">
+                  {{row.BillAmounts |number:'.0'}}</td>
+                <td class="paid" *ngIf="row.PaymentStatusId==PaymentStatus.Paid">
+                  {{row.NetAmount |number:'.0'}}</td>
+                <td class="paid" *ngIf="row.PaymentStatusId==PaymentStatus.Paid">
+                  {{row.FinalAmount}}</td>
+                <td class="paid" *ngIf="row.PaymentStatusId==PaymentStatus.Paid">
+                  {{row.DueAmount}}</td>
+                <td class="paid" *ngIf="row.PaymentStatusId==PaymentStatus.Paid">
+                  {{row.DueDate | date:'dd/MM/yyyy'}}</td>
+                <td class="paid" *ngIf="row.PaymentStatusId==PaymentStatus.Paid">
+                  {{row.PaymentStatus}}</td> -->
+              <td>
+                <div *ngIf="ActivityRights.CanManageFeedPurchase">
+                  <button type="button" class="btn btn-primary btn-circle btn-xs" title="Edit" data-toggle="tooltip"
+                    (click)="onEditFeedPurchaseClick(row)">
+                    <i class="mdi mdi-table-edit"></i>
+                  </button>
+                  <button type="button" class="btn btn-danger btn-circle btn-xs" title="Delete" data-toggle="tooltip"
+                    (click)="onDeleteFeedPurchaseClick(row)">
+                    <i class="mdi mdi-delete"></i>
+                  </button>
+                  <button type="button" class="btn btn-danger btn-circle btn-xs" title="Pay" data-toggle="tooltip"
+                    (click)="onChangePaymentStatusClick(row)"
+                    *ngIf="row.PaymentStatusId == PaymentAmounts.OutstandingAmount">
+                    <i class="fa fa-inr p-1"></i>
+                  </button>
+                  <button type="button" class="btn btn-primary btn-circle btn-xs" title="View Transcation"
+                    data-toggle="tooltip" (click)="onViewTransactionClick(row)">
+                    <i class="mdi mdi-eye"></i>
+                  </button>
+                  <button type="button" class="btn btn-primary btn-circle btn-xs" title="View Document"
+                    data-toggle="tooltip" (click)="onViewDoc(row.FileUrl)">
+                    <i class="mdi mdi-file-pdf"></i>
+                  </button>
+                  <!-- *ngIf="row.fileLocation !=null" -->
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage" let-columns>
+            <tr>
+              <td colspan="13" class="ui-datatable-emptymessage text-center">No Records Found</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+  <div class="purchase-popup" *ngIf="isEditFeedPurchase">
+    <div class="header text-primary mb-2">
+      <h4>Update Feed Purchase</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div>
+      <form class="form-horizontal form-label-left" [formGroup]="editfeedPurchaseForm">
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <mat-select placeholder="Select Type Feed" formControlName="feedType" [(ngModel)]="rowData.FeedTypeId"
+              required>
+              <mat-option *ngFor="let farm of totalFeedData" [value]="farm.Id">
+                {{farm.NAME}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span
+                *ngIf="editfeedPurchaseForm.get('feedType').invalid && editfeedPurchaseForm.get('feedType').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['feedType'].hasError('required') ">
+                  Please Enter feed
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="picker4" placeholder="Received Date" formControlName="receivedDate"
+              [max]='curDate' [(ngModel)]="rowData.Receiveddate" required (dateChange)="onEditReceivedDateChage()">
+            <mat-datepicker-toggle matSuffix [for]="picker4"></mat-datepicker-toggle>
+            <mat-datepicker #picker4></mat-datepicker>
+            <mat-error>
+              <span
+                *ngIf="editfeedPurchaseForm.get('receivedDate').invalid && editfeedPurchaseForm.get('receivedDate').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['receivedDate'].hasError('required') ">
+                  Please Enter Received Date
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="Datepicker" formControlName="BillDate" placeholder="Bill Date"
+              [(ngModel)]="rowData.BillDate" [max]='curDate'>
+            <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+            <mat-datepicker #Datepicker></mat-datepicker>
+            <mat-error>
+              <span
+                *ngIf="editfeedPurchaseForm.get('BillDate').invalid && editfeedPurchaseForm.get('BillDate').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['BillDate'].hasError('required') ">
+                  Please Enter feed
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Invoice number" formControlName="invoiceNumber"
+              [(ngModel)]="rowData.InvoiceNumber" (keypress)="onlyNumber(event)">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Lorry Number" formControlName="lorryNumber" [(ngModel)]="rowData.LorryNumber">
+            <!-- <mat-error>
+              <span
+                *ngIf="editfeedPurchaseForm.get('lorryNumber').invalid && editfeedPurchaseForm.get('lorryNumber').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['lorryNumber'].hasError('required') ">
+                  Please Enter lorryNumber
+                </span>
+              </span>
+            </mat-error> -->
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <mat-select placeholder="Select Broker" formControlName="brokerName" [(ngModel)]="rowData.BrokerId">
+              <mat-option *ngFor="let broker of totalBrokerData" [value]="broker.BrokerId">
+                {{broker.Name}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span
+                *ngIf="editfeedPurchaseForm.get('brokerName').invalid && editfeedPurchaseForm.get('brokerName').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['brokerName'].hasError('required') ">
+                  Please Enter brokerName
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <!-- <input matInput placeholder="Name" formControlName="Name" [(ngModel)]="rowData.Name"> -->
+            <input matInput placeholder="Name" [matAutocomplete]="auto2" formControlName="Name"
+              [(ngModel)]="rowData.Name" (input)="initSourceUser($event.target.value)" required>
+            <mat-autocomplete autoActiveFirstOption #auto2="matAutocomplete">
+              <mat-option class="opt" *ngFor="let n of namesList" [value]="n.Name">
+                <span style="font-size: 14px;">{{n.Name}}</span>
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error>
+              <span *ngIf="editfeedPurchaseForm.get('Name').invalid && editfeedPurchaseForm.get('Name').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['Name'].hasError('required') ">
+                  Please Enter Name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <!-- <input matInput placeholder="Town" formControlName="Town" [(ngModel)]="rowData.Town"> -->
+            <input matInput placeholder="Town" [matAutocomplete]="auto3" formControlName="Town"
+              (input)="initSourceTown($event.target.value)" [(ngModel)]="rowData.Town" required>
+            <mat-autocomplete autoActiveFirstOption #auto3="matAutocomplete">
+              <mat-option class="opt" *ngFor="let town of townsList" [value]="town.Town">
+                <span style="font-size: 14px;">{{town.Town}}</span>
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error>
+              <span *ngIf="editfeedPurchaseForm.get('Town').invalid && editfeedPurchaseForm.get('Town').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['Town'].hasError('required') ">
+                  Please Enter Town
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <mat-select placeholder="Payment Terms" formControlName="paymentType" required #matSelect1
+              (selectionChange)="onSelectEditPaymentType($event.value)" [(ngModel)]="rowData.PaymentTypeId">
+              <mat-option *ngFor="let payment of paymentTerms" [value]="payment.TypeCdId">
+                {{payment.Desc}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="editfeedPurchaseForm.controls['paymentType'].hasError('required') ">
+                Please Select Payment Terms
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="picker7" placeholder="Due Date" formControlName="DueDate"
+              [(ngModel)]="rowData.DueDate">
+            <mat-datepicker-toggle matSuffix [for]="picker7"></mat-datepicker-toggle>
+            <mat-datepicker #picker7></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <mat-select placeholder="UOM" formControlName="UOMType" [(ngModel)]="rowData.UOMTypeId"
+              (selectionChange)="onEditUOMChange($event.value)"
+              [style]="{'position': 'relative', 'overflow': 'visible', 'z-index': '1005'}" required>
+              <mat-option>Select UOM</mat-option>
+              <mat-option *ngFor="let list of UOMTypes" [value]="list.TypeCdId"
+                [style]="{ 'z-index': '1005!important'}">
+                {{list.Desc}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="editfeedPurchaseForm.get('UOMType').invalid && editfeedPurchaseForm.get('UOMType').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['UOMType'].hasError('required') ">
+                  Please Select UOM
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Rate(Ton/Unit)" formControlName="Cost" [(ngModel)]="rowData.Cost"
+              (input)="onEditRateChange($event.target.value)">
+            <mat-error>
+              <span *ngIf="editfeedPurchaseForm.get('Cost').invalid && editfeedPurchaseForm.get('Cost').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['Cost'].hasError('required') ">
+                  Please Enter Cost
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Weight/Units" formControlName="Weight" [(ngModel)]="rowData.Weight" required
+              (input)="onEditWeightChange($event.target.value)" maxlength="10">
+            <mat-error>
+              <span *ngIf="editfeedPurchaseForm.get('Weight').invalid && editfeedPurchaseForm.get('Weight').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['Weight'].hasError('required') ">
+                  Please Enter Weight
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="GST (%)" formControlName="Gst" (input)="onEditGstChange($event.target.value)"
+              [(ngModel)]="rowData.GST">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Additional Expenses" formControlName="AdditionalExpenses" maxlength="5"
+              (keypress)="onlyNumber(event)" [(ngModel)]="rowData.AdditionalAxpenses"
+              (input)="onEditAdditionalExpensesChange($event.target.value)">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Freight" formControlName="Freight" [(ngModel)]="rowData.Freight" maxlength="6"
+              (input)="onEditFreightChange($event.target.value)">
+            <!-- <mat-error>
+                      <span *ngIf="editfeedPurchaseForm.get('Freight').invalid && editfeedPurchaseForm.get('Freight').touched">
+                          <span *ngIf="editfeedPurchaseForm.controls['Freight'].hasError('required') "> (keypress)="onlyNumber(event)"
+                              Please Enter Freight
+                          </span>
+                      </span>
+                    </mat-error> -->
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Bill Amount" formControlName="billAmount" [(ngModel)]="rowData.BillAmounts"
+              required maxlength="7">
+            <mat-error>
+              <span
+                *ngIf="editfeedPurchaseForm.get('billAmount').invalid && editfeedPurchaseForm.get('billAmount').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['billAmount'].hasError('required') ">
+                  Please Enter Bill Amount
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Net Amount" formControlName="totalAmount" readonly
+              [(ngModel)]="rowData.TotalAmounts" (keypress)="onlyNumber(event)">
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Total Amount" formControlName="finalAmount" readonly
+              [(ngModel)]="rowData.FinalAmount" (keypress)="onlyNumber(event)">
+          </mat-form-field>
+          <div class="col-md-2 mt-4 mp-0">
+            <mat-checkbox class="check" [(ngModel)]="rowData.ConsiderFreight" [ngModelOptions]="{standalone: true}"
+              (change)="onEditCheckedChange(rowData.ConsiderFreight)" required>Consider Freight</mat-checkbox>
+          </div>
+          <!-- <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Cheque Number" formControlName="ChequeNumber"
+              [(ngModel)]="rowData.ChequeNumber">
+            <mat-error>
+              <span
+                *ngIf="editfeedPurchaseForm.get('ChequeNumber').invalid && editfeedPurchaseForm.get('ChequeNumber').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['ChequeNumber'].hasError('required') ">
+                  Please Enter ChequeNumber
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="picker2" formControlName="ChequeDate" placeholder="Cheque Date "
+              [(ngModel)]="rowData.ChequeDate" [max]='curDate'>
+            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+            <mat-datepicker #picker2></mat-datepicker>
+            <mat-error>
+              <span
+                *ngIf="editfeedPurchaseForm.get('ChequeDate').invalid && editfeedPurchaseForm.get('ChequeDate').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['ChequeDate'].hasError('required') ">
+                  Please Enter ChequeDate
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field> -->
+
+          <mat-form-field class="col-md-4 col-12 mt-0 pt-0">
+            <textarea matInput placeholder="Remarks" maxlength="500" formControlName="remarks"
+              [(ngModel)]="rowData.Remarks"></textarea>
+          </mat-form-field>
+          <div class="col-md-4 col-12 pt-4">
+            <input type="file" #myInputEdit (change)="onSelectEditFile($event)" formControlName="uploadInvoice">
+          </div>
+          <!-- <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Difference Amount" formControlName="DifferenceAmount"  maxlength="5" (keypress)="onlyNumber(event)" (input)="onEditDifferenceAmountChange($event.target.value)" [(ngModel)]="rowData.DifferenceAmount">
+          </mat-form-field> -->
+        </div>
+        <div class="form-group col-md-4" *ngIf="image !=null">
+          <div class="file-uploded">
+            <a target="_blank">
+              <img [src]="image" class="img-fluid box-shadow " style="height:150px;">
+            </a>
+          </div>
+        </div>
+        <div class="ln_solid"></div>
+        <div class="form-group">
+          <div class="float-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleFeeedPurchaseEdit()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="editfeedPurchaseForm.invalid||clicked"
+              (click)="onUpdateFeeedPurchase();clicked=true">Update</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="purchase-popup" *ngIf="isAddMPFeedPurchase">
+    <div class="header text-primary mb-2">
+      <h4>Add Medicine / Protein Purchase</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div class="clearefix"></div>
+    <div>
+      <form class="form" [formGroup]="AddMPfeedPurchaseForm">
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <mat-select placeholder="Select Feed" formControlName="feedType" required>
+              <mat-option *ngFor="let farm of MPtotalFeedData" [value]="farm.Id">
+                {{farm.NAME}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span
+                *ngIf="AddMPfeedPurchaseForm.get('feedType').invalid && AddMPfeedPurchaseForm.get('feedType').touched">
+                <span *ngIf="AddMPfeedPurchaseForm.controls['feedType'].hasError('required') ">
+                  Please Enter feed
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="picker1" placeholder="Received Date" formControlName="receivedDate"
+              [max]='curDate' required>
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+            <mat-error>
+              <span
+                *ngIf="AddMPfeedPurchaseForm.get('receivedDate').invalid && AddMPfeedPurchaseForm.get('receivedDate').touched">
+                <span *ngIf="AddMPfeedPurchaseForm.controls['receivedDate'].hasError('required') ">
+                  Please Enter Received Date
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="Datepicker" placeholder="Bill Date" formControlName="BillDate"
+              [max]='curDate' required>
+            <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+            <mat-datepicker #Datepicker></mat-datepicker>
+            <mat-error>
+              <span
+                *ngIf="AddMPfeedPurchaseForm.get('BillDate').invalid && AddMPfeedPurchaseForm.get('BillDate').touched">
+                <span *ngIf="AddMPfeedPurchaseForm.controls['BillDate'].hasError('required') ">
+                  Please Enter Bill Date
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Invoice number" formControlName="invoiceNumber">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Vechine Number" formControlName="vechileNumber">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Medicine Name" formControlName="medicineName" required name="name"
+              [ngModel]="name | titleCase" (ngModelChange)="name=$event" maxlength="70">
+            <mat-error>
+              <span
+                *ngIf="AddMPfeedPurchaseForm.get('medicineName').invalid && AddMPfeedPurchaseForm.get('medicineName').touched">
+                <span *ngIf="AddMPfeedPurchaseForm.controls['medicineName'].hasError('required') ">
+                  Please Enter Medicine Name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Name" [matAutocomplete]="auto" formControlName="Name"
+              (input)="initSourceUser($event.target.value)" required>
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+              <mat-option class="opt" *ngFor="let n of namesList" [value]="n.Name">
+                <span style="font-size: 14px;">{{n.Name}}</span>
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error>
+              <span *ngIf="AddMPfeedPurchaseForm.get('Name').invalid && AddMPfeedPurchaseForm.get('Name').touched">
+                <span *ngIf="AddMPfeedPurchaseForm.controls['Name'].hasError('required') ">
+                  Please Enter Name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <!-- <input matInput placeholder="Town" formControlName="Town"> -->
+            <input matInput placeholder="Town" [matAutocomplete]="auto" formControlName="Town"
+              (input)="initSourceTown($event.target.value)">
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+              <mat-option class="opt" *ngFor="let town of townsList" [value]="town.Town">
+                <span style="font-size: 14px;">{{town.Town}}</span>
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="picker9" placeholder="Due Date" formControlName="DueDate">
+            <mat-datepicker-toggle matSuffix [for]="picker9"></mat-datepicker-toggle>
+            <mat-datepicker #picker9></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Rate" formControlName="rate" (input)="onRateChange($event.target.value)">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Freight" formControlName="Freight" maxlength="6" (keypress)="onlyNumber(event)"
+              (input)="calculateTotalAmount($event.target.value)">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Bill Amount" formControlName="billAmount" required maxlength="7">
+            <mat-error>
+              <span
+                *ngIf="AddMPfeedPurchaseForm.get('billAmount').invalid && AddMPfeedPurchaseForm.get('billAmount').touched">
+                <span *ngIf="AddMPfeedPurchaseForm.controls['billAmount'].hasError('required') ">
+                  Please Enter Bill Amount
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Net Amount" formControlName="netAmount" required
+              (input)="calculateTotalAmount($event.target.value)">
+            <mat-error>
+              <span *ngIf="AddMPfeedPurchaseForm.controls['netAmount'].hasError('required')">
+                Please Enter Net Amount
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Total Amount" formControlName="totalAmount" readonly [(ngModel)]="totalAmount">
+          </mat-form-field>
+          <div class="col-md-2 col-12 pt-4">
+            <input type="file" #myMPInput (change)="onSelectMPFile($event)" formControlName="uploadInvoice">
+          </div>
+        </div>
+        <div class="form-group col-md-4" *ngIf="image1 !=null">
+          <div class="file-uploded">
+            <a target="_blank">
+              <img [src]="image1" class="img-fluid box-shadow " style="height:150px;">
+            </a>
+          </div>
+        </div>
+        <div class="float-right">
+          <button type="button" class="btn btn-light text-dark" (click)="onCancleMPFeeedPurchaseAdd()">Cancel</button>
+          <button type="button" class="btn btn-primary" [disabled]="AddMPfeedPurchaseForm.invalid || clicked"
+            (click)="saveMPFeedPurchase();clicked=true">Save</button>
+        </div>
+        <!-- </div> -->
+      </form>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+
+  <div class="purchase-popup" *ngIf="isEditMPFeedPurchase">
+    <div class="header text-primary mb-2">
+      <h4>Update Medicine / Protein Purchase</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div>
+      <form class="form-horizontal form-label-left" [formGroup]="editMPfeedPurchaseForm">
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <mat-select placeholder="Select Type Feed" formControlName="feedType" [(ngModel)]="rowData.FeedTypeId"
+              required>
+              <mat-option *ngFor="let farm of MPtotalFeedData" [value]="farm.Id">
+                {{farm.NAME}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span
+                *ngIf="editMPfeedPurchaseForm.get('feedType').invalid && editMPfeedPurchaseForm.get('feedType').touched">
+                <span *ngIf="editMPfeedPurchaseForm.controls['feedType'].hasError('required') ">
+                  Please Enter feed
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="picker4" placeholder="Received Date" formControlName="receivedDate"
+              [max]='curDate' [(ngModel)]="rowData.Receiveddate" required>
+            <mat-datepicker-toggle matSuffix [for]="picker4"></mat-datepicker-toggle>
+            <mat-datepicker #picker4></mat-datepicker>
+            <mat-error>
+              <span
+                *ngIf="editMPfeedPurchaseForm.get('receivedDate').invalid && editMPfeedPurchaseForm.get('receivedDate').touched">
+                <span *ngIf="editMPfeedPurchaseForm.controls['receivedDate'].hasError('required') ">
+                  Please Enter Received Date
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="Datepicker" formControlName="BillDate" placeholder="Bill Date"
+              [(ngModel)]="rowData.BillDate" [max]='curDate'>
+            <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+            <mat-datepicker #Datepicker></mat-datepicker>
+            <mat-error>
+              <span
+                *ngIf="editMPfeedPurchaseForm.get('BillDate').invalid && editMPfeedPurchaseForm.get('BillDate').touched">
+                <span *ngIf="editMPfeedPurchaseForm.controls['BillDate'].hasError('required') ">
+                  Please Enter feed
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Invoice number" formControlName="invoiceNumber"
+              [(ngModel)]="rowData.InvoiceNumber" (keypress)="onlyNumber(event)">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Vechile Number" formControlName="vechileNumber"
+              [(ngModel)]="rowData.LorryNumber">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Medicine Name" formControlName="medicineName" name="{{rowData.MedicineName}}"
+              (ngModelChange)="rowData.MedicineName=$event" maxlength="70" [ngModel]="rowData.MedicineName | titleCase"
+              required>
+            <mat-error>
+              <span
+                *ngIf="editMPfeedPurchaseForm.get('medicineName').invalid && editMPfeedPurchaseForm.get('medicineName').touched">
+                <span *ngIf="editMPfeedPurchaseForm.controls['medicineName'].hasError('required') ">
+                  Please Enter Medicine Name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <!-- <input matInput placeholder="Name" formControlName="Name" [(ngModel)]="rowData.Name"> -->
+            <input matInput placeholder="Name" [matAutocomplete]="auto" formControlName="Name"
+              [(ngModel)]="rowData.Name" (input)="initSourceUser($event.target.value)" required>
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+              <mat-option class="opt" *ngFor="let n of namesList" [value]="n.Name">
+                <span style="font-size: 14px;">{{n.Name}}</span>
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error>
+              <span *ngIf="editfeedPurchaseForm.get('Name').invalid && editfeedPurchaseForm.get('Name').touched">
+                <span *ngIf="editfeedPurchaseForm.controls['Name'].hasError('required') ">
+                  Please Enter Name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <!-- <input matInput placeholder="Town" formControlName="Town" [(ngModel)]="rowData.Town"> -->
+            <input matInput placeholder="Town" [matAutocomplete]="auto" formControlName="Town"
+              (input)="initSourceTown($event.target.value)" [(ngModel)]="rowData.Town">
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+              <mat-option class="opt" *ngFor="let town of townsList" [value]="town.Town">
+                <span style="font-size: 14px;">{{town.Town}}</span>
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="picker10" placeholder="Due Date" formControlName="DueDate"
+              [(ngModel)]="rowData.DueDate">
+            <mat-datepicker-toggle matSuffix [for]="picker10"></mat-datepicker-toggle>
+            <mat-datepicker #picker10></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Rate" formControlName="rate" [(ngModel)]="rowData.Cost">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Freight" formControlName="Freight" [(ngModel)]="rowData.Freight" maxlength="6"
+              (input)="calculateMPTotalAmount($event.target.value)">
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Bill Amount" formControlName="billAmount" [(ngModel)]="rowData.BillAmounts"
+              required maxlength="7">
+            <mat-error>
+              <span
+                *ngIf="editMPfeedPurchaseForm.get('billAmount').invalid && editMPfeedPurchaseForm.get('billAmount').touched">
+                <span *ngIf="editMPfeedPurchaseForm.controls['billAmount'].hasError('required') ">
+                  Please Enter Bill Amount
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Net Amount" formControlName="netAmount" required
+              [(ngModel)]="rowData.TotalAmounts" (keypress)="onlyNumber(event)"
+              (input)="calculateMPTotalAmount($event.target.value)">
+            <mat-error>
+              <span *ngIf="editMPfeedPurchaseForm.controls['netAmount'].hasError('required')">
+                Please Enter Net Amount
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Total Amount" formControlName="totalAmount" readonly
+              [(ngModel)]="rowData.FinalAmount" (keypress)="onlyNumber(event)">
+          </mat-form-field>
+          <div class="col-md-2 col-12 pt-4">
+            <input type="file" #myMPInputEdit (change)="onSelectMPEditFile($event)" formControlName="uploadInvoice">
+          </div>
+
+        </div>
+        <div class="form-group col-md-4" *ngIf="image1 !=null">
+          <div class="file-uploded">
+            <a target="_blank">
+              <img [src]="image1" class="img-fluid box-shadow " style="height:150px;">
+            </a>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="form-group">
+          <div class="float-right">
+            <button type="button" class="btn btn-light text-dark"
+              (click)="onCancleMPFeeedPurchaseEdit()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="editMPfeedPurchaseForm.invalid"
+              (click)="onUpdateMPFeeedPurchase()">Update</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+
+  <!-- Modal -->
+  <div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Payment Summary</h4>
+          <div class="close-btn">
+            <button type="button" class="" data-dismiss="modal">&times;</button>
+          </div>
+          <!-- <h4 class="modal-title">Total Due Amount(Rs) : </h4>{{totalOutstandingSummaryAmount}} -->
+        </div>
+        <div>
+        </div>
+        <div class="modal-body">
+          <h4 style="font-size:17px;margin-top: 5px;">Total Due Amount :
+            <b class="text-danger">&#x20B9;{{totalOutstandingSummaryAmount| number: '.0'}}</b>
+          </h4>
+          <p-table #st [value]="paymentSummary" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true"
+            columnResizeMode="expand">
+            <ng-template pTemplate="header">
+              <tr>
+                <th [pSortableColumn]="'Name'">Feed
+                  <p-sortIcon [field]="'Name'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'TotalAmount'">Due Amount (Rs)
+                  <p-sortIcon [field]="'TotalAmount'"></p-sortIcon>
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td>{{row.Name}}</td>
+                <td>{{row.TotalAmount |currency }}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage" let-columns>
+              <tr>
+                <td colspan="2" class="ui-datatable-emptymessage text-center">No Records Found</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light text-dark" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div id="productModal" class="modal">
+      <div class="close-btn">
+        <button class="" (click)="closeImage()">&times;</button>
+      </div>
+      <img class="modal-content" [src]="modalImg" id="productImage">
+      <div id="caption"></div>
+    </div>
+  </div>
+</div>

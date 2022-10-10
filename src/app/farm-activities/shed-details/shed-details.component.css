@@ -1,0 +1,22 @@
+/* tr:nth-child(odd) {background-color: #ffff;} */
+
+
+body .ui-table .ui-table-tbody > tr > td:nth-child(odd) {
+    /* background-color: inherit;
+    border: 1px solid #c8c8c8; */
+    background-color: #ffff;
+}
+
+td:nth-child(even) {background-color: red;}
+
+
+
+
+tr:nth-child(even) 
+{
+background-color: #f2f2f2
+}
+.Padding{
+    padding:3px 25px;
+    border-bottom: 0 none;
+    }

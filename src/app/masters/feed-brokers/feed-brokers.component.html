@@ -1,0 +1,124 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Feed Broker Details</h3>
+    <div class="pull-right ml-auto">
+      <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="addRow()"
+        *ngIf="ActivityRights.CanManageFeedBrokers">
+        Add New Feed Broker
+      </button>
+      <button type="button" class="btn btn-primary " title="Export" data-toggle="tooltip" (click)="download()"
+        *ngIf='BrokerData?.length>0'>
+        Export
+      </button>
+      <button class="btn btn-primary " (click)="toggleFilter()" *ngIf="!isFiltersEnabled && BrokerData.length>0 ">
+        {{filterTooltip}}
+      </button>&nbsp;&nbsp;
+      <button class="btn btn-warning " (click)="toggleFilter()" *ngIf="isFiltersEnabled && BrokerData.length>0 ">
+        {{filterTooltip}}
+      </button>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+    <!-- <div class="pull-left" style="padding:4px 10px;border-bottom: 0 none;margin-bottom:10px;">
+      <input #gb type="text" class="form-control" pInputText size="50" placeholder="Search" style="width:auto">
+    </div> -->
+  <form class="form" [formGroup]="AddBrokerInfoForm">
+    <p-dataTable #fb [value]="BrokerData" [tableStyle]="{'table-layout':'auto'}" styleClass="bg-white"
+      [resizableColumns]="true" columnResizeMode="expand" [editable]="true"
+      [sortField]="['Name','Location','MobileNumber','IsActive']">
+      <p-column field="Name" header="Name" [sortable]="true" [filter]="isFiltersEnabled">
+        <ng-template let-row="rowData" pTemplate="body">
+          <div *ngIf="!row.isEditable">{{row.Name}}</div>
+          <div *ngIf="row.isEditable || row.isAdd">
+            <input type="text" class="form-control" [(ngModel)]="row.Name" formControlName="Name">
+            <mat-error>
+              <span *ngIf="AddBrokerInfoForm.get('Name').invalid && AddBrokerInfoForm.get('Name').touched">
+                <span *ngIf="AddBrokerInfoForm.controls['Name'].hasError('required') ">
+                  Please enter Name
+                </span>
+              </span>
+            </mat-error>
+          </div>
+        </ng-template>
+      </p-column>
+      <p-column field="Location" header="Location" [sortable]="true" [filter]="isFiltersEnabled">
+        <ng-template let-row="rowData" pTemplate="body">
+          <div *ngIf="!row.isEditable">{{row.Location}}</div>
+          <div *ngIf="row.isEditable || row.isAdd">
+            <input type="text" class="form-control" [(ngModel)]="row.Location" formControlName="Location">
+            <mat-error>
+              <span *ngIf="AddBrokerInfoForm.get('Location').invalid && AddBrokerInfoForm.get('Location').touched">
+                <span *ngIf="AddBrokerInfoForm.controls['Location'].hasError('required') ">
+                  Please enter Location
+                </span>
+              </span>
+            </mat-error>
+          </div>
+        </ng-template>
+      </p-column>
+      <p-column field="MobileNumber" header="Mobile Number" [sortable]="true" [filter]="isFiltersEnabled">
+        <ng-template let-row="rowData" pTemplate="body">
+          <div *ngIf="!row.isEditable" class="pull-right">{{row.MobileNumber}}</div>
+          <div *ngIf="row.isEditable || row.isAdd">
+            <input type="text" class="form-control" [(ngModel)]="row.MobileNumber" formControlName="MobileNumber"
+              (keypress)="onlyNumber(event)" maxlength="10">
+            <mat-error>
+              <span
+                *ngIf="AddBrokerInfoForm.get('MobileNumber').invalid && AddBrokerInfoForm.get('MobileNumber').touched">
+                <span *ngIf="AddBrokerInfoForm.controls['MobileNumber'].hasError('required') ">
+                  Please enter MobileNumber
+                </span>
+              </span>
+            </mat-error>
+          </div>
+        </ng-template>
+      </p-column>
+      <p-column header="Active" [style]="{'text-align':'center'}" [sortable]="true" [filter]="isFiltersEnabled">
+        <ng-template let-row="rowData" pTemplate="body">
+          <div *ngIf="!row.isEditable">{{row.IsActive}}</div>
+          <div *ngIf="row.isEditable || row.isAdd">
+            <!-- <input type="checkbox" [(ngModel)]="row.IsActive" [disabled]="false" formControlName="IsActive"  /> -->
+            <mat-checkbox [(ngModel)]="row.IsActive" [disabled]="false" formControlName="IsActive"></mat-checkbox>
+          </div>
+        </ng-template>
+      </p-column>
+      <p-column field="" header="Action(s)" [style]="{'text-align':'center'}">
+        <ng-template let-row="rowData" let-rowIndex="rowIndex" pTemplate="body">
+          <button type="button" class="btn btn-success btn-xs" title="Save" data-toggle="tooltip"
+            (click)="addFeedBrokerClick(row);clicked=true"
+            *ngIf="row.isEditable && row.isAdd==true && ActivityRights.CanManageMasters "
+            [disabled]="!AddBrokerInfoForm.valid||clicked">
+            <i class="mdi mdi-plus-circle"></i></button>
+          <button type="button" class="btn btn-danger btn-xs" title="Cancel" data-toggle="tooltip"
+            (click)="cancelFeedBrokerAddClick(row)" *ngIf="row.isEditable && row.isAdd==true">
+            <i class="mdi mdi-block-helper"></i></button>
+          <button type="button" class="btn btn-primary btn-xs" title="Edit" data-toggle="tooltip" (click)="editRow(row)"
+            *ngIf="!row.isEditable && ActivityRights.CanManageFeedBrokers">
+            <i class="mdi mdi-table-edit"></i></button>
+          <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip"
+            (click)="delete(row,rowIndex)" *ngIf="!row.isEditable && ActivityRights.CanManageFeedBrokers"
+            [disabled]='!row.IsActive'>
+            <i class="mdi mdi-delete"></i></button>
+          <button type="button" class="btn btn-success btn-xs" title="Update" data-toggle="tooltip"
+            (click)="onUpdateRow(row);clicked=true" *ngIf="row.isEditable && row.isAdd==false" [disabled]="!AddBrokerInfoForm.valid||clicked">
+            <i class="mdi mdi-content-save"></i></button>
+          <button type="button" class="btn btn-danger btn-xs" title="Cancel" data-toggle="tooltip"
+            (click)="cancelFeedBrokerEditClick(row)" *ngIf="row.isEditable && row.isAdd==false">
+            <i class="mdi mdi-block-helper"></i></button>
+        </ng-template>
+      </p-column>
+      <ng-template pTemplate="emptymessage" let-columns>
+        <tr>
+          <!-- <td colspan="5" class="ui-datatable-emptymessage text-center">No Records Found</td> -->
+          No Records Found
+        </tr>
+      </ng-template>
+    </p-dataTable>
+  </form>
+</div>

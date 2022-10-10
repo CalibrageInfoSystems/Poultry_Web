@@ -1,0 +1,64 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title>Feed Purchase Transaction
+  </h2>
+</div>
+<mat-dialog-content>
+  <form class="form row" [formGroup]="transactionForm">
+    <mat-form-field class="col-md-12">
+      <input matInput placeholder="Feed Type" formControlName="feedType" [(ngModel)]="data.FeedType" readonly>
+    </mat-form-field>
+    <mat-form-field class="col-md-12">
+      <input matInput placeholder="Name" formControlName="name" [(ngModel)]="data.Name" readonly>
+    </mat-form-field>
+    <mat-form-field class="col-md-12">
+      <input matInput [matDatepicker]="Datepicker1" placeholder="Received Date" formControlName="receiveddate" required
+        [(ngModel)]="data.Receiveddate" readonly>
+      <mat-datepicker-toggle matSuffix [for]="Datepicker1" disabled></mat-datepicker-toggle>
+      <mat-datepicker #Datepicker1></mat-datepicker>
+    </mat-form-field>
+    <!-- <mat-form-field class="col-md-12">
+      <input matInput placeholder="Invoice Date" formControlName="receiveddate" [(ngModel)]="data.Receiveddate"
+        readonly>
+    </mat-form-field> -->
+    <mat-form-field class="col-md-12">
+      <input matInput placeholder="Due Amount" formControlName="dueAmount" [(ngModel)]="data.DueAmount" readonly>
+    </mat-form-field>
+    <mat-form-field class="col-md-12">
+      <mat-select placeholder="Payment Mode" formControlName="paymentType" required>
+        <mat-option *ngFor="let payment of paymentTypes" [value]="payment.TypeCdId">
+          {{payment.Desc}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="transactionForm.controls['paymentType'].hasError('required')">
+        Please Select Payment Mode
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field class="col-md-12">
+      <input matInput placeholder="Payment(Check/Reference Number)" formControlName="refrenceNumber">
+    </mat-form-field>
+    <mat-form-field class="col-md-12">
+      <input matInput [matDatepicker]="Datepicker" placeholder="Paid Date" formControlName="paidDate" required
+        [(ngModel)]="payDate">
+      <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+      <mat-datepicker #Datepicker></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field class="col-md-12">
+      <input matInput placeholder="Paid Amount" formControlName="paidAmount" required (keypress)="numberOnly($event)"
+      (ngModelChange)="searchModel($event)" maxlength="10">
+      <mat-error *ngIf="transactionForm.controls['paidAmount'].hasError('required')">
+        Please Enter Amount
+      </mat-error>
+      <mat-error *ngIf="transactionForm.get('paidAmount').hasError('max')">
+        Amount should be less than due amount {{totalAmount}}
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions class="pull-right">
+  <button class="btn btn-light text-dark" type="reset()" (click)="onCancelClick()">
+    <span matTooltip="Cancel">Cancel</span>
+  </button>
+  <button class="btn btn-primary" type="submit" [mat-dialog-close]="transactionForm" [disabled]="!transactionForm.valid">
+    <span matTooltip="Ok">Pay</span>
+  </button>
+</mat-dialog-actions>

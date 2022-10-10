@@ -1,0 +1,170 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+<div class="page-breadcrumb">
+  <div class="row">
+    <div class="col-12 d-flex no-block align-items-center">
+      <h3 class="page-title header">Income/Expenses Report</h3>
+    </div>
+</div>
+    <div class="clearfix"></div>
+    <div class="purchase-popup" style="margin-top: 12px;">
+      <div class="row">
+        <!-- <mat-form-field class="col-md-2">
+        <mat-select placeholder="Income/Expense" [(value)]="selectedIncome">
+          <mat-option *ngFor="let expense of expensesTypeList" [value]="expense.Id">
+            {{expense.Name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field> -->
+        <mat-form-field class="col-md-2 col-12">
+          <input matInput [matDatepicker]="picker" placeholder="From Date" readonly [max]="currentDate"
+            [(ngModel)]="fromDate">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field class="col-md-2 col-12">
+          <input matInput [matDatepicker]="picker1" placeholder="To Date" readonly [min]="fromDate" [max]="currentDate"
+            [(ngModel)]="toDate">
+          <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+          <mat-datepicker #picker1></mat-datepicker>
+        </mat-form-field>
+        <div class="col-md-3 col-12">
+          <button type="button" class="btn btn-primary" title="Search" data-toggle="tooltip" (click)="GetIncomeExpenses()"
+            [disabled]="">Search</button>
+          <button type="button" class="btn btn-primary" title="Clear" data-toggle="tooltip" (click)="onClearSearch()"
+            [disabled]="">Clear</button>
+        </div>
+        <div class="col-md-5 col-12">
+        <div class="pull-right">
+          <!-- <button class="btn btn-primary " (click)="toggleFilter()"   [disabled]="incomeList.length==0"
+          *ngIf="!isFiltersEnabled">
+          <i class="fa fa-filter" aria-hidden="true"></i>
+          &nbsp;{{filterTooltip}}
+        </button>&nbsp;&nbsp;
+        <button class="btn btn-success" (click)="toggleFilter()"
+          *ngIf="isFiltersEnabled">
+          <i class="fa fa-filter" aria-hidden="true"></i>&nbsp;{{filterTooltip}}
+        </button>  -->
+        <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip"  [disabled]="incomeList.length==0"
+        (click)="download()">Export</button>
+      </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <span class="d-flex align-items-center purchase-popup">
+          <h5 class="mb-0 pb-0 " style="color:black;">Profit/Loss(Rs) :</h5>
+           <span *ngIf="profitLoss>0" style="color: green;">{{profitLoss | currency}}</span>
+          <span *ngIf="profitLoss<0" style="color: red;">{{profitLoss | currency}}</span>
+        </span>
+      </div>
+             
+        
+    
+    </div>
+    <div class="card" style="width: 100%; margin-top: 12px;">      
+      <div class="card-body">
+       <div class="row">
+          <div class="x_content"  style="width: 45%; margin-bottom: 10px;">
+              <div class="header">
+                <h3>Income</h3>
+              </div> 
+              <p-table #IN [value]="incomeList" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true"
+              columnResizeMode="expand" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th [pSortableColumn]="'Desc'">Type
+                    <p-sortIcon [field]="'Desc'"></p-sortIcon>
+                  </th>
+                  <th [pSortableColumn]="'Amount'"> Amount (Rs)
+                    <p-sortIcon [field]="'Amount'"></p-sortIcon>
+                  </th>
+                
+                  </tr>
+                  <!-- <tr *ngIf="isFiltersEnabled">                      
+                    <th>
+                      <input type="text" class="form-control" maxlength="15"
+                        (input)="IN.filter($event.target.value, 'Desc', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="IN.filter($event.target.value, 'Amount', 'contains')">
+                    </th>
+                    </tr> -->
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td>{{row.Desc}}</td>
+                  <td>{{row.Amount| currency}}</td></tr>
+                  </ng-template>
+                  <ng-template pTemplate="footer">
+                    <tr *ngIf="incomeList.length>0">
+                      <td class="textleft">Total Amount (Rs) : </td>
+                      <td >{{totalData.IncomeAmount| currency}}</td>               
+                    </tr>
+                    
+                  </ng-template>
+                  <ng-template pTemplate="emptymessage" let-columns>
+                    <tr style="text-align: center">
+                      <td colspan="2" class="ui-datatable-emptymessage text-center">No Records Found</td>
+                    </tr>
+                  </ng-template>
+            </p-table>
+              
+          </div>
+          <div class="x_content"  style="width: 10%;">
+          </div>
+          <br/>
+          <div class="x_content"  style="width: 45%;margin-bottom: 10px  ;"> 
+            <div class="header">
+              <h3>Expenses</h3>
+            </div>  
+            <p-table #OUT [value]="expensesList" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true"
+            columnResizeMode="expand" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">
+            <ng-template pTemplate="header">
+              <tr>
+                <th [pSortableColumn]="'Desc'">Type
+                  <p-sortIcon [field]="'Desc'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'Amount'"> Amount (Rs)
+                  <p-sortIcon [field]="'Amount'"></p-sortIcon>
+                </th>
+                </tr>
+                <!-- <tr *ngIf="isFiltersEnabled">                      
+                  <th>
+                    <input type="text" class="form-control" maxlength="15"
+                      (input)="OUT.filter($event.target.value, 'Desc', 'contains')">
+                  </th>
+                  <th>
+                    <input type="text" class="form-control" maxlength="50"
+                      (input)="OUT.filter($event.target.value, 'Amount', 'contains')">
+                  </th>
+                </tr> -->
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td>{{row.Desc}}</td>
+                <td>{{row.Amount| currency}}</td></tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                  <tr *ngIf="incomeList.length>0">
+                    <td >Total Amount (Rs) : </td>
+                    <td >{{totalData.ExpensesAmount| currency}}</td>               
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage" let-columns>
+                  <tr style="text-align: center">
+                    <td colspan="2" class="ui-datatable-emptymessage text-center">No Records Found</td>
+                  </tr>
+                </ng-template>
+          </p-table>          
+          <br />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

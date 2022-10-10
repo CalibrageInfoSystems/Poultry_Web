@@ -1,0 +1,86 @@
+<div class="right_col" role="main" style="height :900px;">
+    <div>
+      <div class="header">
+        <h3>Notifications</h3>
+      </div>
+  
+    </div>
+    <div >
+        <div class="row">
+
+            <p-table #sd [value]="Alerts" [rows]="5" [paginator]="true" [rowsPerPageOptions]="[5, 10,15]" >
+    
+                    <ng-template pTemplate="header">
+                            <tr>
+                                <th [pSortableColumn]="'Name'">Header
+                                    <p-sortIcon [field]="Name"></p-sortIcon>
+                                </th>
+                                <th [pSortableColumn]="'Desc'">Description
+                                    <p-sortIcon [field]="Desc"></p-sortIcon>
+                                </th>
+                                <th [pSortableColumn]="'CreatedDate'"> Created Date
+                                    <p-sortIcon [field]="CreatedDate"></p-sortIcon>
+                                </th>
+                                <th [pSortableColumn]="'AlertRaisedBy'">Created By
+                                    <p-sortIcon [field]="AlertRaisedBy"></p-sortIcon>
+                                </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row>
+                            <tr *ngIf="!row.IsRead"  (click)="AlertInfo(row)" >
+                                <td > <b>{{row.Name}}</b></td>
+                                <td>  <b>{{row.Desc}}</b></td>
+                                <td><b>{{row.CreatedDate | date: 'dd-MM-yyyy @ hh:mm a'}}</b></td>
+                                <td><b>{{row.AlertRaisedBy}}</b></td>
+                            </tr>
+                            <tr *ngIf="row.IsRead"  (click)="AlertInfo(row)" >
+                                <td> {{row.Name}}</td>
+                               
+                                <td>{{row.Desc}}</td>
+                                <td>{{row.CreatedDate | date: 'dd-MM-yyyy @ hh:mm a'}}</td>
+                                <td>{{row.AlertRaisedBy}}</td>
+                            </tr>
+                            
+                        </ng-template>
+                <!-- <ng-template pTemplate="body" let-row>
+                    <tr href="#" *ngFor="let row of Alerts" ng-hide="isDataLoading" (click)="AlertInfo(row)">
+                        <th>Header</th>
+                        <td *ngIf="!row.IsRead" href="#" style="text-align:center">
+                            <b>{{row.Name}}</b>
+                            <br />{{row.CreatedDate | date: 'dd-MM-yyyy @ hh:mm a'}}
+                        </td>
+                        <td *ngIf="row.IsRead" href="#">
+                            {{row.Name}}
+                            <br />{{row.CreatedDate | date: 'dd-MM-yyyy @ hh:mm a'}}
+                        </td>
+                    </tr>
+                </ng-template> -->
+            </p-table>
+    
+        </div>
+  </div>
+  <!-- <div class="col-sm-9">
+      <p-table #sd [value]="gridReq" >
+        <ng-template pTemplate="body" let-row>
+            <tr>
+                <th><h4 align="left"><b>Alert Details:</b></h4></th>
+                <th></th>
+            </tr>
+            <tr>
+                <td><b>Header : </b>{{row.AlertType}}</td>
+                <td width="300" height="20"><b>Created Date : </b>{{row.AlertDate | date : 'dd-MM-yyyy @ hh:mm a'}}</td>
+            </tr>
+            <tr>
+                <td colspan="2"><b>Description : </b></td>
+            </tr>
+            <tr>
+                <td colspan="2">{{row.Desc}}</td>
+            </tr>
+            <tr>
+                <td colspan="2"><b>Created By : </b>{{row.AlertCreatedBy}}</td>
+            </tr>
+        </ng-template>
+      </p-table>
+
+  </div> -->
+  </div>

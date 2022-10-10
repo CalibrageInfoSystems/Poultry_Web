@@ -1,0 +1,225 @@
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Chick Vaccination Details</h3>
+  </div>
+  <div class="clearfix"></div>
+  <div class="purchase-popup" *ngIf="isAddVaccinDetails">
+    <div class="header text-primary">
+      <h4 class="pl-3">Add Chick Vaccination Details</h4>
+      <div class="clearfix"></div>
+    </div>
+      <form class="form-horizontal form-label-left" [formGroup]="AddChickVaccinationForm">
+        <div class="row">
+          <mat-form-field class="col-md-3 col-12">
+            <mat-select placeholder="Select Batch" formControlName="BatchName">
+              <mat-option *ngFor="let Batch of BatchList" [value]="Batch.Id" (onSelectionChange)="onSelectBatch(Batch)">
+                {{Batch.Name}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span
+                *ngIf="AddChickVaccinationForm.get('BatchName').invalid && AddChickVaccinationForm.get('BatchName').touched">
+                <span *ngIf="AddChickVaccinationForm.controls['BatchName'].hasError('required') ">
+                  Please Select Batch
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder="Age " [(ngModel)]="Age" formControlName="Age" readonly>
+          </mat-form-field>
+          <mat-form-field class="col-md-3 col-12">
+            <mat-select placeholder="Select Vaccination " formControlName="VaccinationName">
+              <mat-option *ngFor="let Vaccination of VaccinationData" [value]="Vaccination.Id">
+                {{Vaccination.Name}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span
+                *ngIf="AddChickVaccinationForm.get('VaccinationName').invalid && AddChickVaccinationForm.get('VaccinationName').touched">
+                <span *ngIf="AddChickVaccinationForm.controls['VaccinationName'].hasError('required') ">
+                  Please Select Vaccination Name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput [matDatepicker]="Datepicker" placeholder="Vaccination Date" [max]="curDate"
+              [(ngModel)]="selectedDate" formControlName="VaccinationDate" readonly>
+            <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+            <mat-datepicker #Datepicker></mat-datepicker>
+            <!-- <mat-error>
+                <span *ngIf="AddChickVaccinationForm.get('VaccinationDate').invalid && AddChickVaccinationForm.get('VaccinationDate').touched">
+                  <span *ngIf="AddChickVaccinationForm.controls['VaccinationDate'].hasError('required') ">
+                    Please Select Vaccination Date
+                  </span>
+                </span>
+              </mat-error> -->
+          </mat-form-field>
+        </div>
+        <div class="ln_solid"></div>
+        <div class="form-group">
+          <div class="float-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleVaccinDetailsAdd()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="onVaccinDetailsAdd()"
+              [disabled]="!AddChickVaccinationForm.valid">Save</button>
+          </div>
+        </div>
+      </form>
+      <div class="clearfix"></div>
+  </div>
+  <div *ngIf="!isAddVaccinDetails && !isEditVaccinDetails">
+    <div class="purchase-popup">
+    <div class="row">
+      <mat-form-field class="col-md-2 col-12">
+        <input matInput [matDatepicker]="picker" placeholder="From Date" readonly [max]="date" [(ngModel)]="FROMDATE"
+          (dateChange)="onDateChange($event)">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field class="col-md-2 col-12">
+        <input matInput [matDatepicker]="picker1" placeholder="To Date" readonly [min]="formDate" [max]="date"
+          [(ngModel)]="selectedDate">
+        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1></mat-datepicker>
+      </mat-form-field>
+      <div class="col-md-4 col-12">
+        <button type="button" class="btn btn-primary" title="Search" data-toggle="tooltip" (click)="getData()"
+          [disabled]="">Search</button>
+        <button type="button" class="btn btn-primary" title="Clear" data-toggle="tooltip" (click)="onClearSearch()"
+          [disabled]="">Clear</button>
+      </div>
+      <div class="col-md-4 col-12">
+      <div class="float-right ml-auto" *ngIf="!isAddVaccinDetails && !isEditVaccinDetails">
+        <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="download()"
+          *ngIf='ChickVaccinationData?.length>0'>
+          Export
+        </button>
+        <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip"
+          (click)="onAddVaccnDetailsClick()" *ngIf="ActivityRights.CanManageVaccinationDetails">
+          Add Chick Vaccination
+        </button>
+      </div>
+      </div>
+    </div>
+  </div>
+    <div>
+      <p-table #dt [value]="ChickVaccinationData" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand" [rows]="10" [paginator]="true"
+        [rowsPerPageOptions]="[10,20,30]">
+        <ng-template pTemplate="header">
+          <tr>
+            <th [pSortableColumn]="'BatchName'">Batch #
+              <p-sortIcon [field]="BatchName"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'AgeinWeeks'"> Age
+              <p-sortIcon [field]="AgeinWeeks"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'VaccinationName'">Vaccination Name
+              <p-sortIcon [field]="VaccinationName"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'VaccinationType'">Vaccination Type
+              <p-sortIcon [field]="VaccinationType"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'VaccinatedDate'">Vaccination Date
+              <p-sortIcon [field]="VaccinatedDate"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'IsActive'">Active
+              <p-sortIcon [field]="IsActive"></p-sortIcon>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>{{row.BatchName}}</td>
+            <td *ngIf="row.AgeinDays==0">{{row.AgeinWeeks}}</td>
+            <td *ngIf="row.AgeinDays!=0">{{row.AgeinWeeks}}/{{row.AgeinDays}}</td>
+            <td>{{row.VaccinationName}}</td>
+            <td>{{row.VaccinationType}}</td>
+            <td>{{row.VaccinatedDate| date:'dd/MM/yyyy'}}</td>
+            <td>{{row.IsActive}}</td>
+            <td>
+              <div>
+                <button type="button" class="btn btn-primary btn-xs" title="Edit" data-toggle="tooltip"
+                  (click)="onEditVaccinDetailsClick(row)" *ngIf="ActivityRights.CanManageVaccinationDetails">
+                  <i class="fa fa-edit"></i>
+                </button>&nbsp;
+                <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip"
+                  (click)="onDeleteVaccinDetailsClick(row)" [disabled]='!row.IsActive'
+                  *ngIf="ActivityRights.CanManageVaccinationDetails">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage" let-columns>
+          <tr>
+            <td colspan="7" class="ui-datatable-emptymessage text-center">No Records Found</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+  <div class="purchase-popup" *ngIf="isEditVaccinDetails">
+    <div class="x_title">
+      <h4 class="header">Update Vaccination Details</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+      <br />
+      <form class="form-horizontal form-label-left" [formGroup]="EditChickVaccinationForm">
+        <div class="row">
+          <mat-form-field class="col-md-3">
+            <mat-select placeholder="Select Batch #" formControlName="BatchName" [(ngModel)]="rowData.BatchId">
+              <mat-option *ngFor="let Batch of BatchList" [value]="Batch.Id" (onSelectionChange)="onSelectBatch(Batch)">
+                {{Batch.BatchName}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span
+                *ngIf="EditChickVaccinationForm.get('BatchName').invalid && EditChickVaccinationForm.get('BatchName').touched">
+                <span *ngIf="EditChickVaccinationForm.controls['BatchName'].hasError('required') ">
+                  Please Select Batch
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Chick Age " [(ngModel)]="Age" formControlName="Age" readonly>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <mat-select placeholder="Select Vaccination " formControlName="VaccinationName"
+              [(ngModel)]="rowData.VaccinationId">
+              <mat-option *ngFor="let Vaccination of VaccinationData" [value]="Vaccination.Id">
+                {{Vaccination.Name}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span
+                *ngIf="EditChickVaccinationForm.get('VaccinationName').invalid && EditChickVaccinationForm.get('VaccinationName').touched">
+                <span *ngIf="EditChickVaccinationForm.controls['VaccinationName'].hasError('required') ">
+                  Please Select Vaccination Name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput [matDatepicker]="picker" placeholder="Vaccination Date" [max]="curDate" readonly
+              [(ngModel)]="rowData.VaccinatedDate" formControlName="VaccinationDate">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="ln_solid"></div>
+        <div class="form-group">
+          <div class="row float-right">
+            <button type="submit" class="btn btn-success" (click)="onVaccinationDetailsEdit()"
+              [disabled]="!EditChickVaccinationForm.valid">Update</button>
+            <button type="button" class="btn btn-primary" (click)="onCancleVaccinDetailsEdit()">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

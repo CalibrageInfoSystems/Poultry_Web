@@ -1,0 +1,119 @@
+<div class="right_col" role="main">
+    <h3 class="header pull-left">Add Visit Log</h3>
+    <div class="clearfix"></div>
+    <!-- Add Log Form -->
+    <div class="x_panel">
+        <!-- <div class="x_title">
+            <h4 class="header">Add Visit Log</h4>
+            <div class="clearfix"></div>
+        </div> -->
+        <div class="x_content">
+            <br />
+            <form [formGroup]="addVisitlogForm">
+                <div formArrayName="items" *ngFor="let item of addVisitlogForm.controls['items']['controls']; let i = index">
+                    <div [formGroupName]="i">
+                        <div class="row">
+                                <!-- [disabled]="viewLogs[i].StatusTypeId==status.Approved" -->
+                            <mat-form-field class="col-xs-12 col-sm-6 col-md-2">
+                                <input matInput placeholder="Shed #" readonly formControlName="ShedName">
+                            </mat-form-field>
+
+                            <mat-form-field class="col-xs-12 col-sm-6 col-md-2">
+                                <input matInput placeholder="Mortality" formControlName="Died" (keypress)="onlyNumber(event)" [ngModel]="viewLogs[i]?.Died" [readonly]="isApprovedOrDeclined(viewLogs[i]) ? null : 'required'">
+                            </mat-form-field>
+
+                            <mat-form-field class="col-xs-12 col-sm-6  col-md-2">
+                                <input matInput placeholder="Hurt" formControlName="Hurt" (keypress)="onlyNumber(event)" [ngModel]="viewLogs[i]?.Hurt" [readonly]="isApprovedOrDeclined(viewLogs[i]) ? null : 'required'">
+                            </mat-form-field>
+
+                            <mat-form-field class="col-xs-12 col-sm-6 col-md-2" *ngIf="viewLogs[i]?.StatusType!='Approved'">
+                                <input matInput placeholder="Number Of Eggs" formControlName="NumberofEggs" (keypress)="onlyNumber(event)" [ngModel]="viewLogs[i]?.NumberofEggs" [required]="isFieldRequired(item) ? 'required' : null"  [readonly]="isFieldReadOnly(item) ? null : 'required'">
+                                <mat-error>
+                                    <span *ngIf="item.get('NumberofEggs').touched && item.get('NumberofEggs').hasError('required')">
+                                        Please enter number of eggs
+                                    </span>
+                                </mat-error>
+                            </mat-form-field>
+
+                            <mat-form-field class="col-xs-12 col-sm-6 col-md-2" *ngIf="viewLogs[i]?.StatusType=='Approved'">
+                                <input matInput placeholder="Number Of Eggs" formControlName="NumberofEggs" [ngModel]="viewLogs[i]?.NumberofEggs" [required]="isFieldRequired(item) ? 'required' : null" readonly>
+                            </mat-form-field>
+
+
+                            <mat-form-field class="col-xs-12 col-sm-6 col-md-2" *ngIf="viewLogs[i]?.StatusType!='Approved'">
+                                <input matInput placeholder="Damaged Eggs" formControlName="DamagedEggs" (keypress)="onlyNumber(event)" [ngModel]="viewLogs[i]?.DamagedEggs" [readonly]="isFieldReadOnly(item) ? null : 'required'">
+                                <!-- (blur)="onBlurMethod(item,i)" -->
+                            </mat-form-field>
+
+                            <mat-form-field class="col-xs-12 col-sm-6 col-md-2" *ngIf="viewLogs[i]?.StatusType=='Approved'">
+                                <input matInput placeholder="Damaged Eggs" formControlName="DamagedEggs" [ngModel]="viewLogs[i]?.DamagedEggs" readonly>
+                            </mat-form-field>
+
+                            <mat-form-field class="col-xs-12 col-sm-6 col-md-2">
+                                <input matInput placeholder="Feed (Bags)" required formControlName="Feed" (keypress)="onlyNumber(event)" [ngModel]="viewLogs[i]?.Feed" [readonly]="isApprovedOrDeclined(viewLogs[i]) ? null : 'required'">
+                                <mat-error>
+                                    <span *ngIf="item.get('Feed').touched && item.get('Feed').hasError('required')">
+                                        Please enter feed
+                                    </span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="ln_solid"></div>
+                <div class="form-group">
+                    <div class="row pull-right">
+                        <button type="submit" class="btn btn-success" (click)="addVisitLog()" [disabled]="!addVisitlogForm.valid">
+                            <i *ngIf="isDataLoading" class="fa fa-spinner fa-spin"></i>&nbsp;&nbsp;Save</button>
+                        <button type="button" class="btn btn-primary" (click)="onCancleLogAdding()">Cancel</button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- <form [formGroup]="addVisitlogForm" *ngIf="viewLogs.length==0">
+                <div formArrayName="items" *ngFor="let item of addVisitlogForm.controls['items'].controls; let i = index">
+                    <div [formGroupName]="i">
+                        <div class="row">
+                            <mat-form-field class="col-md-2">
+                                <input matInput placeholder="Shed" readonly formControlName="ShedName">
+                            </mat-form-field>
+
+                            <mat-form-field class="col-md-2">
+                                <input matInput placeholder="Died" formControlName="Died" >
+                            </mat-form-field>
+
+                            <mat-form-field class="col-md-2">
+                                <input matInput placeholder="Hurt" formControlName="Hurt">
+                            </mat-form-field>
+
+                            <mat-form-field class="col-md-2">
+                                <input matInput placeholder="Number Of Eggs" formControlName="NumberofEggs"[required]="isFieldRequired(item) ? 'required' : null"  [readonly]="isFieldRequired(item) ? null : 'required'">
+                            </mat-form-field>
+
+                            <mat-form-field class="col-md-2">
+                                <input matInput placeholder="Damaged Eggs" formControlName="DamagedEggs" [readonly]="isFieldRequired(item) ? null : 'required'">
+                            </mat-form-field>
+
+                            <mat-form-field class="col-md-2">
+                                <input matInput placeholder="Feed (Tons)" required formControlName="Feed" >
+                                <mat-error>
+                                    <span *ngIf="item.get('Feed').touched && item.get('Feed').hasError('required')">
+                                        Please enter feed
+                                    </span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="ln_solid"></div>
+                <div class="form-group">
+                    <div class="row pull-right">
+                        <button type="submit" class="btn btn-success" (click)="addVisitLog()" [disabled]="!addVisitlogForm.valid">Save</button>
+                        <button type="button" class="btn btn-primary" (click)="onCancleLogAdding()">Cancel</button>
+                    </div>
+                </div>
+            </form> -->
+        </div>
+    </div>
+    <!-- Add Log Form End -->
+</div>

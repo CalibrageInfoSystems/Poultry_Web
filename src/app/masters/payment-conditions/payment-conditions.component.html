@@ -1,0 +1,75 @@
+<div class="right_col" role="main" style="height :900px;">
+  <div>
+    <div class="header">
+      <h3>Payment Condition Details</h3>
+    </div>
+  </div>
+
+  <div class="clearfix"></div>
+  <div class="row">
+    <div class="pull-left" style="padding:4px 10px;border-bottom: 0 none;margin-bottom:10px;">
+      <input #gb type="text" class="form-control" pInputText size="50" placeholder="Search" style="width:auto">
+    </div>
+    <div class="pull-right">
+      <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="addRow()">
+        Add New Payment Condition
+      </button>
+      <button type="button" class="btn btn-primary " title="Export" data-toggle="tooltip" (click)="download()">
+        Export
+      </button>
+    </div>
+  </div>
+  <p-dataTable [value]="data" [editable]="true" [sortField]="['name','description']" [globalFilter]="gb">
+    <p-column field="name" header="Name" [sortable]="true">
+      <ng-template let-row="rowData" pTemplate="body">
+        <div *ngIf="!row.isEditable">{{row.name}}</div>
+        <div *ngIf="row.isEditable || row.isAdd">
+          <input type="text" class="form-control" [(ngModel)]="row.name">
+        </div>
+      </ng-template>
+    </p-column>
+    <p-column field="description" header="Description" [sortable]="true">
+      <ng-template let-row="rowData" pTemplate="body">
+        <div *ngIf="!row.isEditable">{{row.description}}</div>
+        <div *ngIf="row.isEditable || row.isAdd">
+          <input type="text" class="form-control" [(ngModel)]="row.description">
+        </div>
+      </ng-template>
+    </p-column>
+    <p-column header="Active" [style]="{'text-align':'center'}">
+      <ng-template let-row="rowData" pTemplate="body">
+          <div *ngIf="!row.isEditable">{{row.isactive}}</div>
+          <div *ngIf="row.isEditable || row.isAdd">
+      <input type="checkbox" [(ngModel)]="row.isactive" [disabled]="false" /></div>
+      </ng-template>
+    </p-column>
+    <p-column field="" header="Action(s)" [style]="{'text-align':'center'}">
+      <ng-template let-row="rowData" let-rowIndex="rowIndex" pTemplate="body">
+        <button type="button" class="btn btn-success btn-circle" title="Save" data-toggle="tooltip"
+          (click)="addPaymentClick(row)" *ngIf="row.isEditable && row.isAdd==true">
+          <i class="fa fa-plus-circle"></i></button>&nbsp;
+        <button type="button" class="btn btn-primary btn-circle" title="Cancel" data-toggle="tooltip"
+          (click)="cancelPaymentAddClick(row)" *ngIf="row.isEditable && row.isAdd==true">
+          <i class="fa fa-ban"></i></button>&nbsp;
+        <button type="button" class="btn btn-primary btn-circle" title="Edit" data-toggle="tooltip"
+          (click)="editRow(row)" *ngIf="!row.isEditable">
+          <i class="fa fa-edit"></i></button>&nbsp;
+        <button type="button" class="btn btn-danger btn-circle" title="Delete" data-toggle="tooltip"
+          (click)="delete(row,rowIndex)" *ngIf="!row.isEditable">
+          <i class="fa fa-trash"></i></button>
+        <button type="button" class="btn btn-success btn-circle" title="Update" data-toggle="tooltip"
+          (click)="onUpdateRow(row)" *ngIf="row.isEditable && row.isAdd==false">
+          <i class="fa fa-save"></i></button>&nbsp;
+        <button type="button" class="btn btn-primary btn-circle" title="Cancel" data-toggle="tooltip"
+          (click)="cancelPaymentEditClick(row)" *ngIf="row.isEditable && row.isAdd==false">
+          <i class="fa fa-ban"></i></button>&nbsp;
+      </ng-template>
+    </p-column>
+    <ng-template pTemplate="emptymessage" let-columns>
+      <tr>
+        <td class="ui-datatable-emptymessage text-center">No Records Found</td>
+      </tr>
+    </ng-template>
+  </p-dataTable>
+
+</div>

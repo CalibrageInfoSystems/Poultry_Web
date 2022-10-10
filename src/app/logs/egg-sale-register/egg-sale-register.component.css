@@ -1,0 +1,16 @@
+label {
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: 500 !important;
+    color: #337ab7 !important;
+}
+
+/* button, .buttons, .btn, .modal-footer .btn+.btn {
+    margin-bottom: 5px;
+    margin-right: 22px !important;
+} */
+
+.text-danger {
+    color: #f16b08 !important;
+}

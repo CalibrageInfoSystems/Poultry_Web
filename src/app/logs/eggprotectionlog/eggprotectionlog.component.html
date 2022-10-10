@@ -1,0 +1,234 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+<div role="main" >
+  <div class="page-header">
+    <h3 class="page-title">Egg Stock Register</h3>
+  </div>
+  <div class="clearfix "></div>
+  <div class="row">
+    <div class="col-12">
+      <span class="d-flex align-items-center purchase-popup">
+        <div class="form-inline w-100">
+        <mat-form-field class="form-group">
+          <input matInput [matDatepicker]="Datepicker" placeholder="From Date" [max]="curDate" [(ngModel)]="FromDate" (fromDateChange)="ChangeFromDate(FromDate)" readonly>
+          <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+          <mat-datepicker #Datepicker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field class="form-group mx-sm-3">
+          <input matInput [matDatepicker]="Datepicker1" placeholder="To Date" [max]="curDate" [(ngModel)]="ToDate" (toDateChange)="ChangeToDate(ToDate)" [min]="FromDate" readonly>
+          <mat-datepicker-toggle matSuffix [for]="Datepicker1"></mat-datepicker-toggle>
+          <mat-datepicker #Datepicker1></mat-datepicker>
+        </mat-form-field>
+       <div  class="form-group">
+          <button type="button" class="btn btn-primary" title="Search" data-toggle="tooltip" (click)="Search()" >Search</button>
+       </div>
+      <div class="form-group ml-auto">
+        <button type="button" class="btn btn-primary mr-1" title="Export" data-toggle="tooltip" (click)="download()" [disabled]="!(eggStock.length>0)">Export</button>
+        <button class="btn btn-primary " (click)="toggleFilter()" [disabled]="!(!isFiltersEnabled && eggStock.length>0) ">
+          {{filterTooltip}}
+        </button>
+        <button class="btn btn-warning " (click)="toggleFilter()" *ngIf="isFiltersEnabled && eggStock.length>0 ">
+         {{filterTooltip}}
+        </button>
+        <!-- <i class="mdi mdi-file-export text-white"></i> -->
+       </div>
+       <div class="clearfix"></div>
+      </div>
+      </span>
+    </div>
+  </div>
+  <!-- <div class="row">
+    <div class="col-12">
+      <span class="d-flex align-items-center purchase-popup">
+        <h4 class="mb-0 pb-0">Each Box Contains:<b class="text-primary">{{"210"}} Eggs</b></h4>
+        <button type="button" class="btn btn-primary ml-auto" title="Export" data-toggle="tooltip" (click)="download()"><i class="mdi mdi-file-export text-white"></i> Export</button>
+      </span>
+    </div> -->
+      <!-- <Label class="col-md-6" style="font-size:17px;margin-top: 13px;">Each Box Contains:
+          <b class="text-danger">{{"210"}} Eggs</b>
+        </Label>
+        <div class="pull-right">
+            <div>
+              <button type="button" class="btn btn-primary" title="Export" data-toggle="tooltip" (click)="download()">Export</button>
+            </div>
+          </div> -->
+  <!-- </div> -->
+  <!-- Main Grid -->
+  <form class="form" [formGroup]="editEggRegisterForm">
+    <div class="mb-3 bg-white">
+        <p-dataTable  #ht [value]="eggStock" [editable]="true" paginatorDropdownAppendTo="body" [tableStyle]="{'table-layout':'auto'}"
+         [resizableColumns]="true" columnResizeMode="expand"  sortOrder="-1" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">  
+             
+       <p-column field="Date" header="Date" [sortable]="true" [filter]="isFiltersEnabled">
+         <ng-template let-row="rowData" pTemplate="body">
+           <div>{{row.Date| date:'dd/MM/yyyy'}}</div>
+           <div *ngIf="row.isEditable || row.isAdd">
+           </div>
+         </ng-template>
+       </p-column>
+       <p-column field="OpeningStock" header="Opening Stock" [sortable]="true" [filter]="isFiltersEnabled">
+         <ng-template let-row="rowData" pTemplate="body">
+           <div *ngIf="!row.isEditable" class="pull-right">{{row.OpeningStock |currency}}</div>
+           <div *ngIf="row.isEditable || row.isAdd" class="pull-right">
+             {{row.OpeningStock}}
+           </div>
+         </ng-template>
+       </p-column>
+   
+       <p-column field="DailyProduction" header="Daily Production" [sortable]="true" [filter]="isFiltersEnabled">
+         <ng-template let-row="rowData" pTemplate="body">
+           <div *ngIf="!row.isEditable" class="pull-right">{{row.DailyProduction |currency}}</div>
+           <div *ngIf="row.isEditable || row.isAdd" class="pull-right">
+             {{row.DailyProduction}}
+           </div>
+         </ng-template>
+       </p-column>
+       <p-column field="Total" header="Total Production" [sortable]="true" [filter]="isFiltersEnabled">
+         <ng-template let-row="rowData" pTemplate="body">
+           <div *ngIf="!row.isEditable" class="pull-right">{{row.Total |currency}}</div>
+           <div *ngIf="row.isEditable || row.isAdd" class="pull-right">
+             {{row.Total}}
+           </div>
+         </ng-template>
+       </p-column>
+       <p-column field="NECCRate" header="Paper Rate" [sortable]="true" [filter]="isFiltersEnabled">
+           <ng-template let-row="rowData" pTemplate="body">
+             <div *ngIf="!row.isEditable" class="pull-right">{{row.NECCRate |currency}}</div>
+             <div *ngIf="row.isEditable || row.isAdd" class="pull-right">
+              {{row.NECCRate}}
+                 <!-- <input type="text" class="form-control" [(ngModel)]="row.NECCRate" (change)="onNECCRateChange(row)" formControlName="NECCRate" > -->
+             </div>
+           </ng-template>
+         </p-column>
+         <p-column field="PulpRate " header="Pulp Rate " [sortable]="true" [filter]="isFiltersEnabled">
+          <ng-template let-row="rowData" pTemplate="body">
+            <div *ngIf="!row.isEditable" class="pull-right">{{row.PulpRate |currency }}</div>
+            <div *ngIf="row.isEditable || row.isAdd" class="pull-right">
+              {{row.PulpRate }}
+                <!-- <input type="text" class="form-control" [(ngModel)]="row.PulpRate"  formControlName="PulpRate" > -->
+            </div>
+          </ng-template>
+        </p-column>
+         <p-column field="BillRate " header="Bill Rate " [sortable]="true" [filter]="isFiltersEnabled">
+           <ng-template let-row="rowData" pTemplate="body">
+             <div *ngIf="!row.isEditable" class="pull-right">{{row.BillRate |currency}}</div>
+             <div *ngIf="row.isEditable || row.isAdd" class="pull-right">
+              {{row.BillRate }}
+                 <!-- <input type="text" class="form-control" [(ngModel)]="row.BillRate"  formControlName="BillRate" > -->
+             </div>
+           </ng-template>
+         </p-column>
+         <p-column field="CullBirdRate" header="Cull Bird Rate" [sortable]="true" [filter]="isFiltersEnabled">
+             <ng-template let-row="rowData" pTemplate="body">
+               <div *ngIf="!row.isEditable" class="pull-right">{{row.CullRate | currency}}</div>
+               <div *ngIf="row.isEditable || row.isAdd" class="pull-right">
+                {{row.CullRate}}
+                   <!-- <input type="text" class="form-control" [(ngModel)]="row.CullRate" formControlName="CullBirdRate" (keypress)="onlyNumber(event)"> -->
+               </div>
+             </ng-template>
+           </p-column>
+   
+       <p-column field="Packing" header="Packing" [sortable]="true" [filter]="isFiltersEnabled">
+         <ng-template let-row="rowData" pTemplate="body">
+          <div *ngIf="!row.isEditable" class="pull-right" (mouseover)="onMouseOver(row)" (mouseout)="onMouseOut()">{{row.Packing |currency}}</div>
+           <div *ngIf="row.isEditable || row.isAdd" class="pull-right">
+            {{row.Packing |currency}}
+             <!-- <input type="text" class="form-control" [(ngModel)]="row.Packing" (change)="onPackedChange(row)" formControlName="Packing" > -->
+           </div>
+         </ng-template>
+       </p-column>
+       <p-column field="Damaged" header="Damaged" [sortable]="true" [filter]="isFiltersEnabled">
+         <ng-template let-row="rowData" pTemplate="body">
+           <div *ngIf="!row.isEditable" class="pull-right">{{row.Damage |currency}}</div>
+           <div *ngIf="row.isEditable || row.isAdd" class="pull-right">
+            {{row.Damage |currency}}
+             <!-- <input type="text" class="form-control" [(ngModel)]="row.Damage" formControlName="Damage" (change)="onPackedChange(row)"> -->
+           </div>
+         </ng-template>
+       </p-column>
+   
+       <p-column field="ClosingStock" header="Closing Stock" [sortable]="true" [filter]="isFiltersEnabled">
+         <ng-template let-row="rowData" pTemplate="body">
+           <div *ngIf="!row.isEditable" class="pull-right">{{row.ClosingStock |currency}}</div>
+           <div *ngIf="row.isEditable || row.isAdd" class="pull-right">
+             {{row.ClosingStock}}
+           </div>
+         </ng-template>
+       </p-column>
+       <!-- <p-column field="TotalAmount" header="Total Amount" [sortable]="true" [filter]="isFiltersEnabled">
+        <ng-template let-row="rowData" pTemplate="body">
+          <div *ngIf="!row.isEditable" class="pull-right">{{row.TotalAmount|currency}}</div>
+          <div *ngIf="row.isEditable || row.isAdd" class="pull-right">
+            {{row.TotalAmount |currency}}
+          </div>
+        </ng-template>
+      </p-column> -->
+      <!-- <p-column field="FreeIssue" header="Free Issue" [sortable]="true" [filter]="isFiltersEnabled">
+        <ng-template let-row="rowData" pTemplate="body">
+          <div *ngIf="!row.isEditable" class="pull-right">{{row.FreeIssue|currency}}</div>
+          <div *ngIf="row.isEditable || row.isAdd" class="pull-right">
+            {{row.FreeIssue |currency}}
+          </div>
+        </ng-template>
+      </p-column> -->
+      <p-column field="FreeIssue" header="Free Issue" [sortable]="true" [filter]="isFiltersEnabled">
+        <ng-template let-row="rowData" pTemplate="body">
+          <div *ngIf="!row.isEditable" class="pull-right">{{row.FreeIssue}}</div>
+          <div *ngIf="row.isEditable || row.isAdd" class="pull-right">            
+            <input type="text" class="form-control" [(ngModel)]="row.FreeIssue" formControlName="FreeIssue" maxlength="5" required  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+          </div>
+        </ng-template>
+      </p-column>
+       <p-column field="Remarks" header="Remarks" [sortable]="true" [filter]="isFiltersEnabled">
+           <ng-template let-row="rowData" pTemplate="body">
+             <div *ngIf="!row.isEditable" class="pull-right">{{row.Remarks}}</div>
+             <div *ngIf="row.isEditable || row.isAdd" class="pull-right">            
+               <input type="text" class="form-control" [(ngModel)]="row.Remarks" formControlName="Remarks" maxlength="500">
+             </div>
+           </ng-template>
+         </p-column>
+       <p-column field="" header="Action(s)" [style]="{'text-align':'center'}">
+         <ng-template let-row="rowData" let-rowIndex="rowIndex" pTemplate="body">
+           
+            
+           <button type="button" class="btn btn-primary btn-circle btn-xs" title="Edit" data-toggle="tooltip" 
+             (click)="editRow(row)" *ngIf="!row.isEditable && ActivityRights.CanManageEggProductionLogs">
+             <i class="mdi mdi-table-edit"></i>
+           </button>
+           <button type="button" class="btn btn-success btn-circle btn-xs" title="Update" data-toggle="tooltip" (click)="updateRow(row)"
+             *ngIf="row.isEditable && row.isAdd==false" style="margin-left: -10px;" [disabled]="!editEggRegisterForm.dirty || !editEggRegisterForm.valid">
+             <i class="mdi mdi-content-save"></i>
+           </button>
+            <!-- <button type="button" class="btn btn-success btn-circle btn-xs" title="Update" data-toggle="tooltip" (click)="updateRow(row)"
+             *ngIf="row.isEditable && row.isAdd==false" style="  margin-left: -18px;" [disabled]="!editEggRegisterForm.dirty ||!editEggRegisterForm.valid ">
+             <i class="mdi mdi-content-save"></i>
+           </button> -->
+            <button type="button" class="btn btn-primary btn-circle btn-xs" title="Cancel" data-toggle="tooltip" (click)="cancelVaccinationEditClick(row)"
+             *ngIf="row.isEditable && row.isAdd==false">
+             <i class="mdi mdi-block-helper"></i>
+           </button>
+          
+         </ng-template>
+       </p-column>
+       <ng-template pTemplate="emptymessage">
+         <div style="text-align: center">No Records Found</div>
+       </ng-template>
+     </p-dataTable>
+    </div>
+ 
+  </form>
+  <!-- Main Grid End-->
+</div>
+<p-dialog [(visible)]="isPackedShow" styleClass="mydialog" [closable]="false"
+  [contentStyle]="{'width': '300px','overflow':'visible','height':'auto'}">
+  <p-header class="text-align:center">
+    {{eggStockInfo.Date | date:'dd/MM/yyyy'}}
+  </p-header> 
+  <div *ngFor="let stock of eggStockDetails">
+   <p> {{stock.Name}}<b>:</b><span></span>{{stock.PackedEggs}}</p>
+  </div>   
+      
+</p-dialog>

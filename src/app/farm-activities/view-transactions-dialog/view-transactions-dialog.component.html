@@ -1,0 +1,50 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title>View Transactions
+  </h2>
+</div>
+<mat-dialog-content>
+  <p-table [value]="transactionData" [rows]="10" [paginator]="true"
+    [globalFilterFields]="['Amount','PaymentType','TransactionDate']">
+    <ng-template pTemplate="header">
+      <tr>
+        <th [pSortableColumn]="'PaymentType'">Payment Type
+          <p-sortIcon [field]="PaymentType"></p-sortIcon>
+        </th>
+        <th [pSortableColumn]="'Amount'"> Amount
+          <p-sortIcon [field]="Amount"></p-sortIcon>
+        </th>
+        <th [pSortableColumn]="'TransactionDate'">TransactionDate
+          <p-sortIcon [field]="TransactionDate"></p-sortIcon>
+        </th>
+        <th [pSortableColumn]="'ReferenceNumber'">Reference Number
+          <p-sortIcon [field]="ReferenceNumber"></p-sortIcon>
+        </th>
+        <th>Action(s)</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td>{{row.PaymentType}}</td>
+        <td>{{row.Amount}}</td>
+        <td>{{row.TransactionDate | date :'dd/MM/yyyy'}}</td>
+        <td>{{row.ReferenceNumber}}</td>
+        <td>
+            <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip"
+              (click)="onDeleteClick(row)">
+              <i class="fa fa-trash"></i>
+            </button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage" let-columns *ngIf="transactionData.length == 0">
+      <tr>
+        <td colspan="5" class="ui-datatable-emptymessage text-center">No Records Found</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</mat-dialog-content>
+<mat-dialog-actions class="pull-right">
+  <button class="btn btn-light text-dark" type="reset()" (click)="onCancelClick()">
+    <span matTooltip="Cancel">Close</span>
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,285 @@
+<div role="main" >
+  <div class="page-header">
+    <h3 class="page-title">In/Out Register</h3>
+  </div>
+  <div class="clearfix"></div>
+  <div class="purchase-popup" *ngIf="isAddingInwordRegister">
+    <div class="header text-primary pl-3">
+      <h4>Add In/Out Register</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div>
+      <form class="form-horizontal form-label-left" [formGroup]="AddInOutRegForm">
+        <div class="row">
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput oninput="this.value = this.value.replace(/[^.]/g, '').replace(/(\..*)\./g, '$1');" [owlDateTime]="dt2" [max]="date" [(ngModel)]="selectedDate" placeholder="In Date"  required
+              [owlDateTimeTrigger]="dt2" formControlName="InDate">
+            <owl-date-time #dt2></owl-date-time>
+          </mat-form-field>
+          <!-- <mat-form-field class="col-md-3">
+            <input matInput [matDatepicker]="Datepicker" placeholder="Vaccination Date" [max]="curDate" [(ngModel)]="selectedDate" formControlName="VaccinationDate" >
+            <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+            <mat-datepicker #Datepicker></mat-datepicker>
+          </mat-form-field> -->
+          <mat-form-field class="col-md-3 col-12">
+              <input matInput placeholder="Name" formControlName="Name" required>
+              <mat-error>
+                  <span *ngIf="AddInOutRegForm.get('Name').invalid && AddInOutRegForm.get('Name').touched">
+                    <span *ngIf="AddInOutRegForm.controls['Name'].hasError('required') ">
+                      Please enter Name
+                    </span>
+                  </span>
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="col-md-3 col-12">
+                <input matInput placeholder="Location" formControlName="Location" required>
+                <mat-error>
+                    <span *ngIf="AddInOutRegForm.get('Location').invalid && AddInOutRegForm.get('Location').touched">
+                      <span *ngIf="AddInOutRegForm.controls['Location'].hasError('required') ">
+                        Please enter Location
+                      </span>
+                    </span>
+                  </mat-error>
+            </mat-form-field>
+              
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder="Vehicle Number" formControlName="VehicleNumber" required>
+            <mat-error>
+                <span *ngIf="AddInOutRegForm.get('VehicleNumber').invalid && AddInOutRegForm.get('VehicleNumber').touched">
+                  <span *ngIf="AddInOutRegForm.controls['VehicleNumber'].hasError('required') ">
+                    Please enter Vehicle Number
+                  </span>
+                </span>
+              </mat-error>
+            
+          </mat-form-field>
+                    
+        </div>
+        <div class="row">
+          <!-- <mat-form-field class="col-md-3">
+            <mat-select placeholder="Material" (selectionChange)="onItemNameChangeEvent($event)">
+              <mat-option *ngFor="let item of itemsList" [value]="item.value">
+                {{item.viewValue}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field> -->
+          <!-- <mat-form-field class="col-md-3" *ngIf="isShowItemNameAdd">
+            <input matInput placeholder="Name">
+          </mat-form-field> -->
+          <mat-form-field class="col-md-3 col-12">
+            <mat-select placeholder="Select Material"  formControlName="MaterialName" required  (selectionChange)="onItemNameChangeEvent($event)">
+                 <mat-option *ngFor="let Material of MaterialData" [value]="Material.Id"  >
+                   {{Material.NAME}}
+                 </mat-option>
+           </mat-select>
+           <mat-error>
+              <span *ngIf="AddInOutRegForm.get('MaterialName').invalid && AddInOutRegForm.get('MaterialName').touched">
+                <span *ngIf="AddInOutRegForm.controls['MaterialName'].hasError('required') ">
+                  Please enter Name
+                </span>
+              </span>
+            </mat-error>
+           
+           </mat-form-field>
+           <mat-form-field class="col-md-3 col-12" *ngIf="isShowItemNameAdd" >
+              <input matInput placeholder="other material Name" formControlName="OtherMaterial">
+              <mat-error>
+                  <span *ngIf="AddInOutRegForm.get('OtherMaterial').invalid && AddInOutRegForm.get('OtherMaterial').touched">
+                    <span *ngIf="AddInOutRegForm.controls['OtherMaterial'].hasError('required') ">
+                      Please enter other material
+                    </span>
+                  </span>
+                </mat-error>
+            </mat-form-field>
+
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder="Number of Units" formControlName="UnitsCount" required (keypress)="onlyNumber(event)">
+            <mat-error>
+                <span *ngIf="AddInOutRegForm.get('UnitsCount').invalid && AddInOutRegForm.get('UnitsCount').touched">
+                  <span *ngIf="AddInOutRegForm.controls['UnitsCount'].hasError('required') ">
+                    Please enter units count
+                  </span>
+                </span>
+              </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput oninput="this.value = this.value.replace(/[^.]/g, '').replace(/(\..*)\./g, '$1');" [max]="date" [owlDateTime]="dt1" formControlName="OutDate" placeholder="Out Date"
+              [owlDateTimeTrigger]="dt1" >
+            <owl-date-time #dt1></owl-date-time>
+          </mat-form-field>
+        </div>
+        <div class="clearfix"></div>
+        <div class="form-group">
+          <div class="pull-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleInwordRegAdd()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="onInwordRegAdd()" [disabled]="!AddInOutRegForm.valid" >Save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div *ngIf="!isAddingInwordRegister">
+      <div class="purchase-popup" *ngIf="!isAddingInwordRegister ">
+          <div class="row">
+              <mat-form-field class="col-md-2 col-12">
+                <input matInput [matDatepicker]="picker" placeholder="From Date"  readonly [max]="date" [(ngModel)]="FROMDATE"  (dateChange)='onDateChange($event)' >
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+              <mat-form-field class="col-md-2 col-12">
+                <input matInput [matDatepicker]="picker1" placeholder="To Date"  readonly [min]="FROMDATE" [max]="date" [(ngModel)]="date" >
+                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                <mat-datepicker #picker1></mat-datepicker>
+              </mat-form-field>    
+              <div class="col-md-4 col-12">
+                <button type="button" class="btn btn-primary" title="Search" data-toggle="tooltip" (click)="onSearch()" >Search</button>
+                <button type="button" class="btn btn-primary" title="Clear" data-toggle="tooltip" (click)="onClearSearch()" >Clear</button>
+              </div> 
+              <div class="col-md-4 col-12">
+                <div class="ml-auto float-right">
+                <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="download()" *ngIf='InOutRegisterData?.length>0'>
+                  Export
+                </button>
+                <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="onAddinwordRegClick()" *ngIf="ActivityRights.CanManageInorOutRegistration">
+                  Add In/Out Register
+                </button>
+              </div>
+              </div>
+        </div>
+        </div>
+    <p-table [value]="InOutRegisterData" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">
+      <ng-template pTemplate="header">
+        <tr>
+          <th [pSortableColumn]="'InDate'">In Date
+            <p-sortIcon [field]="InDate"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'Name'">Name
+            <p-sortIcon [field]="Name"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'Location'">Location
+            <p-sortIcon [field]="Location"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'VehicleNumber'">Vehicle Number
+            <p-sortIcon [field]="VehicleNumber"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'Material'">Material Name
+            <p-sortIcon [field]="Material"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'UnitsCount'">No.Of Units
+            <p-sortIcon [field]="UnitsCount"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'OutDate'">Out Date
+            <p-sortIcon [field]="OutDate"></p-sortIcon>
+          </th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      
+      <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+        <tr>
+          <td>{{row.InDate | date:'dd/MM/yyyy hh:mm'}}</td>
+          <td>{{row.Name}}</td>
+          <td>{{row.Location}}</td>
+          <td>{{row.VehicleNumber}}</td>
+          <td>{{row.Material}}</td>
+          <td class="textright">{{row.UnitsCount}}</td>
+          <td *ngIf="!isEditingInwordRegister[rowIndex]" >{{row.OutDate | date:'dd/MM/yyyy hh:mm'}}
+            <!-- <input matInput oninput="this.value = this.value.replace(/[^.]/g, '').replace(/(\..*)\./g, '$1');" *ngIf="isEditingInwordRegister" [owlDateTime]="dt1" placeholder="Out Date"
+            [owlDateTimeTrigger]="dt1" [(ngModel)]="rowData.OuDate" > -->            
+          </td>
+          <td *ngIf="isEditingInwordRegister[rowIndex]">
+              <input  [owlDateTime]="dt3" [(ngModel)]="rowData.OutDate" style="width:108px"
+              [owlDateTimeTrigger]="dt3" [max]="date">
+              <span class="trigger" [owlDateTimeTrigger]="dt3">
+                  <i class="fas fa-calendar-alt"></i>
+              </span>
+            <owl-date-time #dt3></owl-date-time>
+            
+          </td>
+          <td>
+            <div *ngIf="!isEditingInwordRegister[rowIndex]">
+              <button type="button" class="btn btn-primary btn-xs" title="Edit" data-toggle="tooltip" (click)="onEditInwordRegClick(row,rowIndex)"  *ngIf="!isEditingInwordRegister[rowIndex] && ActivityRights.CanManageInorOutRegistration" [disabled]="row.OutDate!=null"> 
+                <i class="fa fa-edit"></i>
+              </button>&nbsp;
+              </div>
+              <div *ngIf="isEditingInwordRegister[rowIndex]">
+              <button type="button" class="btn btn-success btn-xs" title="Update" data-toggle="tooltip"  (click)="onUpdateRow(row)"  *ngIf="isEditingInwordRegister[rowIndex]">
+                <i class="fa fa-save"></i></button>&nbsp;
+              <button type="button" class="btn btn-primary btn-xs" title="Cancel" data-toggle="tooltip" (click)="onCancleInwordRegEdit(row)" *ngIf="isEditingInwordRegister[rowIndex]">
+                <i class="fa fa-ban"></i></button>&nbsp;
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage" let-columns>
+        <tr>
+          <td colspan="8" class="ui-datatable-emptymessage text-center">No Records Found</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <!-- <div class="x_panel" *ngIf="isEditingInwordRegister">
+    <div class="x_title">
+      <h4 class="header">Update In/Out Register</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+      <br />
+      <form class="form-horizontal form-label-left" [formGroup]="EditInOutRegForm">
+        <div class="row">
+          <mat-form-field class="col-md-3">
+            <input matInput oninput="this.value = this.value.replace(/[^.]/g, '').replace(/(\..*)\./g, '$1');" [owlDateTime]="dt3" placeholder=" In Date "
+              [owlDateTimeTrigger]="dt3" [(ngModel)]="rowData.Date" [ngModelOptions]="{standalone: true}">
+            <owl-date-time #dt3></owl-date-time>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Name" [(ngModel)]="rowData.Name" [ngModelOptions]="{standalone: true}">
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Location" [(ngModel)]="rowData.Location" [ngModelOptions]="{standalone: true}">
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Vehicle Number" [(ngModel)]="rowData.VechileNumber" [ngModelOptions]="{standalone: true}">
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-3">
+            <mat-select placeholder="Item Name" (selectionChange)="onItemNameChangeEvent($event)" [(ngModel)]="rowData.ItemName" [ngModelOptions]="{standalone: true}">
+              <mat-option *ngFor="let item of itemsList" [value]="item.value">
+                {{item.viewValue}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="col-md-3">
+            <mat-select placeholder="Select Material"  formControlName="MaterialName">
+                 <mat-option *ngFor="let Material of MaterialData" [value]="Material.Id" >
+                   {{Material.NAME}}
+                 </mat-option>
+           </mat-select>
+           </mat-form-field>
+          <mat-form-field class="col-md-3" *ngIf="isShowItemNameEdit">
+            <input matInput placeholder=" Other Name" [(ngModel)]="rowData.ItemName" [ngModelOptions]="{standalone: true}">
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Number of Units" [(ngModel)]="rowData.NumberOfUnits" [ngModelOptions]="{standalone: true}">
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput oninput="this.value = this.value.replace(/[^.]/g, '').replace(/(\..*)\./g, '$1');" [owlDateTime]="dt4" placeholder="Out Date"
+              [owlDateTimeTrigger]="dt4" [(ngModel)]="rowData.OutDate" [ngModelOptions]="{standalone: true}">
+            <owl-date-time #dt4></owl-date-time>
+          </mat-form-field>
+        </div>
+        <div class="ln_solid"></div>
+        <div class="form-group">
+          <div class="row pull-right">
+            <button type="submit" class="btn btn-success" (click)="onCancleInwordRegEdit()">Update</button>
+            <button type="button" class="btn btn-primary" (click)="onCancleInwordRegEdit()">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div> -->
+</div>

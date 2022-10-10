@@ -1,0 +1,241 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Feed Grinding</h3>
+  </div>
+  <div class="clearfix"></div>
+  <div class="purchase-popup">
+  <div class="row">
+    <mat-form-field class="col-lg-2 col-md-3 col-sm-6 col-12">
+      <input matInput [matDatepicker]="picker" placeholder="From Date" readonly [max]="currentDate"
+        [(ngModel)]="fromDate">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field class="col-lg-2 col-md-3 col-sm-6 col-12">
+      <input matInput [matDatepicker]="picker1" placeholder="To Date" readonly [min]="fromDate" [max]="currentDate"
+        [(ngModel)]="toDate">
+      <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+      <mat-datepicker #picker1></mat-datepicker>
+    </mat-form-field>
+    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+      <button type="button" class="btn btn-primary" title="Search" data-toggle="tooltip" (click)="onSearchClick()" [disabled]="">Search</button>
+      <button type="button" class="btn btn-primary" title="Clear" data-toggle="tooltip" (click)="onClearSearch()" [disabled]="">Clear</button>
+    </div>
+    <div class="col-lg-4 col-md-12 col-sm-12 col-12 mt-2 mt-sm-2 mt-lg-0" *ngIf="!isAddFeedGrinding && !isEditFeedGrinding">
+      <div class="float-right">
+      <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="onAddFeedGrindingClick()" *ngIf="ActivityRights.CanManageFeedGrinding">
+        Add Feed Grinding
+      </button>
+      <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="download()" [disabled]="!feedGrindingList.length > 0">
+        Export
+      </button>      
+    </div>
+    </div>
+  </div>
+</div>
+  <div class="clearfix"></div>
+  <!-- <div class="x_panel" *ngIf="isAddFeedGrinding">
+    <div class="x_title">
+      <h4 class="header">Add Feed Grinding</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+      <br />
+      <form class="form-horizontal form-label-left" [formGroup]="addFeedGrinding">
+        <div class="row">
+          <mat-form-field class="col-md-3">
+            <input matInput [matDatepicker]="picker" placeholder="Date" required formControlName="date" readonly>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error>
+              <span *ngIf="addFeedGrinding.controls['date'].hasError('required')">
+                Please Select Date
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Number of Tons (Feed)" required formControlName="noOfTon" (keypress)="onlyNumber(event)" maxlength="10">
+            <mat-error>
+              <span *ngIf="addFeedGrinding.controls['noOfTon'].hasError('required')">
+                Please Enter Number of Tons
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Cost (Ton)" required formControlName="cost" (keypress)="onlyNumber(event)" maxlength="10">
+            <mat-error>
+              <span *ngIf="addFeedGrinding.controls['cost'].hasError('required')">
+                Please Enter Cost Per Ton
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="ln_solid"></div>
+        <div class="form-group">
+          <div class="row pull-right">
+            <button type="submit" class="btn btn-success" [disabled]="!addFeedGrinding.valid" (click)="onSaveFeeedGrindingAdd()">Save</button>
+            <button type="button" class="btn btn-primary" (click)="onCancleFeeedGrindingAdd()">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div> -->
+  <div class="row" >
+    <!-- <div class="col-12">
+      <div class="d-flex align-items-center purchase-popup" *ngIf="!isAddFeedGrinding && !isEditFeedGrinding">
+          <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="onAddFeedGrindingClick()">
+            Add Feed Grinding
+          </button>
+          <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="download()" *ngIf="feedGrindingList.length > 0">
+            Export
+          </button>
+        </div>
+    </div> -->
+    <div class="col-12">
+    <div class="float-right mb-2">
+      <button class="btn btn-primary " (click)="toggleFilter()" [disabled]="!(!isFiltersEnabled && feedGrindingList.length>0) ">
+        {{filterTooltip}}
+      </button>
+      <button class="btn btn-warning " (click)="toggleFilter()" *ngIf="isFiltersEnabled && feedGrindingList.length>0 ">
+        {{filterTooltip}}
+      </button>
+    </div>
+  </div>
+    <form class="form col-12" [formGroup]="addFeedGrinding">    
+    <p-dataTable #fg [value]="feedGrindingList" [tableStyle]="{'table-layout':'auto'}" styleClass="bg-white" [resizableColumns]="true" columnResizeMode="expand" [editable]="true" 
+     [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" sortField="FGDate" sortOrder="-1" >    
+    <p-column field="FGDate" header="Date" [sortable]="true"  [filter]="isFiltersEnabled">
+      <ng-template let-row="rowData" pTemplate="body">
+        <div *ngIf="!row.isEditable">{{row.FGDate | date:'dd/MM/yyyy'}}</div>
+        <div *ngIf="row.isEditable || row.isAdd">
+          <mat-form-field >
+            <input matInput [matDatepicker]="picker" placeholder="Date" required formControlName="date"[(ngModel)]="row.FGDate" >
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error>
+              <span *ngIf="addFeedGrinding.controls['date'].hasError('required')">
+                Please Select Date
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+    </ng-template>
+    </p-column>
+
+    <p-column field="AmountPerTonne" header="Cost per Ton(Rs)" [sortable]="true"  [filter]="isFiltersEnabled">
+      <ng-template let-row="rowData" pTemplate="body">
+        <div *ngIf="!row.isEditable">{{row.AmountPerTonne |currency}}</div>
+        <div *ngIf="row.isEditable || row.isAdd">
+            <input type="text" class="form-control" [(ngModel)]="row.AmountPerTonne" formControlName="cost" (keypress)="onlyNumber(event)">
+            <mat-error>
+                <span *ngIf="addFeedGrinding.get('cost').invalid && addFeedGrinding.get('cost').touched">
+                  <span *ngIf="addFeedGrinding.controls['cost'].hasError('required') ">
+                    Please enter Number of Tons
+                  </span>
+                </span>
+              </mat-error>
+        </div>
+    </ng-template>
+    </p-column>
+
+    <p-column field="Tonnes" header=" No. Of Ton(s)" [sortable]="true"  [filter]="isFiltersEnabled">
+      <ng-template let-row="rowData" pTemplate="body">
+        <div *ngIf="!row.isEditable">{{row.Tonnes |currency}}</div>
+        <div *ngIf="row.isEditable || row.isAdd">
+            <input type="text" class="form-control" [(ngModel)]="row.Tonnes" formControlName="noOfTon" (keypress)="onlyNumber(event)">
+            <mat-error>
+                <span *ngIf="addFeedGrinding.get('noOfTon').invalid && addFeedGrinding.get('noOfTon').touched">
+                  <span *ngIf="addFeedGrinding.controls['noOfTon'].hasError('required') ">
+                    Please enter Cost per Ton
+                  </span>
+                </span>
+              </mat-error>
+        </div>
+    </ng-template>
+    </p-column>
+
+    <p-column field="TotalAmount" header="Total Amount(Rs)" [sortable]="true"  [filter]="isFiltersEnabled">
+      <ng-template let-row="rowData" pTemplate="body">
+        <div *ngIf="!row.isEditable">{{row.TotalAmount |currency}}</div>        
+    </ng-template>
+  </p-column>
+
+  <p-column field="" header="Action(s)" [style]="{'text-align':'center'} ">
+    <ng-template let-row="rowData" let-rowIndex="rowIndex" pTemplate="body">
+      <button type="button" class="btn btn-success btn-xs" title="Save" data-toggle="tooltip" (click)="onSaveFeeedGrindingAdd(row);clicked=true" *ngIf="row.isEditable && row.isAdd==true" [disabled]="!addFeedGrinding.valid||clicked">
+        <i class="mdi mdi-plus-circle"></i></button>
+      <button type="button" class="btn btn-danger btn-xs" title="Cancel" data-toggle="tooltip" (click)="onCancleFeeedGrindingAdd(row)" *ngIf="row.isEditable && row.isAdd==true">
+        <i class="mdi mdi-block-helper"></i></button>
+      <button type="button" class="btn btn-primary btn-xs" title="Edit" data-toggle="tooltip" (click)="onEditFeedGrindingClick(row)"  *ngIf="!row.isEditable && ActivityRights.CanManageFeedGrinding" >
+        <i class="mdi mdi-table-edit"></i></button>
+      <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip" (click)="onDeleteFeedGrindingClick(row,rowIndex)" *ngIf="!row.isEditable  && ActivityRights.CanManageFeedGrinding">
+      <i class="mdi mdi-delete"></i></button>
+      <button type="button" class="btn btn-success btn-xs" title="Update" data-toggle="tooltip" (click)="onupdateFeeedGrindingEdit(row);clicked=true" *ngIf="row.isEditable && row.isAdd==false"  [disabled]="!addFeedGrinding.valid ||clicked">
+        <i class="mdi mdi-content-save"></i></button>
+        <button type="button" class="btn btn-danger btn-xs" title="Cancel" data-toggle="tooltip" (click)="onCancleFeeedGrindingEdit(row)" *ngIf="row.isEditable && row.isAdd==false">
+          <i class="mdi mdi-block-helper"></i></button>
+    </ng-template>
+  </p-column>      
+      
+      <ng-template pTemplate="emptymessage" let-columns>
+        <tr>
+          <td colspan="5" class="ui-datatable-emptymessage text-center" style="padding-left:50rem">No Records Found</td>
+        </tr>
+      </ng-template>
+      
+    </p-dataTable>
+  </form>
+  </div>
+  <!-- <div class="x_panel" *ngIf="isEditFeedGrinding">
+    <div class="x_title">
+      <h4 class="header">Update Feed Grinding</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+      <br />
+      <form class="form-horizontal form-label-left" [formGroup]="editFeedGrinding">
+        <div class="row">
+          <mat-form-field class="col-md-3">
+            <input matInput [matDatepicker]="picker1" placeholder="Date" formControlName="date" readonly [(ngModel)]="edittedRowData.FGDate">
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+            <mat-error>
+              <span *ngIf="editFeedGrinding.controls['date'].hasError('required')">
+                Please Enter Number of Tons
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Number of Tons (Feed)" formControlName="noOfTon" [(ngModel)]="edittedRowData.Tonnes" (keypress)="onlyNumber(event)" maxlength="10">
+            <mat-error>
+              <span *ngIf="editFeedGrinding.controls['noOfTon'].hasError('required')">
+                Please Enter Number of Tons
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Cost (Ton)" required formControlName="cost" [(ngModel)]="edittedRowData.AmountPerTonne" (keypress)="onlyNumber(event)" maxlength="10">
+            <mat-error>
+              <span *ngIf="editFeedGrinding.controls['cost'].hasError('required')">
+                Please Enter Cost Per Ton
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="ln_solid"></div>
+        <div class="form-group">
+          <div class="row pull-right">
+            <button type="submit" class="btn btn-success" (click)="onupdateFeeedGrindingEdit()" [disabled]="!editFeedGrinding.valid || !editFeedGrinding.dirty">Update</button>
+            <button type="button" class="btn btn-primary" (click)="onCancleFeeedGrindingEdit()">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div> -->
+</div>

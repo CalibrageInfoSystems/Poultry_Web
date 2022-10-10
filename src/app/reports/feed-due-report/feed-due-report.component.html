@@ -1,0 +1,175 @@
+
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Feed Purchase Due Report</h3>
+  </div>
+  <div class="clearfix"></div>
+    <div class="d-flex align-items-center purchase-popup">
+      <div class="row">
+          <mat-form-field class="col-xl-2 col-lg-3 col-md-6 col-sm-6 col-12">
+            <mat-label aria-required="true">Feed Type</mat-label>
+            <mat-select [(ngModel)]="selectedFeedIds" multiple (selectionChange)="onChange($event.value)" >
+              <mat-checkbox class="check" [(ngModel)]="checked" [ngModelOptions]="{standalone: true}" (change)="onCheckedChange(checked)" readonly required>Select All</mat-checkbox>
+
+              <mat-option *ngFor="let feed of feedTypes" [value]="feed.Id">
+                {{feed.NAME}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>        
+          
+          <mat-form-field class="col-xl-2 col-lg-3 col-md-6 col-sm-6 col-12">
+            <mat-label aria-required="true">Broker</mat-label>
+            <mat-select  multiple  [(ngModel)]="selectedBrokerIds" (selectionChange)="onBChange($event.value)"  >
+              <mat-checkbox class="check" [(ngModel)]="bchecked" [ngModelOptions]="{standalone: true}" (change)="onBCheckedChange(bchecked)" readonly required>Select All</mat-checkbox>
+              <mat-option *ngFor="let broker of BrokerData" [value]="broker.BrokerId">
+                {{broker.Name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        <mat-form-field class="col-xl-2 col-lg-3 col-md-6 col-sm-6 col-12">
+          <input matInput [matDatepicker]="picker" placeholder="From Date" readonly [max]="currentDate"
+            [(ngModel)]="fromDate">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field class="col-xl-2 col-lg-3 col-md-6 col-sm-6 col-12">
+          <input matInput [matDatepicker]="picker1" placeholder="To Date" readonly [min]="fromDate" [max]="currentDate"
+            [(ngModel)]="toDate">
+          <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+          <mat-datepicker #picker1></mat-datepicker>
+        </mat-form-field>
+        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12">
+          <button type="button" class="btn btn-primary" title="Search" data-toggle="tooltip" (click)="onSearchClick()"
+            [disabled]="">Search</button>
+          <button type="button" class="btn btn-primary" title="Clear" data-toggle="tooltip" (click)="onClearSearch()"
+            [disabled]="">Clear</button>
+        </div>
+      </div>
+        <!-- <mat-form-field appearance="fill"  class="col-md-2" >
+          <mat-select placeholder="Select Month/Year" [(ngModel)]="selectedRecord" (selectionChange)="onOptionType($event.value)"
+            [style]="{'position': 'relative', 'overflow': 'visible', 'z-index': '1005'}" >
+            <mat-option *ngFor="let roc of monthlyRecords " [value]="roc.Id" [style]="{ 'z-index': '1005!important'}">
+              {{roc.Name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill"  class="col-md-2" *ngIf="isYear">
+          <mat-select placeholder="Select Financial Year"
+            [style]="{'position': 'relative', 'overflow': 'visible', 'z-index': '1005'}" [(ngModel)]="currentFY"  (selectionChange)="chosenYear($event)">
+            <mat-option *ngFor="let year of financialYears" [value]="year" [style]="{ 'z-index': '1005!important'}">
+              {{year}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill"  class="col-md-2"  *ngIf="!isYear">
+          <input matInput [matDatepicker]="picker" placeholder="From Date" [max]="currentDate" [formControl]="date">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker startView="multi-year" (yearSelected)="chosenYearHandler($event)"
+            (monthSelected)="chosenMonthHandler($event, picker)" panelClass="example-month-picker"></mat-datepicker>
+        </mat-form-field>       -->  
+    </div>
+    <div class="clearfix"></div>
+    <div class="d-flex align-items-center purchase-popup">
+      <div class="ml-auto">
+        <button type="button" class="btn btn-primary" title="Export" data-toggle="tooltip"
+        (click)="download()">Export</button>
+        <button class="btn btn-primary mr-0" (click)="toggleFilter()" *ngIf="!isFiltersEnabled && feedDueDetails.length>0 ">
+          {{filterTooltip}}
+        </button>
+        <button class="btn btn-warning mr-0" (click)="toggleFilter()" *ngIf="isFiltersEnabled && feedDueDetails.length>0 ">
+          {{filterTooltip}}
+        </button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <span class="d-flex align-items-center purchase-popup">
+          <h5 class="mb-0 pb-0 " style="color:black;">Total Due Amount(Rs) :</h5>
+           <span>{{totalDue.DueAmount| currency}}</span>          
+        </span>
+      </div>
+    </div>
+    <div class="row">
+    <div class="col-md-12">
+      <p-table #Fd [value]="feedDueDetails" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand" [rows]="10" [paginator]="true"
+        [rowsPerPageOptions]="[10,20,30]">
+        <ng-template pTemplate="header">
+          <tr>
+            <th [pSortableColumn]="'Date'"><span class="d-inline-flex">Date
+              <p-sortIcon [field]="'Date'"></p-sortIcon></span>
+            </th>
+            <th [pSortableColumn]="'FeedName'"><span class="d-inline-flex">Feed Name
+              <p-sortIcon [field]="'FeedName'"></p-sortIcon></span>
+            </th>
+            <th [pSortableColumn]="'BrokerName'"><span class="d-inline-flex">Broker Name
+              <p-sortIcon [field]="'BrokerName'"></p-sortIcon></span>
+            </th>
+            <th [pSortableColumn]="'Name'"><span class="d-inline-flex">Name
+              <p-sortIcon [field]="'Name'"></p-sortIcon></span>
+            </th>
+            <th [pSortableColumn]="'DueAmount'"><span class="d-inline-flex">Due Amount(Rs)
+              <p-sortIcon [field]="'DueAmount'"></p-sortIcon></span>
+            </th>
+            <th [pSortableColumn]="'DueDate'"><span class="d-inline-flex">Due Date
+              <p-sortIcon [field]="'DueDate'"></p-sortIcon></span>
+            </th>
+            </tr>
+            <tr *ngIf="isFiltersEnabled">
+              <th>
+                <input type="text" class="form-control" maxlength="50"
+                  (input)="Fd.filter($event.target.value, 'Date', 'contains')">
+              </th>
+              <th>
+                <input type="text" class="form-control" maxlength="50"
+                  (input)="Fd.filter($event.target.value, 'FeedName', 'contains')">
+              </th>
+              <th>
+                <input type="text" class="form-control" maxlength="50"
+                  (input)="Fd.filter($event.target.value, 'BrokerName', 'contains')">
+              </th>
+              <th>
+                <input type="text" class="form-control" maxlength="50"
+                  (input)="Fd.filter($event.target.value, 'Name', 'contains')">
+              </th>
+              <th>
+                <input type="text" class="form-control" maxlength="50"
+                  (input)="Fd.filter($event.target.value, 'DueAmount', 'contains')">
+              </th>
+              <th>
+                <input type="text" class="form-control" maxlength="5"
+                  (input)="Fd.filter($event.target.value, 'DueDate', 'contains')">
+              </th>
+              
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+          <tr>
+            <td>{{row.Date | date:'dd/MM/yyyy'}}</td>
+            <td>{{row.FeedName }}</td>
+            <td>{{row.BrokerName }}</td>
+            <td>{{row.Name }}</td>
+            <td>{{row.DueAmount }}</td>
+            <td>{{row.DueDate| date:'dd/MM/yyyy' }}</td>
+          </tr>
+        </ng-template>
+        <!-- <ng-template pTemplate="footer">
+          <tr *ngIf="feedDueDetails.length>0">
+            <td class="textleft">Total  Due Amount (Rs) : </td>            
+            <td class="text-center" colspan="5" >{{totalDue.DueAmount| currency}}</td>                        
+          </tr>
+        </ng-template> -->
+        <ng-template pTemplate="emptymessage" let-columns>
+          <tr>
+            <td colspan="6" class="ui-datatable-emptymessage text-center">No Records Found</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+

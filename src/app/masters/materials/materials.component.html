@@ -1,0 +1,94 @@
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Material Details</h3>
+    <div class="pull-right ml-auto">
+      <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" (click)="addRow() "
+        *ngIf="ActivityRights.CanManageMaterials">
+        Add New Material
+      </button>
+      <button type="button" class="btn btn-primary " title="Export" data-toggle="tooltip" (click)="download()"
+        *ngIf='MaterialData?.length>0'>
+        Export
+      </button>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+    <!-- <div class="pull-left" style="padding:4px 10px;border-bottom: 0 none;margin-bottom:10px;">
+      <input #gb type="text" class="form-control" pInputText size="50" placeholder="Search" style="width:auto">
+    </div> -->
+  <form class="form" [formGroup]="AddMaterialsForm">
+    <p-dataTable [value]="MaterialData" [tableStyle]="{'table-layout':'auto'}" styleClass="bg-white"
+    [resizableColumns]="true" columnResizeMode="expand" [editable]="true"
+      [sortField]="['NAME','Remarks','IsActive']">
+      <p-column field="name" header="Name" [sortable]="true">
+        <ng-template let-row="rowData" pTemplate="body">
+          <div *ngIf="!row.isEditable">{{row.NAME}}</div>
+          <div *ngIf="row.isEditable || row.isAdd">
+            <input matInput type="text" class="form-control" [(ngModel)]="row.NAME" formControlName="NAME">
+            <mat-error>
+              <span *ngIf="AddMaterialsForm.get('NAME').invalid && AddMaterialsForm.get('NAME').touched">
+                <span *ngIf="AddMaterialsForm.controls['NAME'].hasError('required') ">
+                  Please enter Name
+                </span>
+              </span>
+            </mat-error>
+          </div>
+        </ng-template>
+      </p-column>
+      <!-- <p-column field="Desc" header="Description" [sortable]="true">
+      <ng-template let-row="rowData" pTemplate="body">
+        <div *ngIf="!row.isEditable">{{row.Desc}}</div>
+        <div *ngIf="row.isEditable || row.isAdd">
+          <input type="text" class="form-control" [(ngModel)]="row.Desc" formControlName="Desc">
+        </div>
+      </ng-template>
+    </p-column> -->
+      <p-column field="Remarks" header="Remarks" [sortable]="true">
+        <ng-template let-row="rowData" pTemplate="body">
+          <div *ngIf="!row.isEditable">{{row.Remarks}}</div>
+          <div *ngIf="row.isEditable || row.isAdd">
+            <input type="text" class="form-control" [(ngModel)]="row.Remarks" formControlName="Remarks">
+          </div>
+        </ng-template>
+      </p-column>
+      <p-column header="Active" [style]="{'text-align':'center'}" [sortable]="true">
+        <ng-template let-row="rowData" pTemplate="body">
+          <div *ngIf="!row.isEditable">{{row.IsActive}}</div>
+          <div *ngIf="row.isEditable || row.isAdd">
+            <!-- <input type="checkbox" [(ngModel)]="row.IsActive" [disabled]="false" formControlName="IsActive" /> -->
+            <mat-checkbox [(ngModel)]="row.IsActive" [disabled]="false" formControlName="IsActive"></mat-checkbox>
+          </div>
+        </ng-template>
+      </p-column>
+      <p-column field="" header="Actions" [style]="{'text-align':'center'}">
+        <ng-template let-row="rowData" let-rowIndex="rowIndex" pTemplate="body">
+          <button type="button" class="btn btn-success btn-xs" title="Save" data-toggle="tooltip"
+            (click)="addMaterialClick(row)" *ngIf="row.isEditable && row.isAdd==true"
+            [disabled]="!AddMaterialsForm.valid">
+            <i class="mdi mdi-plus-circle"></i></button>
+          <button type="button" class="btn btn-danger btn-xs" title="Cancel" data-toggle="tooltip"
+            (click)="cancelMaterialAddClick(row)" *ngIf="row.isEditable && row.isAdd==true">
+            <i class="mdi mdi-block-helper"></i></button>
+          <button type="button" class="btn btn-primary btn-xs" title="Edit" data-toggle="tooltip" (click)="editRow(row)"
+            *ngIf="!row.isEditable && ActivityRights.CanManageMaterials">
+            <i class="mdi mdi-table-edit"></i></button>
+          <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip"
+            (click)="delete(row,rowIndex)" *ngIf="!row.isEditable && ActivityRights.CanManageMaterials"
+            [disabled]='!row.IsActive'>
+            <i class="mdi mdi-delete"></i></button>
+          <button type="button" class="btn btn-success btn-xs" title="Update" data-toggle="tooltip"
+            (click)="onUpdateRow(row)" *ngIf="row.isEditable && row.isAdd==false" [disabled]="!AddMaterialsForm.valid">
+            <i class="mdi mdi-content-save"></i></button>
+          <button type="button" class="btn btn-danger btn-xs" title="Cancel" data-toggle="tooltip"
+            (click)="cancelMaterialEditClick(row)" *ngIf="row.isEditable && row.isAdd==false">
+            <i class="mdi mdi-block-helper"></i></button>
+        </ng-template>
+      </p-column>
+      <ng-template pTemplate="emptymessage" let-columns tableClass="ui-datatable-emptymessage text-center">
+          <!-- <td colspan="4" class="ui-datatable-emptymessage text-center"> -->
+            No Records Found
+          <!-- </td> -->
+      </ng-template>
+    </p-dataTable>
+  </form>
+</div>

@@ -1,0 +1,74 @@
+<div class="right_col" role="main" >
+    <div>
+      <div class="header">
+        <h3>Egg Stock Register</h3>
+      </div>      
+    </div>
+    <div class="clearfix"></div>
+    <div class="row">
+      <div class="row">
+        <form class="form-horizontal form-label-left" [formGroup]="eggStockFilterForm">
+          <div class="row" style="padding:4px 20px;border-bottom: 0 none;">         
+                <mat-form-field class="col-md-2">
+                  <input matInput [matDatepicker]="picker" placeholder="From Date" [(ngModel)]="FROMDATE" formControlName="fromDate" readonly [max]="date"  (dateChange)="onDateChange($event)" >
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field class="col-md-2">
+                  <input matInput [matDatepicker]="picker1" placeholder="To Date" [(ngModel)]="date" formControlName="toDate" readonly [min]="FROMDATE"  [max]="date">
+                  <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                  <mat-datepicker #picker1></mat-datepicker>
+                </mat-form-field>    
+                <div class="col-md-4">
+                  <button type="button" class="btn btn-primary" title="Search" data-toggle="tooltip" (click)="GetEggStockRegister()" [disabled]="">Search</button>
+                  <button type="button" class="btn btn-primary" title="Clear" data-toggle="tooltip" (click)="onClearSearch()" [disabled]="">Clear</button>                
+                </div> 
+                <button type="button" class="btn btn-primary pull-right" title="Export" data-toggle="tooltip" (click)="download()">Export</button>
+          </div>
+        </form>
+      </div>
+      <p-table [value]="eggStockList" sortMode="single" sortField="Date" [tableStyle]="{'table-layout':'auto'}" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">
+        <ng-template pTemplate="header">
+          <tr>
+              <th [pSortableColumn]="'Date'">Date
+                <p-sortIcon [field]="Date"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'OpeningStock'">Opening Stock
+                <p-sortIcon [field]="OpeningStock"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'DailyProd'">Daily Production
+                <p-sortIcon [field]="DailyProd"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'Total'">Total
+                <p-sortIcon [field]="Total"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'Packing'">Packing
+                <p-sortIcon [field]="Packing"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'Damage'">Damage
+                <p-sortIcon [field]="Damage"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'ClosingStock'">Closing Stock
+                <p-sortIcon [field]="ClosingStock"></p-sortIcon>
+              </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+          <tr>
+            <td>{{rowData.Date | date:'dd/MM/yyyy'}}</td>
+            <td class="textright">{{rowData.OpeningStock | currency}}</td>
+            <td class="textright">{{rowData.DailyProd}}</td>
+            <td class="textright">{{rowData.Total | currency}}</td>
+            <td class="textright">{{rowData.Packing |currency}}</td>
+            <td class="textright">{{rowData.Damage |currency}}</td>
+            <td class="textright">{{rowData.ClosingStock |currency}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage" let-columns>
+          <tr> 
+            <td colspan="7" class="ui-datatable-emptymessage text-center">No Records Found</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>

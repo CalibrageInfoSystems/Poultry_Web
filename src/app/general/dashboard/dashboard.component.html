@@ -1,0 +1,977 @@
+<div class="ds-bd" role="main">
+  <!-- top tiles -->
+  <div class="page-header">
+    <h3 class="page-title align-self-end d-flex flex-column mb-2">Driver Seat</h3>
+      <div class="align-items-center purchase-popup mb-1 ml-auto text-right rounded d-sm-flex" *ngIf="showDate">
+        <p class="pb-2 pb-sm-1 text-primary">Paper Rate: <span class="font-weight-bold">&#x20B9;{{ManageData.NECCRate}}</span></p>
+        <p class="pb-2 pb-sm-1 text-primary px-sm-4">Pulp Rate: <span class="font-weight-bold">&#x20B9;{{ManageData.PulpRate}}</span></p>
+        <p class="pb-2 pb-sm-1 text-primary">Cull Rate: <span class="font-weight-bold">&#x20B9;{{ManageData.CullRate}}</span></p>
+      </div>
+    <!-- <nav aria-label="breadcrumb">
+      <ul class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">
+          <span></span>Overview <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
+        </li>
+      </ul>
+    </nav> -->
+  </div>
+  <div class="row">
+    <div class="col-12">
+      
+      <span class="d-flex align-items-center purchase-popup">
+        <mat-form-field>
+          <input matInput [matDatepicker]="Datepicker" placeholder="Date" [max]="curDate" [(ngModel)]="displayDate"
+            (dateChange)="onChangeDate()">
+          <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+          <mat-datepicker #Datepicker></mat-datepicker>
+        </mat-form-field>
+        <a routerLink="/reports/dailyproduction" class="ml-auto text-decoration-none main-color">More info <i
+            class="fa fa-arrow-circle-right"></i></a>
+      </span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+      <div class="card bg-gradient-primary card-img-holder text-white">
+        <div class="card-body">
+          <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+          <h3 class="font-weight-bold mb-3">Production <i class="mdi mdi-chart-line mdi-24px float-right"></i>
+          </h3>
+          <!-- <h2 class="mb-5">$ 15,0000</h2>
+          <h6 class="card-text">Increased by 60%</h6> -->
+          <div class="d-flex flex-wrap justify-content-between data-fields mt-5">
+            <div class="mt">
+              <h4>{{productions?.LayerProduction}}%</h4>
+              <p class="mb-0 mr"><small>Layers</small></p>
+            </div>
+            <div class="mt">
+              <h4>{{productions?.GrowerProduction==null?0:productions?.GrowerProduction}}%</h4>
+              <p class="mb-0 mr"><small>Growers</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+      <div class="card bg-gradient-info card-img-holder text-white">
+        <div class="card-body">
+          <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+          <h3 class="font-weight-bold mb-3">Total Birds <img src="assets/images/icons/chicken.svg" width="24"
+              class="float-right" />
+          </h3>
+          <div class="d-flex flex-wrap justify-content-between data-fields mt-5">
+            <div class="mt">
+              <h4>{{productions?.LayerChicks==null?0:productions?.LayerChicks |currency }}</h4>
+              <p class="mb-0 mr"><small>Layers</small></p>
+            </div>
+            <div class="mt">
+              <h4>{{productions?.GrowerChicks==null?0:productions?.GrowerChicks |currency}}</h4>
+              <p class="mb-0 mr"><small>Growers</small></p>
+            </div>
+            <div class="mt">
+              <h4>{{productions?.ChickShedChicks==null?0:productions?.ChickShedChicks |currency}}</h4>
+              <p class="mb-0 mr"><small>Chicks</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+      <div class="card bg-gradient-success card-img-holder text-white">
+        <div class="card-body">
+          <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+          <h3 class="font-weight-bold mb-3">Total Eggs <img width="24" src="assets/images/icons/egg.svg"
+              class="float-right" />
+          </h3>
+          <div class="d-flex flex-wrap justify-content-between data-fields mt-5">
+            <div class="mt">
+              <h4>{{productions?.LayerEggs==null?0:productions?.LayerEggs |currency}}</h4>
+              <p class="mb-0 mr"><small>Layers</small></p>
+            </div>
+            <div class="mt">
+              <h4>{{productions?.GrowerEggs==null?0:productions?.GrowerEggs |currency}}</h4>
+              <p class="mb-0 mr"><small>Growers</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+      <div class="card bg-gradient-danger card-img-holder text-white">
+        <div class="card-body">
+          <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+          <h3 class="font-weight-bold mb-3">Mortality
+            <img src="assets/images/icons/farm-house-24.png" class="float-right" />
+          </h3>
+          <div class="d-flex flex-wrap justify-content-between data-fields mt-5">
+            <div class="mt">
+              <h4>{{productions?.LayerMortality==null?0:productions?.LayerMortality |currency}}</h4>
+              <p class="mb-0 mr"><small>Layers</small></p>
+            </div>
+            <div class="mt">
+              <h4>{{productions?.GrowerMortality==null?0:productions?.GrowerMortality |currency}}</h4>
+              <p class="mb-0 mr"><small>Growers</small></p>
+            </div>
+            <div class="mt">
+              <h4>{{productions?.ChickMortality==null?0:productions?.ChickMortality |number}}</h4>
+              <p class="mb-0 mr"><small>Chicks</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <span class="d-flex align-items-center purchase-popup">
+        <h4 class="mb-0 pb-0">Egg Production</h4>
+        <a routerLink="/log/eggprotection" class="ml-auto text-decoration-none main-color">More info <i
+            class="fa fa-arrow-circle-right"></i></a>
+      </span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+      <div class="card card-img-holder text-primary">
+        <div class="card-body">
+          <!-- <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" /> -->
+          <h3 class="font-weight-bold mb-3">Production <small>(Cartons)</small><img
+              src="assets/images/icons/chicken.svg" width="24" class="float-right" />
+          </h3>
+          <ul class="list-unstyled max-h-60 mt-2">
+            <li class="mb-1">
+              <h4 class="mb-2 mr"><small class="f-w-500">Today's Production</small><span
+                  class="float-right">{{dailyStock.length==0?0:dailyStock[0]?.Production |currency}}</span></h4>
+            </li>
+            <li class="mb-1">
+              <h4 class="mb-2 mr"><small class="f-w-500">Opening Stock</small><span
+                  class="float-right">{{dailyStock.length==0?0:dailyStock[0]?.OpeningStock |currency}}</span></h4>
+            </li>
+            <!-- <li class="mb-1">
+              <h4 class="mb-2 mr"><small>Damage</small><span class="float-right"><small>(static)</small> 0</span></h4>
+            </li> -->
+          </ul>
+          <hr class="mb-0 pb-0" />
+          <div class="d-flex flex-wrap justify-content-between data-fields mt-2">
+            <div class="mt">
+              <h4>{{dailyStock.length==0?0:dailyStock[0]?.Total |currency }}</h4>
+              <p class="mb-0 mr"><small class="f-w-500">Total Production</small></p>
+            </div>
+            <div class="mt">
+              <h4>{{dailyStock.length==0?0:dailyStock[0]?.ClosingBalance |currency}}</h4>
+              <p class="mb-0 mr"><small class="f-w-500">Closing Stock</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 stretch-card grid-margin">
+      <div class="card card-img-holder text-primary">
+        <div class="card-body">
+          <!-- <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" /> -->
+          <h3 class="font-weight-bold mb-3">Packing <small>(Cartons)</small><img
+              src="assets/images/icons/chicken.svg" width="24" class="float-right" />
+          </h3>
+          <ul class="list-unstyled max-h-60 overflow-y-auto mt-2" data-spy="scroll">
+            <li *ngFor="let sale of sales" class="mb-1">
+              <h4 class="mb-2 mr"><small class="f-w-500">{{sale.Name}}</small><span class="float-right">{{sale.PackedBoxes}}</span></h4>
+            </li>
+          </ul>
+          <hr class="mb-0 pb-0" />
+          <div class="d-flex flex-wrap justify-content-end data-fields mt-2 text-right">
+            <!-- <div class="mt">
+              <h4>100<small>(static)</small></h4>
+              <p class="mb-0 mr"><small>Local Sales</small></p>
+            </div> -->
+            <div class="mt">
+              <h4>{{totalSales |currency}}</h4>
+              <p class="mb-0 mr"><small class="f-w-500">Total Packing</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-lg-12 col-md-12 col-sm-6 col-12 stretch-card grid-margin">
+      <div class="card card-img-holder text-primary">
+        <div class="card-body">
+          <!-- <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" /> -->
+          <h3 class="font-weight-bold mb-3">Payments <img src="assets/images/icons/chicken.svg" width="24"
+              class="float-right" />
+          </h3>
+          <ul class="list-unstyled max-h-60 mt-2">
+            <li class="mb-1">
+              <h4 class="mb-2 mr"><small class="f-w-500">Inward Payment</small><span
+                  class="float-right">{{inwardPayment |currency}}</span></h4>
+            </li>
+            <li>
+              <h4 class="mb-2 mr"><small class="f-w-500">Outward Payment</small><span
+                  class="float-right">{{outwardPayment==null?0:outwardPayment|currency}}</span></h4>
+            </li>
+          </ul>
+          <hr class="mb-2 pb-0" />
+          <div class="d-flex flex-wrap justify-content-end data-fields mt-2 text-right">
+            <div class="mt" *ngIf="paymentDifference >= 0">
+              <h4 class="text-success">{{paymentDifference==null?0:paymentDifference|currency}}</h4>
+              <p class="mb-0 mr"><small class="f-w-500">Payment Difference</small></p>
+            </div>
+            <div class="mt" *ngIf="paymentDifference <=0">
+              <h4 class="text-danger">{{paymentDifference==null?0:paymentDifference|currency}}</h4>
+              <p class="mb-0 mr"><small class="f-w-500">Payment Difference</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <div class="clearfix">
+            <h3 class="card-title float-left font-weight-bold"><a routerLink="/farm/productanalysis" class="ml-auto text-decoration-none">Production </a></h3>
+            <div class="float-right">
+              <mat-form-field>
+                <mat-select placeholder="Select Range" [(ngModel)]="selectedProductionValue"
+                  (selectionChange)="onProductionChangeEvent($event)">
+                  <mat-option *ngFor="let data of DropdownForFeed" [value]="data.Name">
+                    {{data.Name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="clearfix"></div>
+            <hr class="mb-1 pb-1 mt-0 pt-0" />
+            <p class="main-color float-right"> Average:{{ProdAvg==null?0:ProdAvg |currency}}</p>
+          </div>
+          <div class="clearfix"></div>
+          <p-toast [style]="{marginTop: '40px'}" styleClass="custom-toast"></p-toast>
+          <p-chart type="line" [data]="linetemp" (onDataSelect)="selectData($event)"></p-chart>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <div class="align-middle">
+            <h3 class="card-title float-left font-weight-bold"> <a routerLink="/farm/productanalysis" class="ml-auto text-decoration-none">Egg Rate </a></h3>
+            <div class="float-right">
+              <mat-form-field>
+                <mat-select placeholder="Select Range" [(ngModel)]="selectedEggrateValue"
+                  (selectionChange)="onChangeEvent($event)">
+                  <mat-option *ngFor="let data of DropdownForFeed" [value]="data.Name">
+                    {{data.Name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="clearfix"></div>
+            <hr class="mb-1 pb-1 mt-0 pt-0" />
+            <p class="main-color float-right"> Average: {{EggAvg==null?0:EggAvg |currency}}</p>
+          </div>
+          <div class="clearfix"></div>
+          <p-toast [style]="{marginTop: '40px'}" styleClass="custom-toast"></p-toast>
+          <p-chart type="line" [data]="line" (onDataSelect)="selectData($event)"></p-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <div class="clearfix">
+            <div class="d-flex align-items-center h-100 mb-3 mt-3">
+            <h3 class="card-title float-left font-weight-bold"><a routerLink="/farm/feedpurchase" class="text-decoration-none">Feed Cost</a></h3>
+            <!-- <div class="text-right ml-auto">
+              <a routerLink="/farm/feedpurchase" class="text-left" style="font-size: 15px">More info <i
+                  class="fa fa-arrow-circle-right"></i></a>
+            </div> -->
+          </div>
+            <div class="clearfix"></div>
+            <hr class="mb-1 pb-1 mt-0 pt-0" />
+          </div>
+          <div class="clearfix"></div>
+          <!-- <p-chart type="pie" [data]="linetempfeed" (onDataSelect)="selectDatafeed($event)"></p-chart> -->
+          <p-toast [style]="{marginTop: '40px'}" styleClass="custom-toast"></p-toast> 
+         <p-chart type="line" [data]="linetempfeed" (onDataSelect)="selectDatafeed($event)"></p-chart> 
+        <!-- <canvas id="myChart" "></canvas>        -->
+        </div>
+      </div>ioj
+    </div>
+    <div class="col-md-6 col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <div class="align-middle">
+            <div class="d-flex align-items-center h-100">
+            <h3 class="card-title float-left font-weight-bold"><a routerLink="/farm/feedpurchase" class="text-decoration-none">Feed Purchase</a></h3>
+            <div class="float-right ml-auto">
+              <mat-form-field>
+                <mat-select placeholder="Select Range" [(ngModel)]="selectedValue"
+                  (selectionChange)="onItemNameChangeEvent($event)">
+                  <mat-option *ngFor="let data of DropdownForFeed" [value]="data.Name">
+                    {{data.Name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+            <!-- <div class="text-right ml-auto">
+              <a routerLink="/farm/feedpurchase" class="text-left" style="font-size: 15px">More info <i
+                  class="fa fa-arrow-circle-right"></i></a>
+            </div> -->
+            <div class="clearfix"></div>
+            <hr class="mb-1 pb-1 mt-0 pt-0" />
+          </div>
+          <div class="clearfix"></div>
+
+                 <!-- <p-chart type="bar" [data]="data"></p-chart>               -->
+                 <div class="chart-container" style="position: relative; height:150vh; width:150vw">
+                 <canvas id="myChart"></canvas>
+                </div>
+          <!-- <canvas id="canvases"></canvas> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- content- ends -->
+<!-- <div class="right_col" role="main"> -->
+<!-- top tiles -->
+<!-- <div class="row">
+    <div class="pull-left" style="padding-top: 20px;">
+      <mat-form-field>
+        <input matInput [matDatepicker]="Datepicker" placeholder="Date" [max]="curDate" [(ngModel)]="selectedDate"
+          (dateChange)="onSelectDate()">
+        <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+        <mat-datepicker #Datepicker></mat-datepicker>
+      </mat-form-field> -->
+<!-- <Label > Date :
+        <b class="text-danger">{{displayDate | date:'dd/MM/yyyy'}}</b>
+      </Label> -->
+<!-- </div>
+    <div style="padding-top: 20px;" class="pull-right">
+      <a routerLink="/reports/dailyproduction" class="pull-right" style="font-size: 15px">More info <i
+          class="fa fa-arrow-circle-right"></i></a>
+    </div> 
+  </div>-->
+
+<!-- <div class="row x_content">
+    <mat-form-field class="col-md-1">
+        <input matInput [matDatepicker]="Datepicker" placeholder="Date" [max]="curDate"
+            [(ngModel)]="selectedDate" (dateChange)="GetVisitLogs()">
+        <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+        <mat-datepicker #Datepicker></mat-datepicker>
+    </mat-form-field>
+    <div class="pull-right">
+        <button type="button" class="btn btn-primary" title="Export" data-toggle="tooltip" (click)="download()"
+            *ngIf='viewLogs?.visitLogSummary?.length>0'>
+            Export
+        </button>
+    </div> -->
+<!-- </div> -->
+<div class="row d-none">
+  <div class="col-md-3 col-sm-12 col-xs-12 ">
+    <div class="card-block rdResponsiveColumn Paddingright2 ">
+      <div class="card card-stats padding-bottom_20" style="height :141px;">
+        <div class=" row card-header card-header-warningp card-header-icon">
+          <div class="card-icon card-HeaderLabel">
+            <span>PRODUCTION</span>
+          </div>
+          <br>
+          <br />
+          <div class=" col-md-3">
+            <span></span>
+          </div>
+          <div class=" col-md-5 ">
+            <h4>Layers</h4>
+            <h4>Growers</h4>
+            <h4></h4>
+          </div>
+          <div class="col-md-4 ">
+            <h4>{{productions?.LayerProduction |currency}}%</h4>
+            <h4>{{productions?.GrowerProduction==null?0:productions?.GrowerProduction |currency}}%</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-sm-12 col-xs-12 ">
+    <div class="card-block rdResponsiveColumn Paddingright2 ">
+      <div class="card card-stats padding-bottom_20" style="height :141px;">
+        <div class=" row card-header card-header-warningp card-header-icon">
+          <div class="card-icon card-HeaderLabel">
+            <span>TOTAL BIRDS</span>
+          </div>
+          <br>
+          <br />
+          <div class=" col-md-2">
+            <span></span>
+          </div>
+          <div class=" col-md-5 ">
+            <h4>Layers</h4>
+            <h4>Growers</h4>
+            <h4> Chicks</h4>
+          </div>
+          <div class="col-md-5 ">
+            <h4>{{productions?.LayerChicks==null?0:productions?.LayerChicks |currency }}</h4>
+            <h4>{{productions?.GrowerChicks==null?0:productions?.GrowerChicks |currency}}</h4>
+            <h4>{{productions?.ChickShedChicks==null?0:productions?.ChickShedChicks |currency}}</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-sm-12 col-xs-12 ">
+    <div class="card-block rdResponsiveColumn Paddingright2 ">
+      <div class="card card-stats padding-bottom_20" style="height :141px;">
+        <div class=" row card-header card-header-warningp card-header-icon">
+          <div class="card-icon card-HeaderLabel">
+            <span>TOTAL EGGS</span>
+          </div>
+          <br>
+          <br />
+          <div class=" col-md-3">
+            <span></span>
+          </div>
+          <div class=" col-md-5 ">
+            <h4>Layers</h4>
+            <h4>Growers</h4>
+            <h4></h4>
+          </div>
+          <div class="col-md-4 ">
+            <h4>{{productions?.LayerEggs==null?0:productions?.LayerEggs |currency}}</h4>
+            <h4>{{productions?.GrowerEggs==null?0:productions?.GrowerEggs |currency}}</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-sm-12 col-xs-12 ">
+    <div class="card-block rdResponsiveColumn Paddingright2 ">
+      <div class="card card-stats padding-bottom_20" style="height :141px;">
+        <div class=" row card-header card-header-warningp card-header-icon">
+          <div class="card-icon card-HeaderLabel">
+            <span>MORTALITY</span>
+          </div>
+          <br>
+          <br />
+          <div class=" col-md-3">
+            <span></span>
+          </div>
+          <div class=" col-md-5 ">
+            <h4>Layers</h4>
+            <h4>Growers</h4>
+            <h4> Chicks</h4>
+          </div>
+          <div class="col-md-4">
+            <h4>{{productions?.LayerMortality==null?0:productions?.LayerMortality |currency}}</h4>
+            <h4>{{productions?.GrowerMortality==null?0:productions?.GrowerMortality |currency}}</h4>
+            <h4>{{productions?.ChickMortality==null?0:productions?.ChickMortality |currency}}</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- </div> -->
+  <br />
+  <!-- <div class="col-md-8 col-sm-12 col-xs-12 ">
+      <h3 class="header">Production Percentage</h3>
+      <div class="col-md-3 col-sm-12 col-xs-12">
+        <div class="widget_border">
+          <div class="x_panel x_panel_cus tile fixed_height_75" style="background-color:#836c8b">
+            <span class="font_decerate"><i class="fa fa-percent" aria-hidden="true"></i> Production</span>
+          </div>
+          <div >
+            <div class="div_sep1">
+              <h2 class="text-center">94%</h2>
+            </div>
+            <div class="div_sep2">
+              <h2 class="text-center">92%</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-12 col-xs-12">
+        <div class="widget_border">
+          <div class="x_panel x_panel_cus tile fixed_height_75" style="background-color:#836c8b">
+            <span class="font_decerate"><i class="fa fa-user"></i> Total Chicks</span>
+          </div>
+          <div>
+            <div class="div_sep1">
+              <h2 class="text-center">1,83,000</h2>
+            </div>
+            <div class="div_sep2">
+              <h2 class="text-center">35000</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-12 col-xs-12">
+        <div class="widget_border">
+          <div class="x_panel x_panel_cus tile fixed_height_75" style="background-color:#836c8b">
+            <span class="font_decerate"><i class="fa fa-lemon-o" aria-hidden="true"></i> Total Eggs</span>
+          </div>
+          <div>
+            <div class="div_sep1">
+              <h2 class="text-center">1,25,000</h2>
+            </div>
+            <div class="div_sep2">
+              <h2 class="text-center">20000</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-12 col-xs-12">
+        <div class="widget_border">
+          <div class="x_panel x_panel_cus tile fixed_height_75" style="background-color:#836c8b">
+            <span class="font_decerate"><i class="fa fa-ban" aria-hidden="true"></i> Mortality</span>
+          </div>
+          <div>
+            <div class="div_sep1">
+              <h2 class="text-center">20</h2>
+            </div>
+            <div class="div_sep2">
+              <h2 class="text-center">12</h2>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="text-right">
+        <a routerLink="/reports/dailyproduction" class="text-left" style="font-size: 15px">More info <i
+            class="fa fa-arrow-circle-right"></i></a> 
+      </div>
+    </div> -->
+  <!-- midilerow -->
+  <!-- <div class="col-md-4 col-sm-12 col-xs-12">
+      <h3 class="header">Payments(in Rupees)</h3>
+     
+      <div class="col-md-6 col-sm-12 col-xs-12 ">
+        <div class="x_panel x_panel_cus tile fixed_height_130 curved_border" style="background-color:#659eb4">
+          <div>
+            <span class="font_decerate"><i class="fa fa-inr" aria-hidden="true"></i> Inward Payment </span>
+          </div>
+          <div>
+            <h2>{{inwardPayment==null?0:inwardPayment}}</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-sm-12 col-xs-12">
+        <div class="x_panel x_panel_cus tile fixed_height_130 curved_border" style="background-color:	#659eb4">
+          <div>
+            <span class="font_decerate"><i class="fa fa-inr" aria-hidden="true"></i> Outward Payment </span>
+          </div>
+          <div>
+            <h2>{{outwardPayment==null?0:outwardPayment}}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-12 col-xs-12">
+      <h3 class="header">Production(in Cartons)</h3>
+      <div class="col-md-6 col-sm-12 col-xs-12">
+        <div class="x_panel x_panel_cus tile fixed_height_130 curved_border" style="background-color:#55638d;">
+          <div>
+            <span class="font_decerate"><i class="fa fa-archive" aria-hidden="true"></i> Production</span>
+          </div>
+          <div>
+            <h2>{{dailyStock.length==0?0:dailyStock[0]?.Production}}</h2>
+          
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-sm-12 col-xs-12">
+        <div class="x_panel x_panel_cus tile fixed_height_130 curved_border" style="background-color:#55638d;">
+          <div>
+            <span class="font_decerate"><i class="fa fa-folder-open" aria-hidden="true"></i> Opening Stock </span>
+          </div>
+          <div>
+            <h2>{{dailyStock.length==0?0:dailyStock[0]?.OpeningStock}}</h2>
+          </div>
+        </div>
+      </div>
+      <div class="text-right">
+        <a routerLink="/reports/eggstock" class="text-left" style="font-size: 15px">More info <i
+            class="fa fa-arrow-circle-right"></i></a>
+      </div>
+     
+    </div>
+    <div class="col-md-4 col-sm-12 col-xs-12 ">
+      <h3 class="header">Packing(in Cartons)</h3>
+      <div class="col-md-6 col-sm-12 col-xs-12">
+        <div class="x_panel x_panel_cus tile fixed_height_130 curved_border"  style="background-color:#746e6e">
+          <div>
+            <span class="font_decerate"><i class="fa fa-trademark" aria-hidden="true"></i> Jai Maa Durga Poultry</span>
+          </div>
+          <div>
+            <h2>{{sales.length==0?0:sales[0]?.PackedBoxes}}</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-sm-12 col-xs-12 ">
+        <div class="x_panel x_panel_cus tile fixed_height_130 curved_border" style="background-color:	#746e6e">
+          <div>
+            <span class="font_decerate"><i class="fa fa-trademark" aria-hidden="true"></i> Sri Lakshmi Egg 
+              Traders</span>
+          </div>
+          <div>
+            <h2>{{sales.length==0?0:sales[1]?.PackedBoxes}}</h2>
+          </div>
+        </div>
+      </div>      
+      <div class="text-right">
+        <a routerLink="/log/eggprotection" class="text-left" style="font-size: 15px">More info <i
+            class="fa fa-arrow-circle-right"></i></a>
+      </div>
+    </div> -->
+</div>
+<!-- New Ribbaons in Dashboard -->
+<div class="row d-none">
+  <div class="text-right">
+    <a routerLink="/log/eggprotection" class="text-left" style="font-size: 15px">More info <i
+        class="fa fa-arrow-circle-right"></i></a>
+  </div>
+  <div class="col-md-4 col-sm-12 col-xs-12">
+    <div class="card-new">
+      <div class="card-footer bg-c-green">
+        <div class="row align-items-center">
+          <div class="col-md-9">
+            <p class="text-white m-b-0">Production (Cartons) </p>
+          </div>
+          <div class="col-md-3 text-right">
+            <!-- <i class="fa fa-user text-white"></i> -->
+          </div>
+        </div>
+      </div>
+      <div class="card-block h-100 hight-146">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h5 class="text-c-green">Production</h5>
+            <h5 class="text-c-green">Opening Stock</h5>
+            <h5 class="text-c-green">Closing Stock</h5>
+            <h5 class="text-c-green">Total</h5>
+          </div>
+          <div class="col-md-2">
+            <h5>{{dailyStock.length==0?0:dailyStock[0]?.Production | currency}}</h5>
+            <h5>{{dailyStock.length==0?0:dailyStock[0]?.OpeningStock |currency}}</h5>
+            <h5>{{dailyStock.length==0?0:dailyStock[0]?.ClosingBalance |currency}}</h5>
+            <h5>{{dailyStock.length==0?0:dailyStock[0]?.Total |currency }}</h5>
+          </div>
+          <div class="col-md-4 text-right">
+            <i class="feather fa fa-folder-open f-28"></i>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="text-right">
+                    <a routerLink="/reports/eggstock" class="text-left" style="font-size: 15px">More info <i
+                        class="fa fa-arrow-circle-right"></i></a>
+                  </div> -->
+  </div>
+  <div class="col-md-4 col-sm-12 col-xs-12">
+    <div class="card-new">
+      <div class="card-footer bg-c-red">
+        <div class="row align-items-center">
+          <div class="col-md-9">
+            <p class="text-white m-b-0">Packing(Cartons)</p>
+          </div>
+          <div class="col-md-3 text-right">
+            <i class="feather icon-trending-down text-white f-16"></i>
+          </div>
+        </div>
+      </div>
+      <div class="card-block h-100 hight-146">
+        <div class="row align-items-center">
+          <div *ngFor="let sale of sales">
+            <div class="col-md-6">
+              <h5 class="text-c-red">{{sale.Name}}</h5>
+            </div>
+            <div class="col-md-2">
+              <h5>{{sale.PackedBoxes |currency}}</h5>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h5 class="text-c-red">Total </h5>
+          </div>
+          <div class="col-md-2">
+            <h5>{{totalSales |currency}}</h5>
+          </div>
+          <div class="col-md-4 text-right">
+            <i class="feather fa fa-archive f-28"> </i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-sm-12 col-xs-12">
+    <div class="card-new">
+      <div class="card-footer bg-c-yellow">
+        <div class="row align-items-center">
+          <div class="col-md-9">
+            <p class="text-white m-b-0">Payments</p>
+          </div>
+          <div class="col-md-3 text-right">
+            <!-- <i class="fa fa-user text-white"></i> -->
+          </div>
+        </div>
+      </div>
+      <div class="card-block h-100 hight-146">
+        <div class="row align-items-center">
+          <div class="col-md-6 ">
+            <h5 class="text-c-yellow ">Inward Payment</h5>
+            <h5 class="text-c-yellow ">Outward Payment</h5>
+            <h5 class="text-c-yellow ">Payment Difference</h5>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="col-md-4 ">
+            <!-- |currency:"INR":"symbol" -->
+            <h5>{{inwardPayment |currency}}</h5>
+            <h5>{{outwardPayment==null?0:outwardPayment|currency}}</h5>
+            <h5 style="color: green;font-weight: bold" *ngIf="paymentDifference >= 0">
+              {{paymentDifference==null?0:paymentDifference|currency}}</h5>
+            <h5 style="color: red;font-weight: bold" *ngIf="paymentDifference < 0">
+              {{paymentDifference==null?0:paymentDifference|currency}}</h5>
+          </div>
+          <div class="col-md-2 text-right">
+            <i class="feather fa fa-inr f-28"></i>
+            <!-- <span class="sam">Rupees</span> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="clearfix"></div>
+<!-- <div class="row row_widget_border">
+  </div> -->
+<div class="row d-none">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div>
+      <!-- <div class="col-md-4 col-sm-12 col-xs-12" style="text-align:center">
+          <div class="x_panel tile fixed_height_370"> 
+            <h2>Shed Allocation</h2>
+            <div class="col-md-1 col-sm-12 col-xs-12">
+              <span style="background-color:#FF6384;color:white;">Feed1</span>{{":50,000"}}
+              <span style="background-color:#36A2EB;color:white">Feed2</span>{{":45,000"}}
+              <span style="background-color:#FFCE56;color:white">Feed3</span>{{":44,000"}}
+            </div>
+            <div class="col-md-11 col-sm-12 col-xs-12">
+              <p-chart type="pie" [data]="piedata"></p-chart>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-12 col-xs-12" style="text-align:center">
+          <div class="x_panel tile fixed_height_370">
+            <h2>Egg Sale Register</h2>
+            <div class="clearfix"></div>
+            <p-chart type="bar" [data]="bardata"></p-chart>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12" style="text-align:center">
+          <div class="x_panel tile fixed_height_370">
+            <h2>Visit log </h2>
+            <div class="row font">
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="col-md-3 col-sm-3 col-xs-3 icons_home">
+                  <i class="fa fa-lemon-o"></i>
+                </div>
+                <div class="col-md-9 col-sm-9 col-xs-9">Total Birds
+                  <br>
+                  <span style="color:#337ab7">60,000</span>
+                </div>
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="col-md-3 col-sm-3 col-xs-3 icons_home">
+                  <i class="fa fa-lemon-o"></i>
+                </div>
+                <div class="col-md-9 col-sm-9 col-xs-9">Mortality
+                  <br>
+                  <span style="color:#337ab7">300</span>
+                </div>
+              </div>
+            </div>
+            <div class="row font">
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="col-md-3 col-sm-3 col-xs-3 icons_home">
+                  <i class="fa fa-lemon-o"></i>
+                </div>
+                <div class="col-md-9 col-sm-9 col-xs-9">Current Birds
+                  <br>
+                  <span style="color:#337ab7">59700</span>
+                </div>
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="col-md-3 col-sm-3 col-xs-3 icons_home">
+                  <i class="fa fa-lemon-o"></i>
+                </div>
+                <div class="col-md-9 col-sm-9 col-xs-9">Feed
+                  <br>
+                  <span style="color:#337ab7">100</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="row font">
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="col-md-3 col-sm-3 col-xs-3 icons_home">
+                  <i class="fa fa-lemon-o"></i>
+                </div>
+                <div class="col-md-9 col-sm-9 col-xs-9">Damage Eggs
+                  <br>
+                  <span style="color:#337ab7">100</span>
+                </div>
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="col-md-3 col-sm-3 col-xs-3 icons_home">
+                  <i class="fa fa-lemon-o"></i>
+                </div>
+                <div class="col-md-9 col-sm-9 col-xs-9">No.of Eggs
+                  <br>
+                  <span style="color:#337ab7">40,000</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="row font">
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="col-md-3 col-sm-3 col-xs-3 icons_home">
+                  <i class="fa fa-lemon-o"></i>
+                </div>
+                <div class="col-md-9 col-sm-9 col-xs-9">Total Eggs
+                  <br>
+                  <span style="color:#337ab7">100</span>
+                </div>
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="col-md-3 col-sm-3 col-xs-3 icons_home">
+                  <i class="fa fa-lemon-o"></i>
+                </div>
+                <div class="col-md-9 col-sm-9 col-xs-9">Total Eggs(%)
+                  <br>
+                  <span style="color:#337ab7">40,000</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="clearfix"></div>
+          </div>
+        </div> -->
+    </div>
+  </div>
+  <br />
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div>
+        <!-- <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="x_panel tile">
+            <div class="col-xs-12 col-sm-8">
+              <h2 style="text-align:left" class="header">Production </h2>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-3">
+              <mat-form-field>
+                <mat-select placeholder="Select Range" [(ngModel)]="selectedProductionValue"
+                  (selectionChange)="onProductionChangeEvent($event)">
+                  <mat-option *ngFor="let data of DropdownForFeed" [value]="data.Name">
+                    {{data.Name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-3 pull-Left">
+              <span class="avgcolor "> Average:{{ProdAvg==null?0:ProdAvg}}</span>
+            </div>
+            <div class="clearfix"></div>
+            <p-toast [style]="{marginTop: '40px'}" styleClass="custom-toast"></p-toast>
+            <p-chart type="line" [data]="linetemp" (onDataSelect)="selectData($event)"></p-chart>
+          </div>
+          <div class="clearfix"></div>
+        </div> -->
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="x_panel tile ">
+            <div class="col-xs-12 col-sm-8">
+              <h2 style="text-align:left" class="header">Egg Rate</h2>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-3">
+              <mat-form-field>
+                <mat-select placeholder="Select Range" [(ngModel)]="selectedEggrateValue"
+                  (selectionChange)="onChangeEvent($event)">
+                  <mat-option *ngFor="let data of DropdownForFeed" [value]="data.Name">
+                    {{data.Name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-3 pull-Left">
+              <span class="avgcolor"> Average:{{EggAvg==null?0:EggAvg |currency}}</span>
+            </div>
+            <div class="clearfix "></div>
+            <p-toast [style]="{marginTop: '40px'}" styleClass="custom-toast"></p-toast>
+            <p-chart type="line" [data]="line" (onDataSelect)="selectData($event)"></p-chart>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+  <br />
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div>
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="x_panel tile ">
+            <div class="col-xs-12 col-sm-8 ">
+              <h2 style="text-align:left" class="header">Feed Cost</h2>
+            </div>
+            <!-- <div class="col-xs-12 col-sm-6 col-md-3">
+                    <mat-form-field>
+                        <mat-select placeholder="Select Range" [(ngModel)]="selectedFeedCostValue" (selectionChange)="onFeedCostChangeEvent()">
+                            <mat-option *ngFor="let data of Dropdowndata" [value]="data.Name">
+                              {{data.Name}}
+                            </mat-option>
+                          </mat-select>
+                    </mat-form-field>
+                </div> -->
+            <div class="clearfix"></div>
+            <!-- <div class="w_left w_23">
+                    <span style="background-color:#7CB342;color:white">Feed1</span>&nbsp; &nbsp; &nbsp;
+                    <span style="background-color:#1E88E5;color:white">Feed2</span>&nbsp; &nbsp; &nbsp;
+                    <span style="background-color:#4bc0c0;color:white">Feed3</span>&nbsp; &nbsp; &nbsp;
+                  </div> -->
+            <p-toast [style]="{marginTop: '40px'}" styleClass="custom-toast"></p-toast>
+
+            <!-- <p-chart type="line" [data]="linetempfeed" (onDataSelect)="selectDatafeed($event)"></p-chart> -->
+            <canvas id="myChart"></canvas>
+          </div>
+        </div>
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="x_panel tile">
+            <div class="col-xs-12 col-sm-8">
+              <h2 style="text-align:left" class="header">Feed Purchase</h2>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-3">
+              <mat-form-field>
+                <mat-select placeholder="Select Range" [(ngModel)]="selectedValue"
+                  (selectionChange)="onItemNameChangeEvent($event)">
+                  <mat-option *ngFor="let data of DropdownForFeed" [value]="data.Name">
+                    {{data.Name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="clearfix"></div>
+            <p-chart type="bar" [data]="data"></p-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

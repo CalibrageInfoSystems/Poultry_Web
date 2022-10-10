@@ -1,0 +1,55 @@
+<div class="right_col" role="main" >
+        <!-- style="height :900px;" -->
+    <div>
+      <div class="header">
+        <h3>Grower Shed Transitions</h3>
+      </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="x_panel">
+      <div class="x_title header">
+        <h4>Add New Grower Shed</h4>
+        <div class="clearfix"></div>
+      </div>
+      <div class="x_content">
+        <br />
+        <div class="row">
+            <mat-form-field class="col-md-3">
+                <input matInput [matDatepicker]="Datepicker" placeholder="Date" [max]="curDate" [(ngModel)]="selectedDate">
+                <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+                <mat-datepicker #Datepicker></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field class="col-md-3">
+                <input matInput placeholder="Batch" [value]="batchInfo.Name" readonly required>
+            </mat-form-field>
+            <mat-form-field class="col-md-3">
+              <input matInput placeholder="Total Birds Count" [value]="batchInfo.AvailableBirds" readonly required>
+            </mat-form-field>  
+        </div>
+        
+        <form [formGroup]="addGrowerForm">
+          <div formArrayName="items" *ngFor="let item of addGrowerForm.controls['items']['controls']; let i = index">
+              <div [formGroupName]="i">
+                  <div class="row">
+                          <mat-form-field class="col-xs-12 col-sm-6 col-md-2">
+                              <input matInput placeholder="Shed" readonly formControlName="ShedName">
+                          </mat-form-field>
+                        <mat-form-field class="col-md-3">
+                          <input matInput placeholder="Birds Count"  formControlName="ChicksCount" (input)="onChange($event.target.value)" (keypress)="onlyNumber(event)" >
+                        </mat-form-field>
+                  </div>
+              </div>
+          </div>
+          <div class="ln_solid"></div>
+          <div class="form-group">
+              <div class="row pull-right">
+                  <button type="submit" class="btn btn-success" (click)="onSave()" [disabled]="!isDisabled">
+                      &nbsp;&nbsp;Save</button>
+                  <button type="button" class="btn btn-primary" (click)="onCancle()">Cancel</button>
+              </div>
+          </div>
+      </form>
+      </div>
+    </div>
+  </div>
+  

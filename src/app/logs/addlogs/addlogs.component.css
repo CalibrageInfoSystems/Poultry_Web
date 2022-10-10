@@ -1,0 +1,7 @@
+mat-form-field input[readonly] {
+    background-color: #eeeff1;
+}
+
+.mat-input-element{
+    padding: 5px !important;
+}

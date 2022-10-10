@@ -1,0 +1,70 @@
+<div class="right_col" role="main" >
+    <!-- style="height :900px;" -->
+  <div>
+    <div class="header">
+      <h3>Vaccination Details</h3>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <div class="row">
+    <div class="row">
+      <div class="pull-left" style="padding:4px 10px;border-bottom: 0 none;">
+        <mat-form-field>
+          <mat-select placeholder="Select Batch" required>
+            <mat-option *ngFor="let batch of batches" [value]="batch.name">
+              {{batch.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="pull-left" style="padding:4px 10px;border-bottom: 0 none;margin-bottom:10px;">
+        <input type="text" class="form-control" pInputText size="50" placeholder="Search"
+          (input)="dt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+      </div>
+      <div>
+        <button type="button" class="btn btn-primary pull-right" title="Export" data-toggle="tooltip"
+          (click)="download()">Export</button>
+      </div>
+    </div>
+    <p-table #dt [value]="vaccinationDetails" sortMode="single"
+      [globalFilterFields]="['BatchNo','Age','Vaccination','DueDate','Status','VaccinatedDate']" sortField="BatchNo">
+      <ng-template pTemplate="header">
+        <tr>
+          <th [pSortableColumn]="'BatchNo'">Batch No
+            <p-sortIcon [field]="BatchNo"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'Age'">Age
+            <p-sortIcon [field]="Age"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'Vaccination'">Vaccination
+            <p-sortIcon [field]="Vaccination"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'DueDate'">Due Date
+            <p-sortIcon [field]="DueDate"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'Status'">Status
+            <p-sortIcon [field]="Status"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'VaccinatedDate'">Vaccinated Date
+            <p-sortIcon [field]="VaccinatedDate"></p-sortIcon>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+        <tr>
+          <td class="textright">{{rowData.BatchNo}}</td>
+          <td class="textright">{{rowData.Age}}</td>
+          <td>{{rowData.Vaccination}}</td>
+          <td>{{rowData.DueDate}}</td>
+          <td>{{rowData.Status}}</td>
+          <td>{{rowData.VaccinatedDate}}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage" let-columns>
+        <tr>
+          <td colspan="6" class="ui-datatable-emptymessage text-center">No Records Found</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

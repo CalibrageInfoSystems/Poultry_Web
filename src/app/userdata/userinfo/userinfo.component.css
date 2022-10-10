@@ -1,0 +1,6 @@
+.header{
+    margin-left: -20px;
+}
+mat-form-field input[readonly] {
+    background-color: #eeeff1;
+}

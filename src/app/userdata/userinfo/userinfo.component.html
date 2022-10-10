@@ -1,0 +1,496 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+    <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+        <p style="font-size: 20px; color: white">Loading...</p>
+    </ngx-spinner>
+  </div>
+
+<div role="main">
+    <div class="page-header">
+        <h3 class="page-title">User Info Details</h3>
+        <div class="float-right ml-auto" *ngIf="!isAddUserInfoDetails && !isEditUserInfoDetails">
+            <button type="button" class="btn btn-primary" title="Add New User" data-toggle="tooltip"
+                (click)="onAddUserInfoClick()" *ngIf="ActivityRights.CanManageUserInfo">
+                Add New User
+            </button>
+            <button type="button" class="btn btn-primary" title="Export" data-toggle="tooltip" (click)="download()">
+                <i class="mdi mdi-file-export text-white"></i> Export
+            </button>
+            <button class="btn btn-primary " (click)="toggleFilter()"
+            *ngIf="!isFiltersEnabled && userInfo.length>0 ">            
+            &nbsp;{{filterTooltip}}
+          </button>&nbsp;&nbsp;
+          <button class="btn btn-warning " (click)="toggleFilter()"
+            *ngIf="isFiltersEnabled && userInfo.length>0 ">
+            {{filterTooltip}}
+          </button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <!-- Add User Info Form -->
+    <div class="purchase-popup" *ngIf="isAddUserInfoDetails">
+        <div class="header text-primary">
+            <h4 class="pl-3">Add New User Details</h4>
+            <div class="clearfix"></div>
+        </div>
+        <div>
+            <form class="form-horizontal form-label-left" [formGroup]="addNewUserForm">
+                <div class="row">
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="First Name" required formControlName="firstName">
+                        <mat-error>
+                            <span
+                                *ngIf="!addNewUserForm.get('firstName').valid && addNewUserForm.get('firstName').touched">
+                                <span *ngIf="addNewUserForm.controls['firstName'].hasError('required') ">
+                                    Please enter first name
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="Middle Name" formControlName="middleName">
+                    </mat-form-field>
+
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="Last Name" required formControlName="lastName">
+                        <mat-error>
+                            <span
+                                *ngIf="!addNewUserForm.get('lastName').valid && addNewUserForm.get('lastName').touched">
+                                <span *ngIf="addNewUserForm.controls['lastName'].hasError('required') ">
+                                    Please enter last name
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="row">
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="Contact Number" required formControlName="contactNumber"
+                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                            maxLength="10" required>
+                        <mat-error>
+                            <span
+                                *ngIf="!addNewUserForm.get('contactNumber').valid && addNewUserForm.get('contactNumber').touched">
+                                <span *ngIf="addNewUserForm.controls['contactNumber'].hasError('required') ">
+                                    Please enter contact number
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="Mobile Number" formControlName="mobileNumber"
+                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                            maxLength="10">
+                    </mat-form-field>
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="Email Id" formControlName="emailId">
+                        <mat-error>
+                            <span *ngIf="!addNewUserForm.get('emailId').valid && addNewUserForm.get('emailId').touched">
+                                <!-- <span *ngIf="addNewUserForm.controls['emailId'].hasError('required') ">
+                                    Please enter email id
+                                </span> -->
+                                <span *ngIf="addNewUserForm.controls['emailId'].hasError('pattern') ">
+                                    Please enter valid email
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="row">
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="User Name" required formControlName="userName">
+                        <mat-error>
+                            <span
+                                *ngIf="!addNewUserForm.get('userName').valid && addNewUserForm.get('userName').touched">
+                                <span *ngIf="addNewUserForm.controls['userName'].hasError('required') ">
+                                    Please enter user name
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="col-12 col-md-4">
+                        <input type="password" matInput placeholder="Password" required formControlName="password"
+                            minLength="6">
+                        <mat-error>
+                            <span
+                                *ngIf="!addNewUserForm.get('password').valid && addNewUserForm.get('password').touched">
+                                <span *ngIf="addNewUserForm.controls['password'].hasError('required') ">
+                                    Please enter user name
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="col-12 col-md-4">
+                        <mat-select placeholder="Select Role" required formControlName="roleName">
+                            <mat-option *ngFor="let role of rolesList" [value]="role.Id">
+                                {{role.RoleName}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error>
+                            <span
+                                *ngIf="!addNewUserForm.get('roleName').valid && addNewUserForm.get('roleName').touched">
+                                <span *ngIf="addNewUserForm.controls['roleName'].hasError('required') ">
+                                    Please select role
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="row">
+                    <mat-form-field class="col-12 col-md-4">
+                        <mat-label>Farms</mat-label>
+                        <mat-select multiple formControlName="farmName">
+                            <mat-option *ngFor="let farm of farmsList" [value]="farm.Id" (click)="onselectFarm($event)">
+                                {{farm.FarmName}}</mat-option>
+                        </mat-select>
+                        <mat-error>
+                            <span
+                                *ngIf="!addNewUserForm.get('farmName').valid && addNewUserForm.get('farmName').touched">
+                                <span *ngIf="addNewUserForm.controls['farmName'].hasError('required') ">
+                                    Please select farm
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="col-12 col-md-4">
+                        <mat-label>Sheds</mat-label>
+                        <mat-select multiple formControlName="shedName">
+                            <mat-option #allShedsSelected (click)="selectAllSheds()" [value]="0">Select All</mat-option>
+                            <mat-option *ngFor="let shed of shedsList" [value]="shed.Id"
+                                (click)="selectShed(allShedsSelected.viewValue)">{{shed.ShedName}} ( {{shed.FarmName}} )
+                            </mat-option>
+                        </mat-select>
+                        <!-- <mat-error>
+                            <span *ngIf="!addNewUserForm.get('shedName').valid && addNewUserForm.get('shedName').touched">
+                                <span *ngIf="addNewUserForm.controls['shedName'].hasError('required') ">
+                                    Please select shed
+                                </span>
+                            </span>
+                        </mat-error> -->
+                    </mat-form-field>
+                    <mat-checkbox class="col-12 col-md-4 mt-2" formControlName="isActive">IsActive</mat-checkbox>
+                </div>
+                <div class="clearfix"></div>
+                <div class="form-group">
+                    <div class="float-right">
+                        <button type="button" class="btn btn-light text-dark"
+                            (click)="onCancleUserInfoAdding()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" (click)="onsaveUserInfo();clicked=true"
+                            [disabled]="!addNewUserForm.valid || clicked">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <!-- Add User Info Form End -->
+
+    <!-- Edit User Info Form -->
+    <div class="purchase-popup" *ngIf="isEditUserInfoDetails">
+        <div class="header text-primary">
+            <h4 class="pl-3">Edit User Details</h4>
+            <div class="clearfix"></div>
+        </div>
+        <div>
+            <form class="form-horizontal form-label-left" [formGroup]="editUserForm">
+                <div class="row">
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="First Name" [(ngModel)]="rowData.FirstName"
+                            formControlName="firstName" required>
+                        <mat-error>
+                            <span *ngIf="!editUserForm.get('firstName').valid && editUserForm.get('firstName').touched">
+                                <span *ngIf="editUserForm.controls['firstName'].hasError('required') ">
+                                    Please enter first name
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="Middle Name" [(ngModel)]="rowData.MiddleName"
+                            formControlName="middleName">
+                    </mat-form-field>
+
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="Last Name" [(ngModel)]="rowData.LastName"
+                            formControlName="lastName" required>
+                        <mat-error>
+                            <span *ngIf="!editUserForm.get('lastName').valid && editUserForm.get('lastName').touched">
+                                <span *ngIf="editUserForm.controls['lastName'].hasError('required') ">
+                                    Please enter last name
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="row">
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="Contact Number" [(ngModel)]="rowData.ContactNumber"
+                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                            required formControlName="contactNumber">
+                        <mat-error>
+                            <span
+                                *ngIf="!editUserForm.get('contactNumber').valid && editUserForm.get('contactNumber').touched">
+                                <span *ngIf="editUserForm.controls['contactNumber'].hasError('required') ">
+                                    Please enter contact number
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="Mobile Number" [(ngModel)]="rowData.MobileNumber"
+                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                            formControlName="mobileNumber">
+                    </mat-form-field>
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="Email Id" [(ngModel)]="rowData.Email" formControlName="emailId">
+                        <mat-error>
+                            <span *ngIf="!editUserForm.get('emailId').valid && editUserForm.get('emailId').touched">
+                                <!-- <span *ngIf="editUserForm.controls['emailId'].hasError('required') ">
+                                    Please enter email id
+                                </span> -->
+                                <span *ngIf="editUserForm.controls['emailId'].hasError('pattern') ">
+                                    Please enter valid email
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="row">
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="User Name" [(ngModel)]="rowData.UserName"
+                            formControlName="userName" required readonly>
+                        <!-- <mat-error>
+                            <span *ngIf="!editUserForm.get('userName').valid && editUserForm.get('userName').touched">
+                                <span *ngIf="editUserForm.controls['userName'].hasError('required') ">
+                                    Please enter user name
+                                </span>
+                            </span>
+                        </mat-error> -->
+                    </mat-form-field>
+                    <mat-form-field class="col-12 col-md-4">
+                        <input matInput placeholder="Password" [(ngModel)]="rowData.Password" formControlName="password"
+                            required readonly>
+                        <!-- <mat-error>
+                            <span *ngIf="!editUserForm.get('password').valid && editUserForm.get('password').touched">
+                                <span *ngIf="editUserForm.controls['password'].hasError('required') ">
+                                    Please enter password
+                                </span>
+                            </span>
+                        </mat-error> -->
+                    </mat-form-field>
+                    <mat-form-field class="col-12 col-md-4">
+                        <mat-select placeholder="Select Role" [(ngModel)]="rowData.RoleId" formControlName="roleName"
+                            required>
+                            <mat-option *ngFor="let role of rolesList" [value]="role.Id">
+                                {{role.RoleName}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error>
+                            <span *ngIf="!editUserForm.get('roleName').valid && editUserForm.get('roleName').touched">
+                                <span *ngIf="editUserForm.controls['roleName'].hasError('required') ">
+                                    Please select role
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="row">
+                    <mat-form-field class="col-12 col-md-4">
+                        <mat-label>Farms</mat-label>
+                        <mat-select multiple="true" formControlName="farmIds" [(ngModel)]="selectedFarmIds">
+                            <mat-option *ngFor="let farm of farmsList" [value]="farm.Id"
+                                (click)="onEditSelectFarm($event)">{{farm.FarmName}}</mat-option>
+                        </mat-select>
+                        <mat-error>
+                            <span *ngIf="!editUserForm.get('farmIds').valid && editUserForm.get('farmIds').touched">
+                                <span *ngIf="editUserForm.controls['farmIds'].hasError('required') ">
+                                    Please select farm
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="col-12 col-md-4">
+                        <mat-label>Sheds</mat-label>
+                        <mat-select multiple="true" formControlName="shedIds" [(ngModel)]="selectedShedIds">
+                            <mat-option #allEditShedsSelected (click)="selectAllEditSheds()" [value]="0">Select All
+                            </mat-option>
+                            <mat-option *ngFor="let shed of shedsList" [value]="shed.Id"
+                                (click)="selectEditShed(allEditShedsSelected.viewValue)">{{shed.ShedName}} (
+                                {{shed.FarmName}} )</mat-option>
+                        </mat-select>
+                        <mat-error>
+                            <span *ngIf="!editUserForm.get('shedIds').valid && editUserForm.get('shedIds').touched">
+                                <span *ngIf="editUserForm.controls['shedIds'].hasError('required') ">
+                                    Please select shed
+                                </span>
+                            </span>
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-checkbox class="col-12 col-md-4" [(ngModel)]="rowData.IsActive"
+                        [ngModelOptions]="{standalone: true}">IsActive</mat-checkbox>
+                </div>
+                <div class="ln_solid"></div>
+                <div class="form-group">
+                    <div class="float-right">
+                        <button type="button" class="btn btn-light text-dark"
+                            (click)="onCancleUserInfoEdit()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" (click)="onUpdateUser();clicked=true"
+                            [disabled]="!editUserForm.valid || !editUserForm.dirty||clicked">Update</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <!-- Edit User Info Form End -->
+
+    <!-- Main Grid -->
+    <div class="row" *ngIf="!isAddUserInfoDetails && !isEditUserInfoDetails">
+        <div class="col-12">
+                <!-- <div class="pull-left" style="padding:4px 10px;border-bottom: 0 none;margin-bottom:10px;">
+                <input type="text" class="form-control" pInputText size="50" placeholder="Search" (input)="dt.filterGlobal($event.target.value, 'contains')"
+                    style="width:auto">
+            </div> -->
+            <p-table #ui [value]="userInfo" dataKey="Id" paginatorDropdownAppendTo="body"
+                [globalFilterFields]="['FullName','UserName','RoleName','MobileNumber','ContactNumber','Email','IsActive']"
+                [paginator]="true" [rows]="10" rowExpandMode="single" expandableRows="true"
+                [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3em"></th>
+                        <th [pSortableColumn]="'FullName'">Full Name
+                            <p-sortIcon [field]="'FullName'"></p-sortIcon>
+                        </th>
+                        <th [pSortableColumn]="'UserName'">User Name
+                            <p-sortIcon [field]="'UserName'"></p-sortIcon>
+                        </th>
+                        <th [pSortableColumn]="'RoleName'">Role Name
+                            <p-sortIcon [field]="'RoleName'"></p-sortIcon>
+                        </th>
+                        <th [pSortableColumn]="'ContactNumber'">Contact Number
+                            <p-sortIcon [field]="'ContactNumber'"></p-sortIcon>
+                        </th>
+                        <th [pSortableColumn]="'MobileNumber'">Mobile Number
+                            <p-sortIcon [field]="'MobileNumber'"></p-sortIcon>
+                        </th>
+                        <th [pSortableColumn]="'Email'">Email
+                            <p-sortIcon [field]="'Email'"></p-sortIcon>
+                        </th>
+                        <th [pSortableColumn]="'IsActive'">Active
+                            <p-sortIcon [field]="'IsActive'"></p-sortIcon>
+                        </th>
+                        <th *ngIf="ActivityRights.CanManageUserInfo"><span class="mr-3">Action(s)</span></th>
+                    </tr>
+                    <tr *ngIf="isFiltersEnabled">  
+                        <th></th> 
+                        <th>
+                            <input type="text" class="form-control" maxlength="50"
+                              (input)="ui.filter($event.target.value, 'FullName', 'contains')">
+                          </th>
+                        <th>
+                            <input type="text" class="form-control" maxlength="50"
+                              (input)="ui.filter($event.target.value, 'UserName', 'contains')">
+                          </th>                   
+                        <th>
+                          <input type="text" class="form-control" maxlength="50"
+                            (input)="ui.filter($event.target.value, 'RoleName', 'contains')">
+                        </th>
+                        <th>
+                            <input type="text" class="form-control" maxlength="15"
+                              (input)="ui.filter($event.target.value, 'ContactNumber', 'contains')">
+                          </th>
+                        <th>
+                          <input type="text" class="form-control" maxlength="15"
+                            (input)="ui.filter($event.target.value, 'MobileNumber', 'contains')">
+                        </th>
+                        <th>
+                          <input type="text" class="form-control" maxlength="50"
+                            (input)="ui.filter($event.target.value, 'Email', 'contains')">
+                        </th>
+                        <th>
+                          <input type="text" class="form-control" maxlength="5"
+                            (input)="ui.filter($event.target.value, 'IsActive', 'contains')">
+                        </th>
+                       <th></th>           
+                      </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-row let-expanded="expanded">
+                    <tr>
+                        <td>
+                            <a [pRowToggler]="row"
+                                (click)="GetShedsFarmsByUser(row,expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right')">
+                                <i [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+                            </a>
+                        </td>
+                        <td>{{row.FullName}}</td>
+                        <td>{{row.UserName}}</td>
+                        <td>{{row.RoleName}}</td>
+                        <td class="textright">{{row.ContactNumber}}</td>
+                        <td class="textright">{{row.MobileNumber}}</td>
+                        <td>{{row.Email}}</td>
+                        <td>{{row.IsActive}}</td>
+                        <td>
+                            <div *ngIf="ActivityRights.CanManageUserInfo">
+                                <button type="button" class="btn btn-primary btn-circle btn-xs" title="Edit"
+                                    data-toggle="tooltip" (click)="onEditUserInfoClick(row)">
+                                    <i class="mdi mdi-table-edit" aria-hidden="true"></i>
+                                </button>
+                                <!-- <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip" (click)="onDeleteUserClick(row)" [disabled]="!row.isActive">
+                                <i class="fa fa-trash"></i>
+                            </button> -->
+                                <button type="button" class="btn btn-danger btn-xs " title="Delete"
+                                    data-toggle="tooltip" (click)="onDeleteUserClick(row)" [disabled]="!row.IsActive">
+                                    <i class="mdi mdi-delete"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="rowexpansion">
+                    <tr>
+                        <td [attr.colspan]="9">
+                            <p-table #dt1 [responsive]="true" [value]="shedfarmInfo" [paginator]="true"
+                                paginatorDropdownAppendTo="body" [rows]="5" [tableStyle]="{'table-layout':'auto'}"
+                                [resizableColumns]="true" columnResizeMode="expand" [rowsPerPageOptions]="[10,20,30]">
+                                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="product-id" [pSortableColumn]="'FarmName'">Farm Name
+                            <p-sortIcon [field]="'FarmName'"></p-sortIcon>
+                        </th>
+                        <th class="product-id" [pSortableColumn]="'ShedName'">Shed #
+                            <p-sortIcon [field]="'ShedName'"></p-sortIcon>
+                        </th>
+                        <th class="product-id" [pSortableColumn]="'ShedType'">Shed Type
+                            <p-sortIcon [field]="'ShedType'"></p-sortIcon>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-expanded="expanded" let-rowdata>
+                    <tr>
+                        <td>{{rowdata.FarmName}}</td>
+                        <td>{{rowdata.ShedName}}</td>
+                        <td>{{rowdata.ShedType}}</td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage" let-columns>
+                    <tr *ngIf="shedfarmInfo == 0">
+                        <td colspan="3" class="ui-datatable-emptymessage text-center">No Records Found</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            </td>
+            </tr>
+            </ng-template>
+            <!-- <div class="text-center" *ngIf="userInfo.length==0">
+                No Records Found
+            </div> -->
+            <ng-template pTemplate="emptymessage" let-columns>
+                <tr>
+                    <td colspan="9" class="ui-datatable-emptymessage text-center">No Records Found</td>
+                </tr>
+            </ng-template>
+            </p-table>
+        </div>
+    </div>
+    <!-- Main Grid End -->
+</div>

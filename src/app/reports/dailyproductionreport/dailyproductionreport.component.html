@@ -1,0 +1,156 @@
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Production Report</h3>
+  </div>
+  <div class="clearfix"></div>
+  <!-- Main Grid -->
+  <div class="row">
+    <div class="col-12">
+      <span class="d-flex align-items-center purchase-popup mb-0">
+        <div class="form-inline w-100">
+          <mat-form-field class="col-md-3 col-sm-6 col-12 pl-1">
+            <input matInput [matDatepicker]="Datepicker" placeholder="Date" [max]="curDate" [(ngModel)]="selectedDate"
+              (dateChange)="GetVisitLogs()" readonly>
+            <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+            <mat-datepicker #Datepicker></mat-datepicker>
+          </mat-form-field>
+          <!-- <div class="pull-left" style="padding:4px 15px;border-bottom: 0 none;margin-bottom:10px;">
+              <input type="text" class="form-control" pInputText size="50" placeholder="Search" (input)="dt.filterGlobal($event.target.value, 'contains')"
+                  style="width:auto">
+          </div> -->
+          <div class="pull-right">
+            <button type="button" class="btn btn-primary" title="Export" data-toggle="tooltip" (click)="download()"
+              *ngIf='viewLogs?.visitLogSummary?.length>0'>
+              Export
+            </button>
+          </div>
+        </div>
+      </span>
+    </div>
+    <div class="mt-4" *ngFor="let reg of finalreq">
+          <div class="col-12">
+            <span class="d-flex align-items-center purchase-popup">
+            <h4>{{reg.shedType}}</h4>
+          </span>
+        </div>
+          <!-- <div class="pull-right" *ngIf="disableButton(reg.logs)">
+          <button type="button" class="btn btn-primary" title="Approve All" data-toggle="tooltip"
+            (click)="approveAll(reg.logs)" style="margin-right: 20px;">Approve All</button>
+        </div> -->
+      <div class="col-md-12">
+        <p-table [value]="reg.logs" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand">
+          <ng-template pTemplate="header">
+            <tr>
+              <th [pSortableColumn]="'ShedName'"> Shed#
+                <p-sortIcon [field]="ShedName"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'BatchName'">Batch#
+                <p-sortIcon [field]="BatchName"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'AgeinWeeks'">Age
+                <p-sortIcon [field]="AgeinWeeks"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'OpeningBirds'">Opening Birds
+                <p-sortIcon [field]="OpeningBirds"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'Died'">Mortality
+                <p-sortIcon [field]="Died"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'Hurt'">Hurt
+                <p-sortIcon [field]="Hurt"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'RemainingBirds'">Remaining Birds
+                <p-sortIcon [field]="RemainingBirds"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'Feed'">Feed (Bags)
+                <p-sortIcon [field]="Feed"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'TotalEggs'">Total Eggs
+                <p-sortIcon [field]="TotalEggs"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'DamagedEggs'">Damaged Eggs
+                <p-sortIcon [field]="DamagedEggs"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'NumberofEggs'">No.Of Eggs
+                <p-sortIcon [field]="NumberofEggs"></p-sortIcon>
+              </th>
+
+              <th [pSortableColumn]="'Percentage'">Percentage (%)
+                <p-sortIcon [field]="Percentage"></p-sortIcon>
+              </th>
+              <th [pSortableColumn]="'StatusType'">Status
+                <p-sortIcon [field]="StatusType"></p-sortIcon>
+              </th>
+              <!-- <th>Action(s) </th> -->
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+            <tr>
+              <td class="text-left">{{row.ShedName}}</td>
+              <td class="text-left">{{row.BatchName}}</td>
+              <td class="textright" *ngIf="row.AgeinDays==0">{{row.AgeinWeeks}}</td>
+              <td class="textright" *ngIf="row.AgeinDays!=0">{{row.AgeinWeeks}} / {{row.AgeinDays}}</td>
+              <td class="textright">{{row.OpeningBirds |currency}}</td>
+              <td class="textright" *ngIf="!row.isEditingvisitlog">{{row.Died |currency}}</td>
+              <td class="textright" *ngIf="row.isEditingvisitlog">
+                <input type="text" class="form-control" [(ngModel)]="row.Died" (keypress)="onlyNumber(event)">
+              </td>
+              <td class="textright" *ngIf="!row.isEditingvisitlog">{{row.Hurt |currency}}</td>
+              <td class="textright" *ngIf="row.isEditingvisitlog">
+                <input type="text" class="form-control" [(ngModel)]="row.Hurt" (keypress)="onlyNumber(event)">
+              </td>
+
+              <td class="textright">{{row.RemainingBirds | currency}}</td>
+              <td class="textright">
+                <input *ngIf="row.isEditingvisitlog" type="text" class="form-control" [(ngModel)]="row.Feed"
+                  (keypress)="onlyNumber(event)">
+                <span *ngIf="!row.isEditingvisitlog">{{row.Feed}}</span>
+              </td>
+              <td class="textright">{{row.TotalEggs |currency}}</td>
+              <td class="textright">
+                <input *ngIf="row.isEditingvisitlog && !reg.ShedType==ChickShed" type="text" class="form-control"
+                  [(ngModel)]="row.DamagedEggs" (keypress)="onlyNumber(event)">
+                <span *ngIf="!row.isEditingvisitlog">{{row.DamagedEggs |currency}}</span>
+              </td>
+              <td class="textright">
+                <input *ngIf="row.isEditingvisitlog && !reg.ShedType==ChickShed" type="text" class="form-control"
+                  [(ngModel)]="row.NumberofEggs" (keypress)="onlyNumber(event)">
+                <span *ngIf="!row.isEditingvisitlog">{{row.NumberofEggs |currency}}</span>
+              </td>
+              <td class="textright">{{row.Percentage}}</td>
+              <td class="text-left">{{row.StatusType}}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer" *ngIf='reg.logs.length>0'>
+            <tr>
+              <td style="border-right:0px !important"></td>
+              <td></td>
+              <td class="textright">Total</td>
+              <td class="textright">{{reg?.Summaries[0]?.OpeningBirds |currency}}</td>
+              <td class="textright">{{reg?.Summaries[0]?.Died |currency}}</td>
+              <td class="textright">{{reg?.Summaries[0]?.Hurt |currency}}</td>
+              <td class="textright">{{reg?.Summaries[0]?.RemainingBirds |currency}}</td>
+              <td class="textright">{{reg?.Summaries[0]?.Feed}}</td>
+              <td class="textright">{{reg?.Summaries[0]?.TotalEggs | currency}}</td>
+              <td class="textright">{{reg?.Summaries[0]?.DamagedEggs |currency}}</td>
+              <td class="textright">{{reg?.Summaries[0]?.NumberofEggs |currency}}</td>
+
+              <td class="textright" *ngIf='reg.Summaries[0].Percentage==null'>{{reg?.Summaries[0]?.Percentage}}</td>
+              <td class="textright" *ngIf='reg.Summaries[0].Percentage!=null'>{{reg?.Summaries[0]?.Percentage}}%</td>
+              <td></td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage" let-columns>
+            <tr>
+              <td colspan="13" class="ui-datatable-emptymessage text-center">No Records Found</td>
+            </tr>
+          </ng-template>
+
+        </p-table>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+
+  </div>
+  <!-- Main Grid End -->
+</div>

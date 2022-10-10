@@ -1,0 +1,6 @@
+td,th {
+    text-align: left;
+} 
+tr{
+    cursor:pointer;
+}

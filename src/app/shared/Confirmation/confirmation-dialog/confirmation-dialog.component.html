@@ -1,0 +1,18 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title>Confirmation
+  </h2>
+</div>
+<mat-dialog-content>
+    <div>
+        <p [innerHTML]="data.msg"></p> 
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions class="pull-right">
+  <button class="btn btn-light text-dark" type="reset()" (click)="onCancelClick()">
+    <span matTooltip="Cancel">Cancel
+    </span>
+  </button>
+  <button class="btn btn-primary" type="submit" [mat-dialog-close]="data">
+    <span matTooltip="Ok">Ok</span>
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,1199 @@
+
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Batch Details</h3>
+    <div class="float-right ml-auto"
+      *ngIf="!isAddBatchDetails && !isEditBatchDetails  && !isAddCulbirds && !canMoveChicks && !isTransactionsView && !showVaccination && !isAddingBatchData">
+      <button type="button" class="btn btn-primary" title="Add Batch" data-toggle="tooltip" (click)="onAddBatchClick()"
+        *ngIf="ActivityRights.CanManageBatchDetails">
+        Add Batch Details
+      </button>
+      <button type="button" class="btn btn-primary" title="Export" data-toggle="tooltip" (click)="download()"
+        [disabled]='!(batchDetailsList?.length>0)'>Export</button>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <!--delete Batch or culbirds -->
+  <div class="purchase-popup" *ngIf="isAddCulbirds">
+    <div class="header text-primary mb-2">
+      <h4>Dispose Batch</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div>
+      <form [formGroup]="addCulbirds">
+        <div class="row">
+          <mat-form-field class="col-md-3">
+            <input matInput [matDatepicker]="Datepicker" placeholder="Cull Date" [max]="curDate"
+              (dateChange)="onCullDateChange()" [(ngModel)]="cullBirdDate" formControlName="cullBirdDate">
+            <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+            <mat-datepicker #Datepicker></mat-datepicker>
+            <mat-error>
+              <span *ngIf="!addCulbirds.get('cullBirdDate').valid && addCulbirds.get('cullBirdDate').touched">
+                <span *ngIf="addCulbirds.controls['cullBirdDate'].hasError('required') ">
+                  Please select date
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Batch #" formControlName="Batch" [(ngModel)]="batchDetails.Name" readonly>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput placeholder="Total Birds" formControlName="totalBirds" [(ngModel)]="totalBirds" readonly>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <mat-select placeholder=" Disposed Type" formControlName="disposeTypeId"
+              (selectionChange)="onSelectDisposeType($event.value)" required>
+              <mat-option *ngFor="let dispose of disposeTypes" [value]="dispose.TypeCdId">
+                {{dispose.Desc}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="addCulbirds.get('disposeTypeId').invalid && addCulbirds.get('disposeTypeId').touched">
+                <span *ngIf="addCulbirds.controls['disposeTypeId'].hasError('required') ">
+                  Please Select Income/Expense Type
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3" *ngIf="isCulling">
+            <input matInput placeholder="Cost Per Kg" formControlName="CostPerKg" (keypress)="onlyNumber(event)"
+              (input)="onCostChange($event.target.value)">
+            <mat-error>
+              <span *ngIf="!addCulbirds.get('CostPerKg').valid && addCulbirds.get('CostPerKg').touched">
+                <span *ngIf="addCulbirds.controls['CostPerKg'].hasError('required') ">
+                  Please enter Cost Per Kg
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3" *ngIf="isCulling">
+            <input matInput placeholder="Total Weight(Kgs)" formControlName="TotalWeight"
+              (input)="onTotalWeightChange($event.target.value)">
+            <mat-error>
+              <span *ngIf="!addCulbirds.get('TotalWeight').valid && addCulbirds.get('TotalWeight').touched">
+                <span *ngIf="addCulbirds.controls['TotalWeight'].hasError('required') ">
+                  Please enter Weight
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3" *ngIf="isCulling">
+            <input matInput placeholder="Total Amount" formControlName="totalAmount" required readonly>
+            <mat-error>
+              <span *ngIf="!addCulbirds.get('totalAmount').valid && addCulbirds.get('totalAmount').touched">
+                <span *ngIf="addCulbirds.controls['totalAmount'].hasError('required') ">
+                  Please enter Weight
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3" *ngIf="isSale">
+            <input matInput placeholder="Total Amount" formControlName="totalAmount" required>
+            <mat-error>
+              <span *ngIf="!addCulbirds.get('totalAmount').valid && addCulbirds.get('totalAmount').touched">
+                <span *ngIf="addCulbirds.controls['totalAmount'].hasError('required') ">
+                  Please enter Weight
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="clearfix"></div>
+      </form>
+      <form [formGroup]="disposeBatchForm">
+        <div formArrayName="items" *ngFor="let item of disposeBatchForm.controls['items']['controls']; let i = index">
+          <div [formGroupName]="i">
+            <div class="row">
+              <mat-form-field class="col-12 col-sm-6 col-md-2">
+                <input matInput placeholder="Shed #" readonly formControlName="ShedName">
+              </mat-form-field>
+              <!-- <mat-form-field class="col-12 col-sm-6 col-md-2">
+                              <input matInput placeholder="Shed Capacity" readonly formControlName="ShedCapacity">
+                          </mat-form-field> -->
+              <mat-form-field class="col-12 col-sm-6 col-md-2">
+                <input matInput placeholder="Available Limit" readonly formControlName="AvailableBirds">
+              </mat-form-field>
+              <mat-form-field class="col-12 col-sm-6 col-md-2">
+                <input matInput placeholder="Birds Count" required formControlName="ChicksCount">
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="form-group">
+          <div class="float-right mt-2">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleCulbirds()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="onAddCullbirds();clicked=true" [disabled]="clicked">Save</button>
+          </div>
+          <!-- <div class="row float-right">
+                    <button type="submit" class="btn btn-success" (click)="onSaveMovingBirds()" [disabled]="!isEnableSave">[disabled]="!addCulbirds.valid"
+                        &nbsp;&nbsp;Save</button>
+                    <button type="button" class="btn btn-primary" (click)="onCancleCulbirds()">Cancel</button>
+                </div> -->
+        </div>
+        <div class="clearfix"></div>
+      </form>
+    </div>
+  </div>
+  <!-- endCulbird -->
+  <div class="purchase-popup" *ngIf="isAddBatchDetails">
+    <div class="header text-primary mb-2">
+      <h4>Add New Batch Details</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div>
+      <form [formGroup]="addBatchDetails">
+        <div class="row">
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder="Batch #" formControlName="batchName">
+            <mat-error>
+              <span *ngIf="!addBatchDetails.get('batchName').valid && addBatchDetails.get('batchName').touched">
+                <span *ngIf="addBatchDetails.controls['batchName'].hasError('required') ">
+                  Please enter batch name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3 col-12">
+            <mat-select placeholder="Select Hatchery" formControlName="hatcheryName">
+              <mat-option *ngFor="let hatchery of filteredHatcheries" [value]="hatchery.Id">
+                {{hatchery.HatcheryName}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="!addBatchDetails.get('hatcheryName').valid && addBatchDetails.get('hatcheryName').touched">
+                <span *ngIf="addBatchDetails.controls['hatcheryName'].hasError('required') ">
+                  Please select Hatchery
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder="Birds Count" formControlName="chickCount" (keypress)="onlyNumber(event)">
+            <mat-error>
+              <span *ngIf="!addBatchDetails.get('chickCount').valid && addBatchDetails.get('chickCount').touched">
+                <span *ngIf="addBatchDetails.controls['chickCount'].hasError('required') ">
+                  Please enter Birds count
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder="Amount (Rs)" formControlName="amount" (keypress)="onlyNumber(event)" required>
+            <mat-error>
+              <span *ngIf="!addBatchDetails.get('amount').valid && addBatchDetails.get('amount').touched">
+                <span *ngIf="addBatchDetails.controls['amount'].hasError('required') ">
+                  Please enter Amount
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput [matDatepicker]="Datepicker" placeholder="Start Date" formControlName="startDate"
+              [(ngModel)]="selectedDate" [max]="curDate" required>
+            <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+            <mat-datepicker #Datepicker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <input matInput [matDatepicker]="Transitiondate" placeholder="Transition Date"
+              formControlName="transactionDate" [(ngModel)]="selectedTransdate" [max]="curDate" required>
+            <mat-datepicker-toggle matSuffix [for]="Transitiondate"></mat-datepicker-toggle>
+            <mat-datepicker #Transitiondate></mat-datepicker>
+            <mat-error>
+              <span
+                *ngIf="!addBatchDetails.get('transactionDate').valid && addBatchDetails.get('transactionDate').touched">
+                <span *ngIf="addBatchDetails.controls['transactionDate'].hasError('required') ">
+                  Please select Transition Date
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3">
+            <mat-select placeholder="Select Shed Type" formControlName="shedTypeId"
+              (selectionChange)="onSelectShedType($event.value)" required>
+              <mat-option *ngFor="let shed of shedTypes" [value]="shed.TypeCdId">
+                {{shed.Desc}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="!addBatchDetails.get('shedTypeId').valid && addBatchDetails.get('shedTypeId').touched">
+                <span *ngIf="addBatchDetails.controls['shedTypeId'].hasError('required') ">
+                  Please select Shed Type
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-checkbox class="col-md-2" style="margin-top: 21px;" formControlName="isActive">IsActive</mat-checkbox>
+        </div>
+        <div class="clearfix"></div>
+        <!-- <div class="form-group">
+          <div class="ml-auto float-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleBatchAdding()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="!addBatchDetails.valid"
+              (click)="onSave(addUpdatebatchObj)">Save</button>
+          </div>
+        </div> -->
+      </form>
+      <form [formGroup]="addShedForm">
+        <div *ngIf="isShedDetails">
+          <div formArrayName="items" *ngFor="let item of addShedForm.controls['items']['controls']; let i = index">
+            <div [formGroupName]="i">
+              <div class="row">
+                <mat-form-field class="col-xs-12 col-sm-6 col-md-2">
+                  <input matInput placeholder="Shed #" readonly formControlName="ShedName">
+                </mat-form-field>
+                <mat-form-field class="col-xs-12 col-sm-6 col-md-2">
+                  <input matInput placeholder="Shed Capacity" readonly formControlName="ShedCapacity">
+                </mat-form-field>
+                <mat-form-field class="col-xs-12 col-sm-6 col-md-2">
+                  <input matInput placeholder="Available Limit" readonly formControlName="AvailableChicksCount">
+                </mat-form-field>
+
+                <mat-form-field class="col-xs-12 col-sm-6 col-md-2">
+                  <input matInput placeholder="Birds Count" required formControlName="ChicksCount"
+                    (input)="onChange($event.target.value)" (keypress)="onlyNumber(event)">
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ln_solid"></div>
+        <div class="form-group">
+          <div class="float-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleBatchAdding()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="onSave();clicked=true"
+              [disabled]="((!addBatchDetails.valid)  || (!isEnableShedSave)) || clicked">Save</button>
+          </div>
+        </div>
+      </form>
+      <div class="clearfix"></div>
+    </div>
+  </div>
+  <div class="row"
+    *ngIf="!isAddBatchDetails && !isEditBatchDetails && !isAddCulbirds && !canMoveChicks && !isTransactionsView && !showVaccination && !isAddingBatchData">
+    <!-- <div class="pull-left" style="padding:4px 10px;border-bottom: 0 none;margin-bottom:10px;">
+          <input type="text" class="form-control" pInputText size="50" placeholder="Search"
+            (input)="dt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+        </div> -->
+    <!-- <div class="col-12"> 
+    <div class="d-flex align-items-center purchase-popup">
+      
+    </div>
+  </div> -->
+    <section class="col-12">
+      <div class="row">
+        <div class="col-12">
+          <nav class="nav text-center bg-white">
+            <div class="nav nav-tabs " id="nav-tab" role="tablist">
+              <a class="nav-item nav-link active" id="pop1-tab" data-toggle="tab" href="#pop1" role="tab"
+                aria-controls="pop1" aria-selected="true">Active Batches</a>
+              <a class="nav-item nav-link" id="pop2-tab" data-toggle="tab" href="#pop2" role="tab" aria-controls="pop2"
+                aria-selected="false">Inactive Batches</a>
+            </div>
+          </nav>
+          <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="pop1" role="tabpanel" aria-labelledby="pop1-tab">
+              <div class="float-right">
+                <button class="btn btn-primary " (click)="toggleFilter()"
+                  [disabled]="!(!isFiltersEnabled && activeBatches.length>0 )">
+                  {{filterTooltip}}
+                </button>&nbsp;&nbsp;
+                <button class="btn btn-warning " (click)="toggleFilter()"
+                  *ngIf="isFiltersEnabled && activeBatches.length>0 ">
+                  {{filterTooltip}}
+                </button>
+              </div>
+              <div class="pt-5"></div>
+              <p-table #ac [value]="activeBatches" dataKey="Id" [tableStyle]="{'table-layout':'auto'}"
+                [resizableColumns]="true" columnResizeMode="expand" rowExpandMode="single" expandableRows="true">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th style="width: 3em"></th>
+                    <th [pSortableColumn]="'Name'"><span class="d-inline-flex">Batch&nbsp;#
+                        <p-sortIcon [field]="'Name'"></p-sortIcon></span>
+                    </th>
+                    <th [pSortableColumn]="'HatcheryName'">Hatchery
+                      <p-sortIcon [field]="'HatcheryName'"></p-sortIcon>
+                    </th>
+                    <th [pSortableColumn]="'BatchStartDate'">Batch Start <span class="d-inline-flex">Date
+                        <p-sortIcon [field]="'BatchStartDate'"></p-sortIcon></span>
+                    </th>
+                    <th [pSortableColumn]="'TransactionDate'">Transaction <span class="d-inline-flex">Date
+                        <p-sortIcon [field]="'TransactionDate'"></p-sortIcon></span>
+                    </th>
+                    <th [pSortableColumn]="'Amount'">Amount <span class="d-inline-flex">(Rs)
+                        <p-sortIcon [field]="'Amount'"></p-sortIcon></span>
+                    </th>
+                    <th [pSortableColumn]="'Age'"><span class="d-inline-flex">Age
+                        <p-sortIcon [field]="'Age'"></p-sortIcon></span>
+                    </th>
+                    <th [pSortableColumn]="'ChicksCount'">Birds <span class="d-inline-flex">Count
+                        <p-sortIcon [field]="'ChicksCount'"></p-sortIcon></span>
+                    </th>
+                    <th [pSortableColumn]="'AvailableBirds'">Available <span class="d-inline-flex">Birds
+                        <p-sortIcon [field]="'AvailableBirds'"></p-sortIcon></span>
+                    </th>
+                    <th [pSortableColumn]="'ShedType'">Shed <span class="d-inline-flex">Type
+                        <p-sortIcon [field]="'ShedType'"></p-sortIcon></span>
+                    </th>
+                    <!-- <th [pSortableColumn]="'IsActive'">Active
+                                          <p-sortIcon [field]="IsActive"></p-sortIcon>
+                                        </th> -->
+                    <th>Action(s)</th>
+                  </tr>
+                  <tr *ngIf="isFiltersEnabled">
+                    <th></th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="ac.filter($event.target.value, 'Name', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="ac.filter($event.target.value, 'HatcheryName', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="ac.filter($event.target.value, 'BatchStartDate', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="ac.filter($event.target.value, 'TransactionDate', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="ac.filter($event.target.value, 'Amount', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="ac.filter($event.target.value, 'Age', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="ac.filter($event.target.value, 'ChicksCount', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="ac.filter($event.target.value, 'AvailableBirds', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="ac.filter($event.target.value, 'ShedType', 'contains')">
+                    </th>
+                    <th></th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-row let-expanded="expanded">
+                  <tr>
+                    <td>
+                      <a [pRowToggler]="row"
+                        (click)="GetBirdsCount(row,expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right')">
+                        <i [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+                      </a>
+                    </td>
+                    <td>{{row.Name}}</td>
+                    <td>{{row.HatcheryName}}</td>
+                    <td>{{row.BatchStartDate | date:'dd/MM/yyyy'}}</td>
+                    <td>{{row.TransactionDate | date:'dd/MM/yyyy'}}</td>
+                    <td>{{row.Amount | currency}}</td>
+                    <!-- <td class="textright">{{row.Age}}</td> -->
+                    <td *ngIf="row.AgeinDays==0">{{row.AgeinWeeks}}</td>
+                    <td *ngIf="row.AgeinDays!=0">{{row.AgeinWeeks}}/{{row.AgeinDays}}</td>
+                    <td class="textright">{{row.ChicksCount | currency}}</td>
+                    <td class="textright">{{row.AvailableBirds |currency}}</td>
+                    <td>{{row.ShedType}}</td>
+                    <!-- <td>{{row.IsActive}}</td> -->
+                    <td>
+                      <div class="float-left" *ngIf="ActivityRights.CanManageBatchDetails">
+                        <button type="button" class="btn btn-primary btn-xs" title="Edit" data-toggle="tooltip"
+                          (click)="onEditBatchDetailsClick(row)">
+                          <i class="mdi mdi-table-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-primary btn-xs" title="View Transactions"
+                          data-toggle="tooltip" (click)="onTransitionsView(row)">
+                          <i class="mdi mdi-eye"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-xs" title="Dispose" data-toggle="tooltip"
+                          (click)="onDisposeClick(row)" *ngIf="row.AvailableBirds != null">
+                          <i class="mdi mdi-block-helper"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-xs" title="Add Vaccination"
+                          data-toggle="tooltip" (click)="onAddVaccinClick(row)">
+                          <i class="mdi mdi-needle" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="btn btn-primary btn-xs" title="Add Batch" data-toggle="tooltip"
+                          (click)="addBatchData(row)">
+                          <i class="mdi mdi-plus" aria-hidden="true"></i>
+                        </button>
+                        <!-- <button type="button" class="btn btn-danger btn-xs" title="Dispose" data-toggle="tooltip"
+                                               (click)="onDisposeClick(row)" *ngIf="row.ShedTypeId==ShedTypes.LayerShed" [disabled]='!row.IsActive'> 
+                                              <i class="fa fa-ban"></i>
+                                            </button>&nbsp; -->
+                        <!-- <button type="button" class="btn btn-primary btn-xs" title="Move Batch to Chick Shed" data-toggle="tooltip"
+                                              (click)="onMoveChicks(row)" *ngIf="row.ShedTypeId==null && row.IsActive">
+                                              <i class="fa fa-arrows-alt"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-primary btn-xs" title="Move Batch to Grower Shed" data-toggle="tooltip"
+                                              (click)="onMoveChicks(row)" *ngIf="row.ShedTypeId==ShedTypes.ChickShed && row.IsActive">
+                                              <i class="fa fa-arrows-alt"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-primary btn-xs" title="Move Batch to Layer Shed" data-toggle="tooltip"
+                                              (click)="onMoveChicks(row)" *ngIf="row.ShedTypeId==ShedTypes.GrowerShed && row.IsActive">
+                                              <i class="fa fa-arrows-alt"></i>
+                                            </button> -->
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="rowexpansion">
+                  <tr>
+                    <td [attr.colspan]="11">
+                      <p-table #dt1 [responsive]="true" [value]="birdsCount" [tableStyle]="{'table-layout':'auto'}"
+                        [resizableColumns]="true" columnResizeMode="expand">
+                        <ng-template pTemplate="header">
+                  <tr>
+                    <th class="product-id" [pSortableColumn]="'ShedName'">Shed #
+                      <p-sortIcon [field]="'ShedName'"></p-sortIcon>
+                    </th>
+                    <th class="product-id" [pSortableColumn]="'ChicksCount'">Birds Count
+                      <p-sortIcon [field]="'ChicksCount'"></p-sortIcon>
+                    </th>
+                    <th [pSortableColumn]="'AvailableBirds'">Available Birds
+                      <p-sortIcon [field]="AvailableBirds"></p-sortIcon>
+                    </th>
+                    <th>Actions</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-expanded="expanded" let-rowdata>
+                  <tr>
+                    <td>{{rowdata.ShedName}}</td>
+                    <td>{{rowdata.ChicksCount | currency}}</td>
+                    <td>{{rowdata.CurrentChicksCount |currency}}</td>
+                    <td class="align:center">
+                      <div *ngIf="ActivityRights.CanManageBatchDetails">
+                        <button type="button" class="btn btn-primary btn-xs" title="Move" data-toggle="tooltip"
+                          (click)="onChangeShed(rowdata,rowdata.ShedTypeId)">
+                          <i class="mdi mdi-arrow-all"></i>
+                        </button>
+                        <button type="button" class="btn btn-primary btn-xs" title="Move Batch to Chick Shed"
+                          data-toggle="tooltip" (click)="onChangeShed(rowdata,ShedTypes.ChickShed)"
+                          *ngIf="rowdata.ShedTypeId==null">
+                          <i class="mdi mdi-arrow-expand-all"></i>
+                        </button>
+                        <button type="button" class="btn btn-primary btn-xs" title="Move Batch to Grower Shed"
+                          data-toggle="tooltip" (click)="onChangeShed(rowdata,ShedTypes.GrowerShed)"
+                          *ngIf="rowdata.ShedTypeId==ShedTypes.ChickShed">
+                          <i class="mdi mdi-arrow-expand-all"></i>
+                        </button>
+                        <button type="button" class="btn btn-primary btn-xs" title="Move Batch to Layer Shed"
+                          data-toggle="tooltip" (click)="onChangeShed(rowdata,ShedTypes.LayerShed)"
+                          *ngIf="rowdata.ShedTypeId==ShedTypes.GrowerShed">
+                          <i class="mdi mdi-arrow-expand-all"></i>
+                        </button>
+                      </div>
+
+                    </td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage" let-columns>
+                  <tr *ngIf="chickTransitions == 0">
+                    <td colspan="6" class="ui-datatable-emptymessage text-center">No Records Found</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+              </td>
+              </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage" let-columns>
+                <tr>
+                  <td colspan="11" class="ui-datatable-emptymessage text-center">No Records Found</td>
+                </tr>
+              </ng-template>
+              </p-table>
+            </div>
+            <div class="tab-pane fade" id="pop2" role="tabpanel" aria-labelledby="pop2-tab">
+              <div class="float-right">
+                <button class="btn btn-primary " (click)="toggle()"
+                  [disabled]="!(!isFiltersEnable && inActiveBatches.length>0) ">
+                  {{Tooltip}}
+                </button>&nbsp;&nbsp;
+                <button class="btn btn-warning " (click)="toggle()"
+                  *ngIf="isFiltersEnable && inActiveBatches.length>0 ">
+                  {{Tooltip}}
+                </button>
+              </div>
+              <div class="pt-5"></div>
+              <p-table #in [value]="inActiveBatches" dataKey="Id" rowExpandMode="single" expandableRows="true"
+                [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th style="width: 3em"></th>
+                    <th [pSortableColumn]="'Name'">Batch #
+                      <p-sortIcon [field]="'Name'"></p-sortIcon>
+                    </th>
+                    <th [pSortableColumn]="'HatcheryName'">Hatchery
+                      <p-sortIcon [field]="'HatcheryName'"></p-sortIcon>
+                    </th>
+                    <th [pSortableColumn]="'BatchStartDate'">Batch Start <span class="d-inline-flex">Date
+                        <p-sortIcon [field]="'BatchStartDate'"></p-sortIcon></span>
+                    </th>
+                    <th [pSortableColumn]="'TransactionDate'">Transaction Date
+                      <p-sortIcon [field]="'TransactionDate'"></p-sortIcon>
+                    </th>
+                    <th [pSortableColumn]="'Amount'">Amount (Rs)
+                      <p-sortIcon [field]="'Amount'"></p-sortIcon>
+                    </th>
+                    <th [pSortableColumn]="'Age'">Age
+                      <p-sortIcon [field]="'Age'"></p-sortIcon>
+                    </th>
+                    <th [pSortableColumn]="'ChicksCount'">Birds Count
+                      <p-sortIcon [field]="'ChicksCount'"></p-sortIcon>
+                    </th>
+                    <th [pSortableColumn]="'AvailableBirds'">Available <span class="d-inline-flex">Birds
+                        <p-sortIcon [field]="'AvailableBirds'"></p-sortIcon></span>
+                    </th>
+                    <!-- <th [pSortableColumn]="'ShedType'">Shed Type
+                                          <p-sortIcon [field]="ShedType"></p-sortIcon>
+                                        </th> -->
+                    <!-- <th [pSortableColumn]="'IsActive'">Active
+                                          <p-sortIcon [field]="IsActive"></p-sortIcon>
+                                        </th> -->
+                    <!-- <th>Actions</th> -->
+                  </tr>
+                  <tr *ngIf="isFiltersEnable">
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="in.filter($event.target.value, 'Name', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="in.filter($event.target.value, 'HatcheryName', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="in.filter($event.target.value, 'BatchStartDate', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="in.filter($event.target.value, 'TransactionDate', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="in.filter($event.target.value, 'Amount', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="in.filter($event.target.value, 'AgeinWeeks', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="in.filter($event.target.value, 'AgeinWeeks/AgeinDays', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="in.filter($event.target.value, 'ChicksCount', 'contains')">
+                    </th>
+                    <th>
+                      <input type="text" class="form-control" maxlength="50"
+                        (input)="in.filter($event.target.value, 'AvailableBirds', 'contains')">
+                    </th>
+
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-row let-expanded="expanded">
+                  <tr>
+                    <td>
+                      <a [pRowToggler]="row"
+                        (click)="GetBatchInfo(row,expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right')">
+                        <i [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+                      </a>
+                    </td>
+                    <td>{{row.Name}}</td>
+                    <td>{{row.HatcheryName}}</td>
+                    <td>{{row.BatchStartDate | date:'dd/MM/yyyy'}}</td>
+                    <td>{{row.TransactionDate | date:'dd/MM/yyyy'}}
+                    <td>{{row.Amount | currency}}</td>
+                    <!-- <td class="textright">{{row.Age}}</td> -->
+                    <td *ngIf="row.AgeinDays==0">{{row.AgeinWeeks}}</td>
+                    <td *ngIf="row.AgeinDays!=0">{{row.AgeinWeeks}}/{{row.AgeinDays}}</td>
+                    <td class="textright">{{row.ChicksCount | currency}}</td>
+                    <td class="textright">{{row.AvailableBirds |currency}}</td>
+                    <!-- <td>{{row.ShedType}}</td>
+                                        <td>{{row.IsActive}}</td> -->
+                    <!-- <td>
+                                          <div *ngIf="ActivityRights.CanManageBatchDetails">
+                                            <button type="button" class="btn btn-primary btn-xs" title="Edit" data-toggle="tooltip"
+                                              (click)="onEditBatchDetailsClick(row)">
+                                              <i class="fa fa-edit"></i>
+                                            </button>&nbsp;
+                                            <button type="button" class="btn btn-danger btn-xs" title="Delete" data-toggle="tooltip"
+                                              [disabled]='!row.IsActive' (click)="onDeleteBatchDetailsClick(row)">
+                                              <i class="fa fa-trash"></i>
+                                            </button>&nbsp;
+                                            <button type="button" class="btn btn-primary btn-xs" title="Move Batch to Chick Shed"
+                                              data-toggle="tooltip" (click)="onMoveChicks(row)" *ngIf="row.ShedTypeId==null && row.IsActive">
+                                              <i class="fa fa-arrows-alt"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-primary btn-xs" title="Move Batch to Grower Shed"
+                                              data-toggle="tooltip" (click)="onMoveChicks(row)"
+                                              *ngIf="row.ShedTypeId==ShedTypes.ChickShed && row.IsActive">
+                                              <i class="fa fa-arrows-alt"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-primary btn-xs" title="Move Batch to Layer Shed"
+                                              data-toggle="tooltip" (click)="onMoveChicks(row)"
+                                              *ngIf="row.ShedTypeId==ShedTypes.GrowerShed && row.IsActive">
+                                              <i class="fa fa-arrows-alt"></i>
+                                            </button>
+                                          </div>
+                                        </td> -->
+                    <!-- <td>
+                                <mat-checkbox class="col-md-2" style="margin-top: 21px;"  binary="true"
+                                  (change)="checkValue(row)" [(ngModel)]="row.IsActive">Make Active</mat-checkbox>
+                                
+                              </td> -->
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="rowexpansion">
+                  <tr>
+                    <td [attr.colspan]="9">
+                      <p-table #dt1 [responsive]="true" [value]="chickTransitions"
+                        [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand">
+                        <ng-template pTemplate="header">
+                  <tr>
+                    <th class="product-id" [pSortableColumn]="'ShedName'">Shed #
+                      <p-sortIcon [field]="'ShedName'"></p-sortIcon>
+                    </th>
+                    <th class="product-id" [pSortableColumn]="'ChicksCount'">Birds Count
+                      <p-sortIcon [field]="'ChicksCount'"></p-sortIcon>
+                    </th>
+                    <th class="product-id" [pSortableColumn]="'CurrentChicksCount'">Available Birds Count
+                      <p-sortIcon [field]="'ChicksCount'"></p-sortIcon>
+                    </th>
+                    <th class="product-id" [pSortableColumn]="'TransitionDate'">Transition Date
+                      <p-sortIcon [field]="'TransitionDate'"></p-sortIcon>
+                    </th>
+                    <th class="product-id" [pSortableColumn]="'IsActive'">Active
+                      <p-sortIcon [field]="'IsActive'"></p-sortIcon>
+                    </th>
+                    <th class="product-id" [pSortableColumn]="'CreatedBy'">Created By
+                      <p-sortIcon [field]="'CreatedBy'"></p-sortIcon>
+                    </th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-expanded="expanded" let-rowdata>
+                  <tr>
+                    <td>{{rowdata.ShedName}}</td>
+                    <td>{{rowdata.ChicksCount}}</td>
+                    <td>{{rowdata.CurrentChicksCount}}</td>
+                    <td>{{rowdata.TransitionDate | date:'dd/MM/yyyy'}}</td>
+                    <td>{{rowdata.IsActive}}</td>
+                    <td>{{rowdata.CreatedBy}}</td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage" let-columns>
+                  <tr *ngIf="chickTransitions == 0">
+                    <td colspan="9" class="ui-datatable-emptymessage text-center">No Records Found</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+              </td>
+              </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage" let-columns>
+                <tr>
+                  <td colspan="10" class="ui-datatable-emptymessage text-center">No Records Found</td>
+                </tr>
+              </ng-template>
+              </p-table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="purchase-popup" *ngIf="isEditBatchDetails">
+    <div class="header text-primary mb-2">
+      <h4>Update Batch Details</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div>
+      <form [formGroup]="editBatchDetails">
+        <div class="row">
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder="Batch Name" formControlName="batchName" [(ngModel)]="rowData.Name">
+            <mat-error>
+              <span *ngIf="!editBatchDetails.get('batchName').valid && editBatchDetails.get('batchName').touched">
+                <span *ngIf="editBatchDetails.controls['batchName'].hasError('required') ">
+                  Please enter batch name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <!-- <mat-form-field class="col-md-3">
+            <input matInput [matDatepicker]="picker" placeholder="Date(Batch Starting Date)" [(ngModel)]="currentDate"
+              [ngModelOptions]="{standalone: true}">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field> -->
+          <mat-form-field class="col-md-3 col-12">
+            <mat-select placeholder="Select Hatchery" formControlName="hatcheryName" [(ngModel)]="rowData.HatcheryId">
+              <mat-option *ngFor="let hatchery of filteredHatcheries" [value]="hatchery.Id">
+                {{hatchery.HatcheryName}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="!editBatchDetails.get('hatcheryName').valid && editBatchDetails.get('hatcheryName').touched">
+                <span *ngIf="editBatchDetails.controls['hatcheryName'].hasError('required') ">
+                  Please select Hatchery
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+
+          <!-- <mat-form-field class="col-md-3">
+            <mat-select placeholder="Select Hatchery" formControlName="hatcheryName">
+              <mat-option *ngFor="let hatchery of filteredHatcheries" [value]="hatchery.Id">
+                {{hatchery.HatcheryName}}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="!editBatchDetails.get('hatcheryName').valid && editBatchDetails.get('hatcheryName').touched">
+                <span *ngIf="editBatchDetails.controls['hatcheryName'].hasError('required') ">
+                  Please select Hatchery 
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field> -->
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder="Birds Count" formControlName="chickCount" (keypress)="onlyNumber(event)"
+              [(ngModel)]="rowData.ChicksCount">
+            <mat-error>
+              <span *ngIf="!editBatchDetails.get('chickCount').valid && editBatchDetails.get('chickCount').touched">
+                <span *ngIf="editBatchDetails.controls['chickCount'].hasError('required') ">
+                  Please enter Birds count
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-3 col-12">
+            <input matInput placeholder="Amount (Rs)" formControlName="amount" (keypress)="onlyNumber(event)" required
+              [(ngModel)]="rowData.Amount">
+            <mat-error>
+              <span *ngIf="!editBatchDetails.get('amount').valid && editBatchDetails.get('amount').touched">
+                <span *ngIf="editBatchDetails.controls['amount'].hasError('required') ">
+                  Please enter Amount
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <!-- <input matInput [matDatepicker]="picker" placeholder="From Date" [(ngModel)]="FROMDATE" readonly [max]="date" formControlName="fromDate"
+            required> -->
+            <input matInput [matDatepicker]="Datepicker" placeholder="Start Date" formControlName="startDate"
+              [max]="curDate" [(ngModel)]="rowData.BatchStartDate" required>
+            <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+            <mat-datepicker #Datepicker></mat-datepicker>
+          </mat-form-field>
+          <mat-checkbox class="col-md-1 col-12" style="margin-top: 21px;" formControlName="isActive"
+            [(ngModel)]="rowData.IsActive">IsActive</mat-checkbox>
+        </div>
+        <div class="clearfix"></div>
+        <div class="form-group">
+          <div class="ml-auto float-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleBatchEditing()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="onUpdateBAtch();clicked=true"
+              [disabled]="!editBatchDetails.valid || !editBatchDetails.dirty || clicked">Update</button>
+          </div>          
+        </div>
+      </form>
+      <div class="clearfix"></div>
+    </div>
+  </div>
+
+  <div class="purchase-popup" *ngIf="canMoveChicks">
+    <div class="header text-primary mb-2">
+      <h4>Move Birds</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div>
+      <div class="row">
+        <mat-form-field class="col-md-3 col-12">
+          <input matInput [matDatepicker]="Datepicker" placeholder="Date" [max]="curDate"
+            (dateChange)="onTransitionDateChange()" [(ngModel)]="selectedDate">
+          <mat-datepicker-toggle matSuffix [for]="Datepicker"></mat-datepicker-toggle>
+          <mat-datepicker #Datepicker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field class="col-md-3 col-12">
+          <input matInput placeholder="Batch #" [value]="selectedShed.BatchName" readonly required>
+        </mat-form-field>
+        <mat-form-field class="col-md-3 col-12">
+          <input matInput placeholder="Shed #" [value]="selectedShed.ShedName" readonly required>
+        </mat-form-field>
+        <mat-form-field class="col-md-3 col-12">
+          <input matInput placeholder="Shed Birds" [value]="selectedShed.CurrentChicksCount" readonly required>
+        </mat-form-field>
+      </div>
+
+      <form [formGroup]="addChickForm">
+        <div formArrayName="items" *ngFor="let item of addChickForm.controls['items']['controls']; let i = index">
+          <div [formGroupName]="i">
+            <div class="row">
+              <mat-form-field class="col-12 col-sm-6 col-md-2">
+                <input matInput placeholder="Shed #" readonly formControlName="ShedName">
+              </mat-form-field>
+              <mat-form-field class="col-12 col-sm-6 col-md-2">
+                <input matInput placeholder="Shed Capacity" readonly formControlName="ShedCapacity">
+              </mat-form-field>
+              <mat-form-field class="col-12 col-sm-6 col-md-2">
+                <input matInput placeholder="Available Limit" readonly formControlName="AvailableChicksCount">
+              </mat-form-field>
+              <mat-form-field class="col-12 col-sm-6 col-md-2">
+                <input matInput placeholder="Birds Count" required formControlName="ChicksCount"
+                  (input)="onBirdLimitChange($event.target.value,item)">
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="ln_solid"></div>
+        <div class="form-group">
+          <div class="float-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancelMovingBirds()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="onSaveMovingBirds()"
+              [disabled]="!isEnableSave">Save</button>
+          </div>
+        </div>
+      </form>
+      <div class="clearfix"></div>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+
+  <div class="purchase-popup" *ngIf="isTransactionsView">
+
+    <div class="row">
+      <div class="col-md-4">
+        <b>Batch # :</b> {{rowData.Name}}
+      </div>
+      <div class="col-md-4">
+        <b>Birds Count : </b> {{rowData.ChicksCount}}
+      </div>
+      <div class="col-md-4">
+        <b>Available Birds : </b> {{rowData.AvailableBirds}}
+      </div>
+    </div>
+    <br>
+    <div *ngIf="batchHistoryDetails.length > 0">
+      <div class="header text-primary mb-2">
+        <h4>Batch History</h4>
+        <div class="clearfix"></div>
+      </div>
+      <div>
+      <p-table [value]="batchHistoryDetails" sortField="ChicksCount" sortOrder="-1" [tableStyle]="{'table-layout':'auto'}"
+      [resizableColumns]="true" columnResizeMode="expand">
+      <ng-template pTemplate="header" class="table table-striped">
+        <tr>
+          <th [pSortableColumn]="'Name'"> Batch #
+            <p-sortIcon [field]="'Name'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'ChicksCount'">Chicks Count
+            <p-sortIcon [field]="'ChicksCount'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'Amount'">Amount(Rs)
+            <p-sortIcon [field]="'Amount'"></p-sortIcon>
+          </th>            
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowdata>
+        <tr>
+          <td>{{rowdata.Name}}</td>
+          <td>{{rowdata.ChicksCount}}</td>
+          <td>{{rowdata.Amount}}</td>            
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage" let-columns>
+        <tr>
+          <td colspan="3" class="ui-datatable-emptymessage text-center">No Records Found</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+    </div>
+<br>
+    <div class="clearfix"></div>
+    
+    <div class="header text-primary">
+      <h4>Batch Transactions</h4>
+      <div class="clearfix"></div>
+    </div>    
+    <div>     
+      <br>
+      <p-table [value]="chickTransitions" sortField="UpdatedDate" sortOrder="-1" [tableStyle]="{'table-layout':'auto'}"
+        [resizableColumns]="true" columnResizeMode="expand">
+        <ng-template pTemplate="header" class="table table-striped">
+          <tr>
+            <th [pSortableColumn]="'FromShedName'"> From Shed #
+              <p-sortIcon [field]="'FromShedName'"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'ShedName'">Shed #
+              <p-sortIcon [field]="'ShedName'"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'ChicksCount'">Birds Count
+              <p-sortIcon [field]="'ChicksCount'"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'TransitionDate'">Transition Date
+              <p-sortIcon [field]="'TransitionDate'"></p-sortIcon>
+            </th>
+            <!-- <th [pSortableColumn]="'FarmName'">Farm Name
+              <p-sortIcon [field]="FarmName"></p-sortIcon>
+            </th> -->
+            <th [pSortableColumn]="'Active'">Active
+              <p-sortIcon [field]="'Active'"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'CreatedBy'">Created By
+              <p-sortIcon [field]="'CreatedBy'"></p-sortIcon>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowdata>
+          <tr>
+            <td>{{rowdata.FromShedName}}</td>
+            <td>{{rowdata.ShedName}}</td>
+            <td>{{rowdata.ChicksCount}}</td>
+            <!-- <td>{{rowdata.CurrentChicksCount}}</td> -->
+            <td>{{rowdata.TransitionDate | date:'dd/MM/yyyy'}}</td>
+            <td>{{rowdata.IsActive}}</td>
+            <td>{{rowdata.CreatedBy}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage" let-columns>
+          <tr>
+            <td colspan="9" class="ui-datatable-emptymessage text-center">No Records Found</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <div class="ln_solid"></div>
+      <div class="form-group mt-2">
+        <div class="float-right">
+          <button type="button" class="btn btn-primary" (click)="onViewCancel()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="clearfix"></div>
+  </div>
+
+
+
+
+  <div class="purchase-popup" *ngIf="showVaccination">
+    <div class="header text-primary mb-2">
+      <h4>Vaccination Schedule</h4>
+      <div class="clearfix"></div>
+    </div>
+    <div>
+      <div class="row">
+        <div class="col-md-4">
+          <b>Batch # :</b> {{batchInfoDetails?.BatchName}}
+        </div>
+        <div class="col-md-4">
+          <b>Batch Start Date : </b> {{batchInfoDetails?.BatchStartDate |  date:'dd/MM/yyyy'}}
+        </div>
+        <div class="col-md-4">
+          <span *ngIf="batchInfo.AgeinDays==0"><b>Age : </b> {{batchInfo?.AgeinWeeks}}</span>
+          <span *ngIf="batchInfo.AgeinDays!=0"><b>Age : </b> {{batchInfo?.AgeinWeeks}}/{{batchInfo?.AgeinDays}}</span>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+      <p-table [value]="vaccinataionDeatls" sortField="UpdatedDate" sortOrder="-1"
+        [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand">
+        <ng-template pTemplate="header" class="table table-striped">
+          <tr>
+            <th [pSortableColumn]="'VaccinAge'"> Age
+              <p-sortIcon [field]="'VaccinAge'"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'VaccinationName'">Vaccination Name
+              <p-sortIcon [field]="'VaccinationName'"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'VaccineDay'">Vaccine Day
+              <p-sortIcon [field]="'VaccineDay'"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'DueDate'">Due Date
+              <p-sortIcon [field]="'DueDate'"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'VaccinatedDate'">Vaccination Date
+              <p-sortIcon [field]="'VaccinatedDate'"></p-sortIcon>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowdata>
+          <tr>
+            <td>{{rowdata.VaccinAge}}</td>
+            <td>{{rowdata.VaccinationName}}</td>
+            <td>{{rowdata.VaccineDay}}</td>
+            <td>{{rowdata.DueDate | date:'dd/MM/yyyy'}}</td>
+            <td>{{rowdata.VaccinatedDate | date:'dd/MM/yyyy'}}</td>
+            <td>
+              <button type="button" class="btn btn-primary btn-xs" title="Vaccin" data-toggle="tooltip"
+                (click)="onVaccinClick(rowdata)" *ngIf="rowdata.VaccinatedDate == null">
+                <i class="mdi mdi-thumb-up-outline"></i>
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage" let-columns>
+          <tr>
+            <td colspan="6" class="ui-datatable-emptymessage text-center">No Records Found</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <div class="clearfix"></div>
+      <div class="form-group mt-2">
+        <div class="float-right">
+          <button type="button" class="btn btn-primary" (click)="onViewScheduleCancel()">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+
+
+  <!-- Adding Chicks to Batch -->
+
+  <div class="purchase-popup" *ngIf="isAddingBatchData">
+    <div class="header text-primary mb-2">
+      <h4>Add Chicks to Batch </h4>
+      <div class="clearfix"></div>
+    </div>
+    <div>
+      <form [formGroup]="addingBatchData">
+        <div class="row">
+          <mat-form-field class="col-md-2">
+            <mat-select placeholder=" Shed Type" formControlName="shedTypeId"
+              (selectionChange)="onSelectShedType($event.value)" required [(ngModel)]="addRowData.ShedTypeId" [disabled]="true">
+              <mat-option *ngFor="let shed of shedTypes" [value]="shed.TypeCdId">
+                {{shed.Desc}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Available Chicks" formControlName="availableChicks" required [(ngModel)]="addRowData.AvailableBirds" readonly>            
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput [matDatepicker]="Datepicker1" placeholder="Transaction Date"
+              formControlName="transactionDate" [max]="curDate" required (dateChange)="onChangeDate()">
+            <mat-datepicker-toggle matSuffix [for]="Datepicker1"></mat-datepicker-toggle>
+            <mat-datepicker #Datepicker1></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Batch #" formControlName="batchName" required [(ngModel)]="addRowData.Name" readonly>            
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Chicks Count" formControlName="ChicksCount" required
+              (keypress)="onlyNumber(event)" maxlength="10">
+            <mat-error>
+              <span *ngIf="!addingBatchData.get('ChicksCount').valid && addingBatchData.get('ChicksCount').touched">
+                <span *ngIf="addingBatchData.controls['ChicksCount'].hasError('required') ">
+                  Please enter Chicks Count
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-md-2 col-12">
+            <input matInput placeholder="Amount" formControlName="amount" required maxlength="10"
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+            <mat-error>
+              <span *ngIf="!addingBatchData.get('amount').valid && addingBatchData.get('amount').touched">
+                <span *ngIf="addingBatchData.controls['amount'].hasError('required') ">
+                  Please enter Amount
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </form>      
+        <div class="clearfix"></div>
+        <form [formGroup]="addShedDataForm">
+          <div *ngIf="isAddShedDetails">
+            <div formArrayName="items" *ngFor="let item of addShedDataForm.controls['items']['controls']; let i = index">
+              <div [formGroupName]="i">
+                <div class="row">
+                  <mat-form-field class="col-xs-12 col-sm-6 col-md-2">
+                    <input matInput placeholder="Shed #" readonly formControlName="ShedName">
+                  </mat-form-field>
+                  <mat-form-field class="col-xs-12 col-sm-6 col-md-2">
+                    <input matInput placeholder="Shed Capacity" readonly formControlName="ShedCapacity">
+                  </mat-form-field>
+                  <mat-form-field class="col-xs-12 col-sm-6 col-md-2">
+                    <input matInput placeholder="Available Limit" readonly formControlName="AvailableChicksCount">
+                  </mat-form-field>
+  
+                  <mat-form-field class="col-xs-12 col-sm-6 col-md-2">
+                    <input matInput placeholder="Birds Count" required formControlName="ChicksCount"
+                      (input)="onChicksChange($event.target.value)" (keypress)="onlyNumber(event)">
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ln_solid"></div>
+        <div class="form-group">
+          <div class="ml-auto float-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleAddingBatchData()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="onSaveAddBatchData();;clicked=true"
+              [disabled]="((!addingBatchData.valid)|| (!isEnableAddingShedSave) || clicked) ">Save</button>
+          </div>
+          <div></div>
+        </div>
+        </form>       
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+  <!-- Adding Chicks to Batch -->
+
+</div>
+
+<p-dialog [(visible)]="isVaccine" styleClass="mydialog" modal="fade" [closable]="false"
+  [contentStyle]="{'width': '500px','overflow':'visible','height':'auto'}">
+  <p-header>
+    Vaccination Confirmation
+  </p-header>
+  <form [formGroup]="AddForm">
+    <mat-form-field class="col-md-12">
+      <input matInput [matDatepicker]="picker2" placeholder="Vaccine Date" readonly [max]="currentDate"
+        formControlName="date">
+      <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+      <mat-datepicker #picker2></mat-datepicker>
+    </mat-form-field>
+    <div class="col-md-12">
+      <p class="font-weight-bold">Are you sure Is Vaccination done ?</p>
+    </div>
+    <p-footer>
+      <div class="col-md-12">
+        <hr />
+      </div>
+      <div class="float-right">
+        <button class="btn btn-light text-dark" (click)="onAddCancelClick()">
+          <span matTooltip="Cancel">Cancel</span>
+        </button>
+        <button class="btn btn-primary" type="submit" (click)="onConfirmClick()">
+          <span matTooltip="Ok">Ok</span>
+        </button>
+        <!-- <p-button icon="pi pi-check" label="Yes" styleClass="ui-button-success" (onClick)="onSaveClick()"
+          [disabled]="!AddForm.valid"></p-button>&nbsp;&nbsp;
+        <p-button icon="pi pi-cross" label="Cancel" styleClass="ui-button-danger" icon="pi pi-times"
+          (onClick)="onAddCancelClick()"></p-button> -->
+      </div>
+    </p-footer>
+  </form>
+  <div class="clearfix"></div>
+</p-dialog>

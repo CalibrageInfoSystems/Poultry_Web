@@ -1,0 +1,274 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Role Details</h3>
+    <div class="float-right ml-auto" *ngIf="!isAddRoleDetails && !isEditRoleDetails">
+      <button type="button" class="btn btn-primary" title="Add New Role" data-toggle="tooltip" (click)="onAddRoleClick()" *ngIf="ActivityRights.CanManageRoleInfo">
+        Add New Role
+      </button>
+      <button type="button" class="btn btn-primary" title="Export" data-toggle="tooltip" (click)="download()">
+        Export
+      </button>
+      <button class="btn btn-primary " (click)="toggleFilter()"
+          *ngIf="!isFiltersEnabled && roleInfo.length>0 ">         
+          &nbsp;{{filterTooltip}}
+        </button>&nbsp;&nbsp;
+        <button class="btn btn-warning " (click)="toggleFilter()"
+          *ngIf="isFiltersEnabled && roleInfo.length>0 ">
+          {{filterTooltip}}
+        </button> 
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <div class="purchase-popup" *ngIf="isAddRoleDetails">
+    <div class="header text-primary">
+      <h4 class="pl-3">Add New Role</h4>
+      <div class="clearfix"></div>
+    </div>
+   
+      <form class="form-horizontal form-label-left" [formGroup]="addRoleForm">
+        <div class="row">
+          <mat-form-field class="col-12 col-sm-6 col-md-3">
+            <input matInput placeholder="Code" formControlName="code" required>
+            <mat-error>
+              <span *ngIf="!addRoleForm.get('code').valid && addRoleForm.get('code').touched">
+                <span *ngIf="addRoleForm.controls['code'].hasError('required') ">
+                  Please enter code
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-12 col-sm-6 col-md-3">
+            <input matInput placeholder="Name" formControlName="roleName" required>
+            <mat-error>
+              <span *ngIf="!addRoleForm.get('roleName').valid && addRoleForm.get('roleName').touched">
+                <span *ngIf="addRoleForm.controls['roleName'].hasError('required') ">
+                  Please enter role name
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="col-12 col-sm-6 col-md-3">
+            <mat-label>Activity Rights</mat-label>
+            <mat-select multiple formControlName="activityRights" required>
+              <mat-option #allRightsSelected (click)="selectAllRights()" [value]="0">Select All</mat-option>              
+              <mat-option *ngFor="let activityright of activityRightsList" (click)="selectRihts(allRightsSelected.viewValue)" [value]="activityright.Id">{{activityright.Name}}</mat-option>
+            </mat-select>
+            <mat-error>
+              <span *ngIf="!addRoleForm.get('activityRights').valid && addRoleForm.get('activityRights').touched">
+                <span *ngIf="addRoleForm.controls['activityRights'].hasError('required') ">
+                  Please select activity rights
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+          <mat-checkbox class="col-12 col-sm-6 col-md-3" style="margin-top: 21px;" formControlName="isActive">Is Active</mat-checkbox>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-12 col-sm-9 col-md-9" required>
+            <textarea matInput placeholder="Description" formControlName="description"></textarea>
+            <mat-error>
+              <span *ngIf="!addRoleForm.get('description').valid && addRoleForm.get('description').touched">
+                <span *ngIf="addRoleForm.controls['description'].hasError('required') ">
+                  Please enter description
+                </span>
+              </span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="ln_solid"></div>
+        <div class="form-group">
+          <div class="float-right">
+            <button type="button" class="btn btn-light text-dark" (click)="onCancleRoleAdding()">Cancel</button>
+            <button type="submit" class="btn btn-primary" (click)="onSaveRoleClick();clicked=true" [disabled]="!addRoleForm.valid||clicked">Save</button>
+          </div>
+        </div>
+      </form>
+      <div class="clearfix"></div>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="row" *ngIf="!isAddRoleDetails && !isEditRoleDetails">
+      <!-- <div class="pull-left" style="padding:4px 10px;border-bottom: 0 none;margin-bottom:10px;">
+        <input type="text" class="form-control" pInputText size="50" placeholder="Search" (input)="dt.filterGlobal($event.target.value, 'contains')"
+          style="width:auto">
+      </div> -->
+      
+    <div class="col-12">
+    <p-table #ro [value]="roleInfo" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand" paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10" rowExpandMode="single" expandableRows="true"
+    dataKey="Id" [globalFilterFields]="['Code','Role','Descrition','IsActive']">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3em"></th>
+          <th [pSortableColumn]="'Code'"> Code
+            <p-sortIcon [field]="'Code'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'Role'"> Role Name
+            <p-sortIcon [field]="'Role'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'Descrition'">Description
+            <p-sortIcon [field]="'Descrition'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'IsActive'">Active
+              <p-sortIcon [field]="'IsActive'"></p-sortIcon>
+            </th>
+          <th *ngIf="ActivityRights.CanManageRoleInfo">Action(s)</th>
+        </tr>
+        <tr *ngIf="isFiltersEnabled">  
+          <th></th>                    
+          <th>
+            <input type="text" class="form-control" maxlength="15"
+              (input)="ro.filter($event.target.value, 'Code', 'contains')">
+          </th>
+          <th>
+            <input type="text" class="form-control" maxlength="50"
+              (input)="ro.filter($event.target.value, 'Role', 'contains')">
+          </th>
+          <th>
+            <input type="text" class="form-control" maxlength="50"
+              (input)="ro.filter($event.target.value, 'Descrition', 'contains')">
+          </th>
+          <th>
+            <input type="text" class="form-control" maxlength="5"
+              (input)="ro.filter($event.target.value, 'IsActive', 'contains')">
+          </th>
+         <th></th>           
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-row let-expanded="expanded">
+        <tr>
+          <td style="width: 3em">
+              <a [pRowToggler]="row" (click)="GetActivityRightsByRoleId(row,expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right')">
+                  <i [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+              </a>
+          </td>
+          <td>{{row.Code}}</td>
+          <td>{{row.RoleName}}</td>
+          <td>{{row.Desc}}</td>
+          <td>{{row.IsActive}}</td>
+          <td >
+            <div *ngIf="ActivityRights.CanManageRoleInfo">
+              <button type="button" class="btn btn-primary btn-circle btn-xs" title="Edit" data-toggle="tooltip" (click)="onEditRoleClick(row)">
+                <i class="mdi mdi-table-edit"></i>
+              </button>
+              <!-- <button type="button" class="btn btn-danger btn-circle btn-xs" title="Delete" data-toggle="tooltip">
+                <i class="mdi mdi-delete"></i>
+              </button> -->
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="rowexpansion">
+          <tr>
+              <td [attr.colspan]="6">
+                  <p-table #dt1 [responsive]="true" [value]="roleActivityRights" [rows]="5" [tableStyle]="{'table-layout':'auto'}" [resizableColumns]="true" columnResizeMode="expand" paginatorDropdownAppendTo="body" [paginator]="true" [rowsPerPageOptions]="[5,10,15]">
+                      <ng-template pTemplate="header">
+                          <tr>
+                              <th class="product-id" [pSortableColumn]="'Name'">Activity Rights
+                                  <p-sortIcon [field]="'Name'"></p-sortIcon>
+                              </th>
+                          </tr>
+                      </ng-template>
+                      <ng-template pTemplate="body" let-expanded="expanded" let-rowdata>
+                          <tr>
+                            <td>{{rowdata.Name}}</td>
+                          </tr>
+                      </ng-template>
+                      <ng-template pTemplate="emptymessage" let-columns>
+                          <tr *ngIf="roleActivityRights == 0">
+                              <td colspan="1" class="ui-datatable-emptymessage text-center">No Records Found</td>
+                          </tr>
+                      </ng-template>
+                  </p-table>
+              </td>
+          </tr>
+      </ng-template>
+      <!-- <div class="text-center" *ngIf="roleInfo.length==0">
+          No Records Found
+      </div> -->
+      <ng-template pTemplate="emptymessage" let-columns>
+        <tr>
+          <td colspan="5" class="ui-datatable-emptymessage text-center">No Records Found</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  </div>
+  <!-- Main Grid End -->
+
+  <!-- Edit Role Form -->
+  <div class="purchase-popup" *ngIf="isEditRoleDetails">
+      <div class="header text-primary">
+        <h4 class="pl-3">Edit Role</h4>
+        <div class="clearfix"></div>
+      </div>
+      <div>
+        <form class="form-horizontal form-label-left" [formGroup]="editRoleForm">
+          <div class="row">
+            <mat-form-field class="col-12 col-sm-6 col-md-3">
+              <input matInput placeholder="Code" [(ngModel)]="rowData.Code" formControlName="code">
+              <mat-error>
+                <span *ngIf="!editRoleForm.get('code').valid && editRoleForm.get('code').touched">
+                  <span *ngIf="editRoleForm.controls['code'].hasError('required') ">
+                    Please enter code
+                  </span>
+                </span>
+              </mat-error>
+            </mat-form-field>
+    
+            <mat-form-field class="col-12 col-sm-6 col-md-3">
+              <input matInput placeholder="Name" [(ngModel)]="rowData.RoleName" formControlName="roleName" required>
+              <mat-error>
+                <span *ngIf="!editRoleForm.get('roleName').valid && editRoleForm.get('roleName').touched">
+                  <span *ngIf="editRoleForm.controls['roleName'].hasError('required') ">
+                    Please enter role name
+                  </span>
+                </span>
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field class="col-12 col-sm-6 col-md-3">
+                <mat-label>Activity Rights</mat-label>
+                <mat-select multiple="true" [(ngModel)]="selectedRightIds" formControlName="activityRights">
+                  <mat-option #allEditRightsSelected (click)="selectEditAllRights()" [value]="0">Select All</mat-option>                                
+                  <mat-option *ngFor="let activityright of activityRightsList" (click)="selectEditRights(allEditRightsSelected.viewValue)" [value]="activityright.Id">{{activityright.Name}}</mat-option>
+                </mat-select>
+                <mat-error>
+                  <span *ngIf="!editRoleForm.get('activityRights').valid && editRoleForm.get('activityRights').touched">
+                    <span *ngIf="editRoleForm.controls['activityRights'].hasError('required') ">
+                      Please select activity rights
+                    </span>
+                  </span>
+                </mat-error>
+              </mat-form-field>
+            <mat-checkbox class="col-12 col-sm-6 col-md-3" style="margin-top: 21px;" [(ngModel)]="rowData.IsActive" formControlName="isActive">Is Active</mat-checkbox>
+          </div>
+          <div class="row">
+            <mat-form-field class="col-12 col-sm-9 col-md-9">
+              <textarea matInput placeholder="Descrition" [(ngModel)]="rowData.Desc" formControlName="description"></textarea>
+              <mat-error>
+                <span *ngIf="!editRoleForm.get('description').valid && editRoleForm.get('description').touched">
+                  <span *ngIf="editRoleForm.controls['description'].hasError('required') ">
+                    Please enter description
+                  </span>
+                </span>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="ln_solid"></div>
+          <div class="form-group">
+            <div class="row float-right">
+              <button type="button" class="btn btn-light text-dark" (click)="onCancleRoleEdit()">Cancel</button>
+              <button type="submit" class="btn btn-primary" (click)="onUpdateRoleClick();clicked=true" [disabled]="!editRoleForm.valid ||!editRoleForm.dirty||clicked">Update</button>
+            </div>
+          </div>
+      </form>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <!-- Edit Role Form End -->
+
+</div>

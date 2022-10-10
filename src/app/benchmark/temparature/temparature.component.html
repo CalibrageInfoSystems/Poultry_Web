@@ -1,0 +1,56 @@
+<div role="main">
+  <div class="page-header">
+    <h3 class="page-title">Temparature Details</h3>
+    <div class="pull-right ml-auto">
+      <button type="button" class="btn btn-primary" title="Export" data-toggle="tooltip" (click)="download()">
+        Export
+      </button>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <div class="row">
+    <div class="col-12">
+      <nav class="nav text-center bg-white">
+        <div class="nav nav-tabs " id="nav-tab" role="tablist">
+          <a class="nav-item nav-link active" id="tab3-tab" data-toggle="tab" href="#tab3" role="tab" aria-controls="tab3" aria-selected="true">List View</a>
+          <a class="nav-item nav-link" id="tab4-tab" data-toggle="tab" href="#tab4" role="tab" aria-controls="tab4" aria-selected="false">Chart View</a>
+        </div>
+      </nav>
+      <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">
+          <div class="pt-3"></div>
+          <p-table [value]="TemparatureData" [tableStyle]="{'table-layout':'auto'}" styleClass="bg-white"
+        [resizableColumns]="true" columnResizeMode="expand">
+          <ng-template pTemplate="header">
+            <tr>
+              <th> Age (Days)</th>
+              <th> Temperature (Celsius) </th>
+              <th> Temperature (Fahrenheit) </th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row let-expanded="expanded">
+            <tr>
+              <td>{{row.StartDay}} - {{row.EndDay}}</td>
+              <td>{{row.StartTemperature}} - {{row.EndTemperature}}</td>
+              <td>{{row.StartTempFahrenheit}} - {{row.EndTempFahrenheit}}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage" let-columns>
+            <tr>
+              <td colspan="3" class="ui-datatable-emptymessage text-center">
+                No Records Found
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+        </div>
+        <div class="tab-pane fade" id="tab4" role="tabpanel" aria-labelledby="tab4-tab">
+          <div class="pt-3"></div>
+          <div class="bg-white">
+          <p-chart type="line" width="100%" height="400px" [data]="data"></p-chart>
+          </div>
+        </div>
+      </div>
+  </div>
+  </div>
+</div>

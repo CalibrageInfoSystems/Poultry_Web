@@ -1,0 +1,139 @@
+<div class="header bg-gradient-warming pb-8 pt-5 pt-md-8">
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-clip-rotate">
+      <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+</div>
+<div class="page-breadcrumb">
+  <div class="row">
+    <div class="col-12 d-flex no-block align-items-center" style="margin-left: 20px;">
+      <h3 class="page-title header">Culled Birds Report</h3>
+    </div>
+</div>
+  <div class="clearfix"></div>
+  
+  <!-- <div class="row"></div> -->
+    <div class="purchase-popup" style="margin-top: 12px;">
+      <form class="form-horizontal form-label-left" [formGroup]="culledBirdsFilterForm">
+        <div class="row">   
+              <mat-form-field class="col-md-2 col-12">
+                <input matInput [matDatepicker]="picker" placeholder="From Date" [(ngModel)]="FROMDATE" formControlName="fromDate" readonly [max]="date"  (dateChange)="onDateChange($event)" >
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+              <mat-form-field class="col-md-2 col-12">
+                <input matInput [matDatepicker]="picker1" placeholder="To Date" [(ngModel)]="date" formControlName="toDate" readonly [min]="FROMDATE"  [max]="date">
+                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                <mat-datepicker #picker1></mat-datepicker>
+              </mat-form-field>    
+              <div class="col-md-3 col-12">
+                <button type="button" class="btn btn-primary" title="Search" data-toggle="tooltip" (click)="GetCullBirdsDetails()" [disabled]="">Search</button>
+                <button type="button" class="btn btn-primary" title="Clear" data-toggle="tooltip" (click)="onClearSearch()" [disabled]="">Clear</button>                
+              </div> 
+              <div class="col-md-5 col-12">
+                <div class="pull-right">
+                  <button type="button" class="btn btn-primary" title="Save" data-toggle="tooltip" [disabled]="culledBirds.length==0"
+                  (click)="download()">Export</button>
+                  <button class="btn btn-primary " (click)="toggleFilter()"   [disabled]="culledBirds.length==0"
+          *ngIf="!isFiltersEnabled">
+          <!-- <i class="fa fa-filter" aria-hidden="true"></i> -->
+          &nbsp;{{filterTooltip}}
+        </button>&nbsp;&nbsp;
+        <button class="btn btn-success" (click)="toggleFilter()"
+          *ngIf="isFiltersEnabled">
+          <!-- <i class="fa fa-filter" aria-hidden="true"></i> -->
+          &nbsp;{{filterTooltip}}
+        </button> 
+               
+                
+              </div>
+                </div>
+              <!-- <button type="button" class="btn btn-primary pull-right" title="Export" data-toggle="tooltip" (click)="download()" [disabled]="culledBirds.length>0">Export</button> -->
+        </div>
+      </form>
+    </div>
+    <div class="row">
+    <div class="col-12 col-md-12 col-xl-12 ">
+      <p-table #cb [value]="culledBirds" [tableStyle]="{'table-layout':'auto'}" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]"
+      sortMode="single">
+        <ng-template pTemplate="header">
+          <tr>              
+            <th [pSortableColumn]="'CulledOn'">Culled On
+              <p-sortIcon [field]="'CulledOn'"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'BatchName'">Batch #
+                <p-sortIcon [field]="'BatchName'"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'DisposedType'">Disposed Type
+              <p-sortIcon [field]="'DisposedType'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'CullBirdsCost'">Total Amount(Rs)
+            <p-sortIcon [field]="'CullBirdsCost'"></p-sortIcon>
+          </th> 
+            <th [pSortableColumn]="'Cost'">Cost (Kg)
+              <p-sortIcon [field]="'Cost'"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'Weight'">Weight (Kg)
+              <p-sortIcon [field]="'Weight'"></p-sortIcon>
+            </th>
+            <th [pSortableColumn]="'CreatedBy'">Created By
+              <p-sortIcon [field]="'CreatedBy'"></p-sortIcon>
+            </th> 
+            <th [pSortableColumn]="'CreatedDate'">Created Date
+              <p-sortIcon [field]="'CreatedDate'"></p-sortIcon>
+            </th>                
+          </tr>
+          <tr *ngIf="isFiltersEnabled">                      
+            <th>
+              <input type="text" class="form-control" maxlength="15"
+                (input)="cb.filter($event.target.value, 'CulledOn', 'contains')">
+            </th>
+            <th>
+              <input type="text" class="form-control" maxlength="50"
+                (input)="cb.filter($event.target.value, 'BatchName', 'contains')">
+            </th>
+            <th>
+              <input type="text" class="form-control" maxlength="50"
+                (input)="cb.filter($event.target.value, 'DisposedType', 'contains')">
+            </th>
+            <th>
+              <input type="text" class="form-control" maxlength="50"
+                (input)="cb.filter($event.target.value, 'CullBirdsCost', 'contains')">
+            </th>
+            <th>
+              <input type="text" class="form-control" maxlength="50"
+                (input)="cb.filter($event.target.value, 'Cost', 'contains')">
+            </th>
+            <th>
+              <input type="text" class="form-control" maxlength="10" (input)="cb.filter($event.target.value, 'Weight', 'contains')">
+            </th>
+            <th>
+              <input type="text" class="form-control" maxlength="50" (input)="cb.filter($event.target.value, 'CreatedBy', 'contains')">
+            </th>
+            <th>
+              <input type="text" class="form-control" maxlength="15"
+                (input)="cb.filter($event.target.value, 'CreatedDate', 'contains')">
+            </th>            
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>            
+            <td>{{row.CulledOn | date:'dd/MM/yyyy'}}</td>
+            <td>{{row.BatchName}}</td>
+            <td>{{row.DisposedType}}</td>
+            <td class="textright">{{row.CullBirdsCost |currency}}</td>
+            <td class="textright">{{row.Cost |currency}}</td>
+            <td class="textright">{{row.Weight |currency}}</td>
+            <td>{{row.CreatedBy}}</td>
+            <td>{{row.CreatedDate | date:'dd/MM/yyyy'}}</td>            
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage" let-columns>
+          <tr>
+            <td colspan="8" class="ui-datatable-emptymessage text-center">No Records Found</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+   
+</div>

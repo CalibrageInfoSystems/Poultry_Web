@@ -1,0 +1,35 @@
+/* New css */
+
+.card.card-img-holder .card-img-absolute{
+    right: -2px !important;
+}
+.stretch-card.grid-margin .card .card-body{
+        padding: 2rem 1.8rem;
+}
+@media (min-width: 768px){
+.grid-margin, .purchase-popup {
+    margin-bottom: 1.5rem;
+}
+}
+.data-fields p small{
+    font-size: 90%;
+    font-weight: 500;
+}
+.text-primary{
+    color: var(--main-color) !important;
+}
+.max-h-60{
+    height: 60px !important;
+}
+.h-90{
+    height: 90px !important;
+}
+/* .page-header h3.page-title:before{
+    content: "";
+    position: absolute;
+    width: 30%;
+    height: 2px;
+    bottom: -20%;
+    left: 0%;
+    border-bottom: 3px solid transparent;
+  } */

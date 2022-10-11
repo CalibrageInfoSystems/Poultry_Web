@@ -27,7 +27,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
   ]
 })
 export class EggSaleRegisterComponent implements OnInit {
-  clicked:boolean = false;
+  clicked: boolean = false;
   @ViewChild('dt') table: Table;
   isDataLoading: boolean;
   isFiltersEnabled = false;
@@ -62,36 +62,27 @@ export class EggSaleRegisterComponent implements OnInit {
   ClassType = DataFactory.ClassType;
   isShowItemNameAdd: boolean;
   selectedFarm: any;
+  buttondisable:boolean=false;
+
 
   constructor(private _dataService: DataService, private toastr: ToastrService, public dialog: MatDialog,
-    private fb: FormBuilder, private conversion: Conversion,private spinner:NgxSpinnerService) {
+    private fb: FormBuilder, private conversion: Conversion, private spinner: NgxSpinnerService) {
     this.userData = JSON.parse(localStorage.getItem("UserInfo"));
     this.ActivityRights = JSON.parse(localStorage.getItem("UserActivityRights"));
     this.selectedFarm = JSON.parse(localStorage.getItem("SelectedFarm"));
 
-    this.AddEggSaleRegForm = fb.group({
-      Saledate: ['', Validators.required],
-      trader: ['', Validators.required],
-      numberofboxes: ['', Validators.required],
-      neccrate: ['', Validators.required],
-      billrate: ['', Validators.required],
-      lorrynumber: [''],
-      remarks: [''],
-      amount: ['', Validators.required],
-      // paymentMode:'',
-      //receivedamount: '',
-      damaged:['']
-    });
+    
     this.EditEggSaleRegForm = fb.group({
       date: ['', Validators.required],
       trader: ['', Validators.required],
-      numberofboxes: ['', Validators.required],
+      numberofboxes: [''],
       neccrate: ['', Validators.required],
       billrate: ['', Validators.required],
       lorrynumber: [''],
       remarks: [''],
       amount: ['', Validators.required],
-      damaged:['']
+      damaged: [''],
+      CrackedEggs: [],
     });
     this.addAmountForm = fb.group({
       Receiveddate: ['', Validators.required],
@@ -105,6 +96,20 @@ export class EggSaleRegisterComponent implements OnInit {
       fromDate: [''],
       toDate: ['']
     });
+    this.AddEggSaleRegForm = this.fb.group({
+      Saledate: ['', Validators.required],
+      trader: ['', Validators.required],
+      numberofboxes: [,[Validators.required]],
+      neccrate: ['', Validators.required],
+      billrate: ['', Validators.required],
+      lorrynumber: [''],
+      remarks: [''],
+      amount: ['', Validators.required],
+      // paymentMode:'',
+      //receivedamount: '',
+      damaged: [''],
+      CrackedEggs: [],
+    });
   }
 
   ngOnInit() {
@@ -117,7 +122,6 @@ export class EggSaleRegisterComponent implements OnInit {
     this.GetTraders();
     this.GetPaymentMode();
   }
-
   //Get all Traders
   GetTraders() {
     this.spinner.show();
@@ -186,8 +190,8 @@ export class EggSaleRegisterComponent implements OnInit {
   onSearchChange(value) {
     debugger
     if (!this.LocalTrader) {
-      this.BillRate = (this.PulpRate == null || value == "")  ? null : (parseFloat(value) - 0.05).toFixed(2);
-      this.Amount = (this.BillRate == null || value == "" )? null : (+this.BillRate * +(this.conversion.BoxestoEggs(+this.AddEggSaleRegForm.value.numberofboxes))).toFixed(2)
+      this.BillRate = (this.PulpRate == null || value == "") ? null : (parseFloat(value) - 0.05).toFixed(2);
+      this.Amount = (this.BillRate == null || value == "") ? null : (+this.BillRate * +(this.conversion.BoxestoEggs(+this.AddEggSaleRegForm.value.numberofboxes))).toFixed(2)
     }
 
 
@@ -300,6 +304,7 @@ export class EggSaleRegisterComponent implements OnInit {
   }
 
   onEditClick(row) {
+    debugger;
     this.isEditingSaleReg = true;
     this.rowData = row;
     this.LocalTrader = this.rowData.Name == 'Local Sales' ? true : false;
@@ -322,6 +327,7 @@ export class EggSaleRegisterComponent implements OnInit {
   }
   //Add Egg Sale Register
   onSaveClick() {
+    debugger;
     var req = {
       "Id": null,
       "TraderId": this.AddEggSaleRegForm.value.trader,
@@ -339,11 +345,13 @@ export class EggSaleRegisterComponent implements OnInit {
       "FarmId": this.selectedFarm.FarmId,
       "Remarks": this.AddEggSaleRegForm.value.remarks,
       "Amount": this.AddEggSaleRegForm.value.amount,
-      "Damaged":this.AddEggSaleRegForm.value.damaged
+      "Damaged": this.AddEggSaleRegForm.value.damaged,
+      "CrackedEggs": this.AddEggSaleRegForm.value.CrackedEggs
+
 
     }
     this.spinner.show();
-    this._dataService.Post('Log/AddUpdateEggSaleRegister/', req)
+    this._dataService.Post('Log/AddUpdateEggSaleRegister', req)
       .subscribe((Data) => {
         this.spinner.hide();
         this.clicked = false;
@@ -361,7 +369,8 @@ export class EggSaleRegisterComponent implements OnInit {
   }
 
   //update egg sle register
-  onUpdateClick() {    
+  onUpdateClick() {
+    debugger;
     var req = {
       "Id": this.rowData.Id,
       "TraderId": this.rowData.TraderId,
@@ -379,7 +388,9 @@ export class EggSaleRegisterComponent implements OnInit {
       "FarmId": this.selectedFarm.FarmId,
       "Remarks": this.rowData.Remarks,
       "Amount": this.rowData.BillAmount,
-      "Damaged":this.rowData.Damaged
+      "Damaged": this.rowData.Damaged,
+      "CrackedEggs": this.rowData.CrackedEggs
+
     }
     this.spinner.show();
     this._dataService.Post('Log/AddUpdateEggSaleRegister/', req)
@@ -535,14 +546,22 @@ export class EggSaleRegisterComponent implements OnInit {
       this.EditEggSaleRegForm.get('amount').setValue(null);
       this.EditEggSaleRegForm.get('billrate').setValue(null);
     }
-    
     this.LocalTrader = this.traderDetails.Name == 'Local Sales' ? true : false;
+    debugger;
+    
     this.BillRate = this.LocalTrader == true ? null : this.PulpRate == null ? null : ((+this.PulpRate) - (+this.traderDetails.Commission)).toFixed(2);
     this.Amount = (this.BillRate == null || this.AddEggSaleRegForm.value.numberofboxes == null) ? null :
-      ((+this.BillRate) * (+ (this.conversion.BoxestoEggs(+this.AddEggSaleRegForm.value.numberofboxes)))).toFixed(2)
-
-  }
-
+      ((+this.BillRate) * (+ (this.conversion.BoxestoEggs(+this.AddEggSaleRegForm.value.numberofboxes)))).toFixed(2);
+      if(this.LocalTrader){
+        this.AddEggSaleRegForm.get('numberofboxes').clearValidators();
+        this.AddEggSaleRegForm.get('numberofboxes').updateValueAndValidity();
+      }
+      else{
+        this.AddEggSaleRegForm.get('numberofboxes').setValidators([Validators.required]);
+      this.AddEggSaleRegForm.get('numberofboxes').updateValueAndValidity();
+      }
+      this.validatebutton(); 
+    }
 
 
   onCartonsChange(cartons) {
@@ -553,7 +572,7 @@ export class EggSaleRegisterComponent implements OnInit {
     }
 
     else {
-      this.BillRate = (this.Amount == null || this.AddEggSaleRegForm.value.numberofboxes == "") ? null : (+ ( +this.Amount)/(+this.conversion.BoxestoEggs(cartons))).toFixed(2);
+      this.BillRate = (this.Amount == null || this.AddEggSaleRegForm.value.numberofboxes == "") ? null : (+ (+this.Amount) / (+this.conversion.BoxestoEggs(cartons))).toFixed(2);
     }
   }
 
@@ -562,29 +581,66 @@ export class EggSaleRegisterComponent implements OnInit {
       this.rowData.BillAmount = (this.rowData.BillRate == null || this.EditEggSaleRegForm.value.numberofboxes == "") ? null : (+this.conversion.BoxestoEggs(cartons) * +this.rowData.BillRate).toFixed(2);
     }
     else {
-      this.rowData.BillRate = (this.rowData.BillAmount == null || this.EditEggSaleRegForm.value.numberofboxes == "") ? null : ( +this.rowData.BillAmount / +(this.conversion.BoxestoEggs(cartons))).toFixed(2);
+      this.rowData.BillRate = (this.rowData.BillAmount == null || this.EditEggSaleRegForm.value.numberofboxes == "") ? null : (+this.rowData.BillAmount / +(this.conversion.BoxestoEggs(cartons))).toFixed(2);
     }
   }
 
   onBillRateChange(value) {
+    debugger
     if (!this.isEditingSaleReg) {
       this.Amount = (this.BillRate == null || this.AddEggSaleRegForm.value.numberofboxes == null || value == "") ? null : (+this.conversion.BoxestoEggs(+this.AddEggSaleRegForm.value.numberofboxes) * +this.BillRate).toFixed(2);
     }
     else {
-      this.rowData.BillAmount = (this.rowData.BillAmount == null || this.EditEggSaleRegForm.value.numberofboxes == null || value == "") ? null : (+this.conversion.BoxestoEggs(+this.EditEggSaleRegForm.value.numberofboxes) * +this.rowData.BillRate).toFixed(2);
+      this.rowData.BillAmount = (+this.conversion.BoxestoEggs(+this.EditEggSaleRegForm.value.numberofboxes) *(+this.rowData.BillRate)).toFixed(2);
     }
 
   }
 
-  onAmountChange() {
+
+  onCrackesChange() {
+    debugger;
     if (!this.isEditingSaleReg) {
-      this.BillRate = (this.Amount == null || this.AddEggSaleRegForm.value.numberofboxes == null) ? null : ((+this.Amount) / +(this.conversion.BoxestoEggs(+this.AddEggSaleRegForm.value.numberofboxes))).toFixed(2);
+      this.BillRate = ((+this.Amount) / +(this.conversion.BoxestoEggs(+this.AddEggSaleRegForm.value.numberofboxes) + (this.conversion.BoxestoEggs(this.AddEggSaleRegForm.value.CrackedEggs)))).toFixed(2);
+    }
+    else {
+      this.rowData.BillRate =  ((+this.rowData.BillAmount) / +(this.conversion.BoxestoEggs(+this.EditEggSaleRegForm.value.numberofboxes) +(this.conversion.BoxestoEggs(this.EditEggSaleRegForm.value.CrackedEggs)))).toFixed(2);
+    }
+    this.validatebutton(); 
+  }
+
+  validatebutton(){
+    debugger;
+    if(this.isEditingSaleReg==false){     
+      let noOfBoxes=this.AddEggSaleRegForm.value.numberofboxes;
+      let crackEggs=this.AddEggSaleRegForm.value.CrackedEggs;
+      if(noOfBoxes!=null&&noOfBoxes!=""|| crackEggs!=null&&crackEggs!=""){
+        this.buttondisable=true;
+      }else{
+        this.buttondisable=false;
+      }
+    }
+    else{
+      let noOfBoxesEdit=this.EditEggSaleRegForm.value.numberofboxes;
+      let crackEggsEdit=this.EditEggSaleRegForm.value.CrackedEggs;
+  
+      if(noOfBoxesEdit!=null&&noOfBoxesEdit!=""|| crackEggsEdit!=null&&crackEggsEdit!=""){
+        this.buttondisable=false;
+      }else{
+        this.buttondisable=true;
+      }
+    }
+  }
+  onAmountChange() {
+    debugger;
+    if (!this.isEditingSaleReg) {
+      this.BillRate = (this.Amount == null || this.AddEggSaleRegForm.value.numberofboxes == null) ? null : ((+this.Amount) / +((this.conversion.BoxestoEggs(+this.AddEggSaleRegForm.value.numberofboxes)) + (this.conversion.BoxestoEggs(+this.AddEggSaleRegForm.value.crackedeggs)))).toFixed(2);
     }
     else {
       this.rowData.BillRate = (this.rowData.BillAmount == null || this.EditEggSaleRegForm.value.numberofboxes == null) ? null :
         ((+this.rowData.BillAmount) / +(this.conversion.BoxestoEggs(+this.EditEggSaleRegForm.value.numberofboxes))).toFixed(2);
     }
   }
+  
 
   DateChangeEvent(item) {
     var req = {
@@ -604,8 +660,8 @@ export class EggSaleRegisterComponent implements OnInit {
       }
     })
   }
-   //TOGGLE FILTER
-   toggleFilter = function () {
+  //TOGGLE FILTER
+  toggleFilter = function () {
     this.isFiltersEnabled = !this.isFiltersEnabled;
     if (this.isFiltersEnabled) {
       this.filterTooltip = "Disable Filters";
@@ -617,7 +673,7 @@ export class EggSaleRegisterComponent implements OnInit {
       this.table.reset();
       this.table.sortField = this.sortField;
       this.table.sortOrder = this.sortOrder;
-      
+
     }
   };
 }

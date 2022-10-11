@@ -110,7 +110,7 @@ export class AppComponent {
     localStorage.removeItem("SelectedFarm"); 
     localStorage.removeItem("BatchInfo");
     // window.location.href = '/Poultry/login';   
-    window.location.href = '/PoultryWeb_Test/login'; 
+    window.location.href = '/Poultry/Web/login'; 
   }
   getFarmDeatils(): void {
     this._dataService.Get('CompanyInfo/GetFarmInfoById/',this.SelectedFarm.FarmId).subscribe((Data) => {

@@ -1,14 +1,23 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { DateAdapter, MatDialogRef, MAT_DATE_FORMATS, MAT_DIALOG_DATA } from '@angular/material';
 import { ToastrService } from 'ngx-toastr';
 import { DataService } from 'src/app/shared/data.service';
 import { DataFactory } from 'src/app/shared/dataFactory';
+import { AppDateAdapter, APP_DATE_FORMATS } from 'src/app/shared/date.adaptor';
 
 @Component({
   selector: 'app-feed-transaction-dialog',
   templateUrl: './feed-transaction-dialog.component.html',
-  styleUrls: ['./feed-transaction-dialog.component.css']
+  styleUrls: ['./feed-transaction-dialog.component.css'],
+  providers: [
+    {
+      provide: DateAdapter, useClass: AppDateAdapter
+    },
+    {
+      provide: MAT_DATE_FORMATS, useValue: APP_DATE_FORMATS
+    }
+  ]
 })
 export class FeedTransactionDialogComponent implements OnInit {
 

@@ -109,7 +109,7 @@
   </div>
     <form class="form col-12" [formGroup]="addFeedGrinding">    
     <p-dataTable #fg [value]="feedGrindingList" [tableStyle]="{'table-layout':'auto'}" styleClass="bg-white" [resizableColumns]="true" columnResizeMode="expand" [editable]="true" 
-     [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" sortField="FGDate" sortOrder="-1" >    
+     [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" sortField="['FGDate','AmountPerTonne','Tonnes']" sortOrder="-1" >    
     <p-column field="FGDate" header="Date" [sortable]="true"  [filter]="isFiltersEnabled">
       <ng-template let-row="rowData" pTemplate="body">
         <div *ngIf="!row.isEditable">{{row.FGDate | date:'dd/MM/yyyy'}}</div>

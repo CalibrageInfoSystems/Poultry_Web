@@ -391,7 +391,7 @@ export class FeedPurchaseComponent implements OnInit {
             this.paidAmount = Math.round(sump).toFixed(2)
             this.totalOutstandingAmount = this.feedPurchaseList.feedPurchaseDetails == null ? 0 : this.feedPurchaseList.feedPurchaseDetails.filter(
               pament => pament.PaymentStatusId === this.PaymentAmounts.OutstandingAmount);
-            this.totalOutstandingAmount.forEach(a => sumo += a.FinalAmount);
+            this.totalOutstandingAmount.forEach(a => sumo += a.DueAmount);
             this.outstandingAmount = Math.round(sumo).toFixed(2)
           }
         }
@@ -431,7 +431,7 @@ export class FeedPurchaseComponent implements OnInit {
           this.totalOutstandingSummaryAmount = 0;
           if (this.paymentSummary != null && this.paymentSummary.length > 0) {
             for (var i = 0, len = this.paymentSummary.length; i < len; i++) {
-              this.totalOutstandingSummaryAmount += this.paymentSummary[i].TotalAmount;  // Iterate over your first array and then grab the second element add the values up
+              this.totalOutstandingSummaryAmount += this.paymentSummary[i].DueAmount;  // Iterate over your first array and then grab the second element add the values up
             }
           }
         }

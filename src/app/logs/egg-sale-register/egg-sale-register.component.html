@@ -163,7 +163,7 @@
             <div class="pull-right">
               <button type="button" class="btn btn-light text-dark" (click)="onCancleAddClick()">Cancel</button>
               <button type="submit" class="btn btn-primary" (click)="onSaveClick();clicked=true"
-                [disabled]="!AddEggSaleRegForm.valid||buttondisable">Save</button>
+                [disabled]="!AddEggSaleRegForm.valid||!buttondisable">Save</button>
             </div>
           </div>
         </div>

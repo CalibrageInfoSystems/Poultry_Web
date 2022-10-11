@@ -764,7 +764,17 @@
           </span>
         </mat-error>
       </mat-form-field>    
-    
+      <mat-form-field class="col-md-12"  >
+        <input matInput placeholder="Bill Rate"  [(ngModel)]="ManageData.BillRate" formControlName="billRate"  maxlength="10" required
+        oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+        <mat-error>
+          <span *ngIf="!manageRateForm.get('billRate').valid && manageRateForm.get('billRate').touched">
+            <span *ngIf="manageRateForm.controls['billRate'].hasError('required') ">
+              Please enter Pulp Rate
+            </span>
+          </span>
+        </mat-error>
+      </mat-form-field> 
     <p-footer>
         <div class="col-12">
             <div class="float-right ml-auto">

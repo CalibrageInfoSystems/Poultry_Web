@@ -574,6 +574,7 @@ export class EggSaleRegisterComponent implements OnInit {
     else {
       this.BillRate = (this.Amount == null || this.AddEggSaleRegForm.value.numberofboxes == "") ? null : (+ (+this.Amount) / (+this.conversion.BoxestoEggs(cartons))).toFixed(2);
     }
+    this.validatebutton(); 
   }
 
   onEditCartonsChange(cartons) {

@@ -104,6 +104,7 @@ export class ViewlogsComponent implements OnInit {
       cullRate: ['', Validators.required],
       neccRate: ['', Validators.required],
       pulpRate: ['', Validators.required],
+      billRate: ['', Validators.required],
     })
   }
 
@@ -568,6 +569,7 @@ export class ViewlogsComponent implements OnInit {
       "CullRate": this.manageRateForm.value.cullRate,
       "NECCRate": this.manageRateForm.value.neccRate,
       "PulpRate": this.manageRateForm.value.pulpRate,
+      "BillRate": this.manageRateForm.value.BillRate,
       "CreatedByUserId": (this.ManageData.CreatedByUserId == null || this.ManageData.CreatedByUserId == undefined) ? this.userData.Id : this.ManageData.CreatedByUserId,
       "CreatedDate": (this.ManageData.CreatedDate == null || this.ManageData.CreatedDate == undefined) ? new Date() : this.ManageData.CreatedDate,
       "UpdatedByUserId": this.userData.Id,

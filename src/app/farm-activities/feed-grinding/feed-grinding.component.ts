@@ -194,7 +194,7 @@ export class FeedGrindingComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result != undefined) {
         this.spinner.show();
-        this._dataService.Delete('FeedGrinding/DeleteFeedGrindingDetails', row.Id)
+        this._dataService.Deleteincfeed('FeedGrinding/DeleteFeedGrindingDetails', row.Id)
           .subscribe((Data) => {
             this.spinner.hide();
             if (Data.IsSuccess) {

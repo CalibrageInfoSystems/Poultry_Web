@@ -45,6 +45,7 @@ export class EggSaleRegisterComponent implements OnInit {
   req: any;
   salesRegList: any = [];
   traders: any;
+  activetraders: any;
   isAddingSaleReg: boolean = false;
   isEditingSaleReg: boolean = false;
   isAddAmount: boolean = false;
@@ -129,7 +130,9 @@ export class EggSaleRegisterComponent implements OnInit {
       .subscribe((Data) => {
         this.spinner.hide();
         if (Data.IsSuccess) {
-          this.traders = Data.ListResult;
+          debugger;
+          this.activetraders = Data.ListResult;
+          this.traders=Data.ListResult.filter(x => x.IsActive == true);
         }
         else {
           this.toastr.error("An error has occured");

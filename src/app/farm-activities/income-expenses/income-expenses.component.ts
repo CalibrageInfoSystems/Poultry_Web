@@ -111,7 +111,8 @@ export class IncomeExpensesComponent implements OnInit {
   }
 
   // On Delete Expense click
-  onDeleteIncomeDetailsClick(row) {    
+  onDeleteIncomeDetailsClick(row) {   
+    debugger; 
     let dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: { msg: "Are you sure you want to delete ?" },
       width: 'auto',
@@ -120,7 +121,7 @@ export class IncomeExpensesComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {      
       if (result != undefined) {
         this.spinner.show();              
-        this.dataService.Delete('IncomeExpenses/DeleteIncomeExpenses', row.Id)
+        this.dataService.Deleteincfeed('IncomeExpenses/DeleteIncomeExpenses', row.Id)
           .subscribe((Data) => {
             this.spinner.hide();  
             if (Data.IsSuccess) {

@@ -63,6 +63,14 @@ return this.http.delete<any>(AppConfig.serviceBase_Url.base_Url + url + '/' + id
     catchError(this.handleError<any>(AppConfig.serviceBase_Url.base_Url + url))
 );
 }
+/** DELETE: delete the hero from the server */
+Deleteincfeed(url: string, id: number): Observable<any> {
+    return this.http.get<any>(AppConfig.serviceBase_Url.base_Url + url + '/' + id)
+    .pipe(
+        tap(data => { console.log(AppConfig.serviceBase_Url.base_Url + url + ' successful'); }),
+        catchError(this.handleError<any>(AppConfig.serviceBase_Url.base_Url + url))
+    );
+    }
 
 /** PUT: update the hero on the server */
 Put(url: string, req: any): Observable<any> {

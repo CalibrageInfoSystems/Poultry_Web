@@ -9,7 +9,7 @@ export const AppConfig: IAppConfig = {
     serviceBase_Url: {  
       //Live
       // base_Url:'http://183.82.111.111/PoultryAPI/api/'
-          // base_Url:'http://localhost:5467/api/' 
+          //base_Url:'http://localhost:5467/api/' 
 
       //Test
       //  base_Url:'http://183.82.111.111/PoultryAPI_Test/api/'  

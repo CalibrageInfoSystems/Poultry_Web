@@ -125,6 +125,7 @@ export class EggSaleRegisterComponent implements OnInit {
   }
   //Get all Traders
   GetTraders() {
+    debugger;
     this.spinner.show();
     this._dataService.GetAll('CompanyInfo/GetTraderInfoById/' + null + '/' + this.selectedFarm.FarmId)
       .subscribe((Data) => {
@@ -132,7 +133,7 @@ export class EggSaleRegisterComponent implements OnInit {
         if (Data.IsSuccess) {
           debugger;
           this.activetraders = Data.ListResult;
-          this.traders=Data.ListResult.filter(x => x.IsActive == true);
+          this.traders=Data.ListResult.filter(x => x.IsActive != 'False');
         }
         else {
           this.toastr.error("An error has occured");

@@ -181,7 +181,7 @@
             <mat-form-field class="form-group">
               <mat-label aria-required="true">Trader</mat-label>
               <mat-select formControlName="trader">
-                <mat-option *ngFor="let trader of traders" [value]="trader.Id">
+                <mat-option *ngFor="let trader of activetraders" [value]="trader.Id">
                   {{trader.Name}}
                 </mat-option>
               </mat-select>

@@ -55,6 +55,8 @@ export class MonthlybalancereportComponent implements OnInit {
   minDate: Moment;
   MMonth: number;
   totalData: any = {};
+  averagerate:number;
+  averageproduction:number;
   financialYears: string[];
   currentFY: string;
   selectedRecord: Number;
@@ -118,9 +120,11 @@ export class MonthlybalancereportComponent implements OnInit {
         this.totalData.FeedAmount = sumTA;
         this.totalData.NumberofEggs = sumNG;
         this.totalData.BillRate = sumBR;
+        this.averagerate=sumBR/(this.monthlyReportsList.length);
         this.totalData.EggsAmount = sumTAM;
         this.totalData.DifferenceAmount = sumDA;
         this.totalData.Production = sumP;
+        this.averageproduction=sumP/(this.monthlyReportsList.length);
         this.totalData.Mortality = sumM;
       }
       else {

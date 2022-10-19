@@ -543,6 +543,7 @@ export class EggSaleRegisterComponent implements OnInit {
   }
 
   onSelectTraderType(event) {
+    debugger;
     this.traderDetails = {};
     var trader = this.traders.filter(t => t.Id == event)
     this.traderDetails = trader[0];
@@ -553,7 +554,8 @@ export class EggSaleRegisterComponent implements OnInit {
     this.LocalTrader = this.traderDetails.Name == 'Local Sales' ? true : false;
     debugger;
     
-    this.BillRate = this.LocalTrader == true ? null : this.PulpRate == null ? null : ((+this.PulpRate) - (+this.traderDetails.Commission)).toFixed(2);
+    //this.BillRate = this.LocalTrader == true ? null : this.PulpRate == null ? null : ((+this.PulpRate) - (+this.traderDetails.Commission)).toFixed(2);
+    this.BillRate = this.LocalTrader == true ? null : this.BillRate.toFixed(2);
     this.Amount = (this.BillRate == null || this.AddEggSaleRegForm.value.numberofboxes == null) ? null :
       ((+this.BillRate) * (+ (this.conversion.BoxestoEggs(+this.AddEggSaleRegForm.value.numberofboxes)))).toFixed(2);
       if(this.LocalTrader){
@@ -648,16 +650,20 @@ export class EggSaleRegisterComponent implements OnInit {
   
 
   DateChangeEvent(item) {
+    debugger;
     var req = {
       "FarmId": this.selectedFarm.FarmId,
       "date": item.value
     }
     this._dataService.Post('Log/GetManageRateDetailsByDate', req).subscribe(res => {
       if (res.IsSuccess) {
+        debugger;
         var Data = res.Result == null ? {} : res.Result;
         this.PulpRate = Data.PulpRate;
+        this.BillRate=Data.BillRate;
         if ((this.AddEggSaleRegForm.value.trader != null && !this.LocalTrader)) {
-          this.BillRate = this.PulpRate == null ? null : +this.PulpRate - +this.traderDetails.Commission;
+          //this.BillRate = this.PulpRate == null ? null : +this.PulpRate - +this.traderDetails.Commission;
+          this.BillRate=Data.BillRate;
           this.Amount = (this.BillRate == null || this.AddEggSaleRegForm.value.numberofboxes == null) ? null :
             ((+this.BillRate) * (+ (this.conversion.BoxestoEggs(+this.AddEggSaleRegForm.value.numberofboxes)))).toFixed(2)
         }

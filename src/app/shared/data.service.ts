@@ -46,6 +46,7 @@ Get(url: string, id: number): Observable<any> {
 Post(url: string, req: any): Observable<any> {
      console.log(AppConfig.serviceBase_Url.base_Url)
      console.log(AppConfig.serviceBase_Url.base_Url + url)
+     debugger;
     return this.http.post<any>(AppConfig.serviceBase_Url.base_Url + url, req, httpOptions)
     .pipe(
         tap(data => { console.log(AppConfig.serviceBase_Url.base_Url + url + ' successful'); }),
